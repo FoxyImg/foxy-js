@@ -11,7 +11,7 @@ import 'vue-json-pretty/lib/styles.css';
 import Tabs from "@/components/UI/Tabs.vue";
 import Tab from "@/components/UI/Tab.vue";
 
-import {CropOptions, CropTagOptions, DebugOptions, InterestingOptions} from "@/types/options";
+import {CropOptions, InterestingOptions} from "@/types/options";
 import EditorPanel from "@/components/editors/EditorPanel.vue";
 import {useStorage} from "@vueuse/core";
 import Icon from "@/components/UI/Icon.vue";
@@ -22,6 +22,8 @@ import SmallLabel from "@/components/UI/SmallLabel.vue";
 import signHMAC256 from "@/utils/sign";
 import TagsParam from "@/components/editors/TagsParam.vue";
 import ColorParam from "@/components/editors/ColorParam.vue";
+import {DefaultImageParams, type ImageParams} from "@/types/params";
+import buildUrl from "@/utils/url-builder";
 
 const url = useStorage('foxy_url', 'http://localhost:8080');
 const accessKey = useStorage('foxy_access_key', 'c8emk0kejqj8rkpn');
@@ -38,49 +40,8 @@ onMounted(async () => {
 	await fetchImageMeta();
 });
 
-const imageParams = reactive<{
-	crop: string[],
-	width: number,
-	height: number,
-	faceIndex: number,
-	personIndex: number,
-	smartMode: string|null,
-
-	backgroundColor: string|null,
-
-	debugFaces: boolean,
-	debugAllFaces: boolean,
-	debugPeople: boolean,
-	debugAllPeople: boolean,
-	debugOtherLabels: boolean,
-
-	disableSourceCache: boolean,
-	disableMetaCache: boolean,
-	disableRenderCache: boolean,
-}>({
-	crop: [],
-	width: 0,
-	height: 0,
-	faceIndex: -1,
-	personIndex: -1,
-	smartMode: null,
-
-	backgroundColor: null,
-
-	debugFaces: false,
-	debugAllFaces: false,
-	debugPeople: false,
-	debugAllPeople: false,
-	debugOtherLabels: false,
-
-	disableSourceCache: false,
-	disableMetaCache: false,
-	disableRenderCache: false,
-});
-
+const imageParams = reactive<ImageParams>(JSON.parse(JSON.stringify(DefaultImageParams)));
 const imageMeta = ref<any>(null);
-
-
 
 const faceCount = computed(() => {
 	if (!imageMeta.value) {
@@ -125,83 +86,7 @@ async function buildImageUrl() {
 		return;
 	}
 
-	let encodedKey = btoa('/'+imageKey.value);
-	let newUrl = `/${accessKey.value}/${encodedKey}`;
-
-	if (imageParams.crop.length > 0) {
-		newUrl += `/crop:${imageParams.crop.join(',')}`;
-	}
-
-	if (imageParams.width > 0) {
-		newUrl += `/w:${imageParams.width}`;
-	}
-
-	if (imageParams.height > 0) {
-		newUrl += `/h:${imageParams.height}`;
-	}
-
-	if (imageParams.crop.includes('face') && imageParams.faceIndex > -1) {
-		newUrl += `/face:${imageParams.faceIndex}`;
-	}
-
-	if (imageParams.crop.includes('person') && imageParams.personIndex > -1) {
-		newUrl += `/person:${imageParams.personIndex}`;
-	}
-
-	if (imageParams.crop.includes('smart') && imageParams.smartMode) {
-		newUrl += `/smart:${imageParams.smartMode}`;
-	}
-
-	if (imageParams.backgroundColor) {
-		newUrl += `/bg:${imageParams.backgroundColor}`;
-	}
-
-	const debug:string[] = [];
-
-	if (imageParams.debugFaces) {
-		debug.push('faces');
-	}
-
-	if (imageParams.debugAllFaces) {
-		debug.push('all-faces');
-	}
-
-	if (imageParams.debugPeople) {
-		debug.push('people');
-	}
-
-	if (imageParams.debugAllPeople) {
-		debug.push('all-people');
-	}
-
-	if (imageParams.debugOtherLabels) {
-		debug.push('other-labels');
-	}
-
-	if (debug.length > 0) {
-		newUrl += `/debug:${debug.join(',')}`;
-	}
-
-	const nocache:string[] = [];
-
-	if (imageParams.disableSourceCache) {
-		nocache.push('source');
-	}
-
-	if (imageParams.disableMetaCache) {
-		nocache.push('meta');
-	}
-
-	if (imageParams.disableRenderCache) {
-		nocache.push('render');
-	}
-
-	if (nocache.length > 0) {
-		newUrl += `/nocache:${nocache.join(',')}`;
-	}
-
-	const sig = await signHMAC256(secret.value, newUrl);
-	currentImageUrl.value = url.value + newUrl + `?_=${new Date().getTime()}&s=`+sig;
+	currentImageUrl.value = await buildUrl(url.value, accessKey.value, secret.value, imageKey.value, imageParams);
 }
 
 const debouncedBuildImageUrl = pDebounce(buildImageUrl, 500);
@@ -309,15 +194,18 @@ const {
 			<div class="absolute top-0 left-0 w-full h-full overflow-y-auto bg-neutral-100">
 				<div class="p-3 flex flex-col gap-5">
 					<EditorPanel title="Cropping / Resizing">
-						<TagsParam title="Crop Mode" :options="CropTagOptions" v-model="imageParams.crop" placeholder="Select 1 or more crop modes" />
+						<TagsParam title="Crop Mode" :options="CropOptions" v-model="imageParams.crop" placeholder="Select 1 or more crop modes" />
 						<SliderParam title="Width" v-model="imageParams.width" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
 						<SliderParam title="Height" v-model="imageParams.height" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
+						<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Width" v-model="imageParams.aspectRatioWidth" :min="0" :max="128" :step="1" :default="0" default-label="None" />
+						<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Height" v-model="imageParams.aspectRatioHeight" :min="0" :max="128" :step="1" :default="0" default-label="None" />
 						<SliderParam v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Index" v-model="imageParams.faceIndex" :min="-1" :max="faceCount - 1" :step="1" :default="-1" default-label="All Faces" />
 						<SliderParam v-if="imageParams.crop.includes('person') && faceCount > 0" title="Person Index" v-model="imageParams.personIndex" :min="-1" :max="peopleCount -1" :step="1" :default="-1" default-label="All People" />
 						<SelectParam v-if="imageParams.crop.includes('smart')" title="Smart Crop Mode" v-model="imageParams.smartMode" :default="null" :options="InterestingOptions" />
+					</EditorPanel>
+					<EditorPanel title="Image Attributes">
 						<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
 					</EditorPanel>
-
 				</div>
 			</div>
 		</div>

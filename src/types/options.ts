@@ -1,12 +1,4 @@
-export const CropOptions = {
-	face: 'Faces',
-	person: 'People',
-	smart: 'Smart',
-	fill: 'Fill',
-	fit: 'Fit',
-}
-
-export const CropTagOptions = [
+export const CropOptions = [
 	{ value: "face", label: "Faces" },
 	{ value: "person", label: "People" },
 	{ value: "smart", label: "Smart" },
