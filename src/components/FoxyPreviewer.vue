@@ -11,7 +11,7 @@ import 'vue-json-pretty/lib/styles.css';
 import Tabs from "@/components/UI/Tabs.vue";
 import Tab from "@/components/UI/Tab.vue";
 
-import {CropOptions, DebugOptions} from "@/types/options";
+import {CropOptions, CropTagOptions, DebugOptions, InterestingOptions} from "@/types/options";
 import EditorPanel from "@/components/editors/EditorPanel.vue";
 import {useStorage} from "@vueuse/core";
 import Icon from "@/components/UI/Icon.vue";
@@ -20,6 +20,8 @@ import useImageLoader from "@/composables/image-loader";
 import ToggleParam from "@/components/editors/ToggleParam.vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
 import signHMAC256 from "@/utils/sign";
+import TagsParam from "@/components/editors/TagsParam.vue";
+import ColorParam from "@/components/editors/ColorParam.vue";
 
 const url = useStorage('foxy_url', 'http://localhost:8080');
 const accessKey = useStorage('foxy_access_key', 'c8emk0kejqj8rkpn');
@@ -37,11 +39,14 @@ onMounted(async () => {
 });
 
 const imageParams = reactive<{
-	crop: string|null,
+	crop: string[],
 	width: number,
 	height: number,
 	faceIndex: number,
 	personIndex: number,
+	smartMode: string|null,
+
+	backgroundColor: string|null,
 
 	debugFaces: boolean,
 	debugAllFaces: boolean,
@@ -53,11 +58,14 @@ const imageParams = reactive<{
 	disableMetaCache: boolean,
 	disableRenderCache: boolean,
 }>({
-	crop: null,
+	crop: [],
 	width: 0,
 	height: 0,
 	faceIndex: -1,
 	personIndex: -1,
+	smartMode: null,
+
+	backgroundColor: null,
 
 	debugFaces: false,
 	debugAllFaces: false,
@@ -120,8 +128,8 @@ async function buildImageUrl() {
 	let encodedKey = btoa('/'+imageKey.value);
 	let newUrl = `/${accessKey.value}/${encodedKey}`;
 
-	if (imageParams.crop) {
-		newUrl += `/crop:${imageParams.crop}`;
+	if (imageParams.crop.length > 0) {
+		newUrl += `/crop:${imageParams.crop.join(',')}`;
 	}
 
 	if (imageParams.width > 0) {
@@ -132,12 +140,20 @@ async function buildImageUrl() {
 		newUrl += `/h:${imageParams.height}`;
 	}
 
-	if (imageParams.crop === 'face' && imageParams.faceIndex > -1) {
+	if (imageParams.crop.includes('face') && imageParams.faceIndex > -1) {
 		newUrl += `/face:${imageParams.faceIndex}`;
 	}
 
-	if (imageParams.crop === 'person' && imageParams.personIndex > -1) {
+	if (imageParams.crop.includes('person') && imageParams.personIndex > -1) {
 		newUrl += `/person:${imageParams.personIndex}`;
+	}
+
+	if (imageParams.crop.includes('smart') && imageParams.smartMode) {
+		newUrl += `/smart:${imageParams.smartMode}`;
+	}
+
+	if (imageParams.backgroundColor) {
+		newUrl += `/bg:${imageParams.backgroundColor}`;
 	}
 
 	const debug:string[] = [];
@@ -226,18 +242,19 @@ const {
 			<div class="flex-1 relative">
 				<template v-if="currentTab === 'preview' || !imageMeta">
 					<div class="group absolute left-0 top-0 right-0 bottom-0 flex items-center justify-center preview-area">
-						<div v-if="error" class="absolute left-1/2 top-1/2 -translate-x-1/2">
-							<Icon name="broken" class="fill-red-600 w-12 h-auto" />
+						<div v-if="error" class="absolute left-1/2 top-1/2 -translate-x-1/2 flex flex-col items-center justify-center bg-white/15 p-2 rounded-lg backdrop-blur overflow-hidden transform-gpu">
+							<Icon name="broken" class="fill-red-600 w-16 h-auto" />
+							<div class="font-bold">Oops.</div>
 						</div>
-						<div v-else-if="isLoading" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-							<LoaderFeedback class=""/>
-						</div>
-						<template v-else-if="isLoaded && currentImageUrl">
+						<template v-else-if="currentImageUrl">
 							<img
 								alt="Preview Image"
 								class="max-w-full max-h-full"
 								:src="currentImageUrl">
 						</template>
+						<div v-if="isLoading" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+							<LoaderFeedback class=""/>
+						</div>
 					</div>
 					<div class="absolute left-0 bottom-0 right-0 flex items-center p-1.5">
 						<div class="flex-1 flex items-center justify-start gap-3">
@@ -292,11 +309,13 @@ const {
 			<div class="absolute top-0 left-0 w-full h-full overflow-y-auto bg-neutral-100">
 				<div class="p-3 flex flex-col gap-5">
 					<EditorPanel title="Cropping / Resizing">
-						<SelectParam title="Crop" v-model="imageParams.crop" :default="null" :options="CropOptions" />
+						<TagsParam title="Crop Mode" :options="CropTagOptions" v-model="imageParams.crop" placeholder="Select 1 or more crop modes" />
 						<SliderParam title="Width" v-model="imageParams.width" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
 						<SliderParam title="Height" v-model="imageParams.height" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
-						<SliderParam title="Face Index" v-model="imageParams.faceIndex" :min="-1" :max="faceCount" :step="1" :default="-1" default-label="All Faces" />
-						<SliderParam title="Person Index" v-model="imageParams.personIndex" :min="-1" :max="peopleCount" :step="1" :default="-1" default-label="All People" />
+						<SliderParam v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Index" v-model="imageParams.faceIndex" :min="-1" :max="faceCount - 1" :step="1" :default="-1" default-label="All Faces" />
+						<SliderParam v-if="imageParams.crop.includes('person') && faceCount > 0" title="Person Index" v-model="imageParams.personIndex" :min="-1" :max="peopleCount -1" :step="1" :default="-1" default-label="All People" />
+						<SelectParam v-if="imageParams.crop.includes('smart')" title="Smart Crop Mode" v-model="imageParams.smartMode" :default="null" :options="InterestingOptions" />
+						<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
 					</EditorPanel>
 
 				</div>
