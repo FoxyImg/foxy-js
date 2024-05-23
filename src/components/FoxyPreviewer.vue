@@ -19,6 +19,7 @@ import LoaderFeedback from "@/components/UI/LoaderFeedback.vue";
 import useImageLoader from "@/composables/image-loader";
 import ToggleParam from "@/components/editors/ToggleParam.vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
+import signHMAC256 from "@/utils/sign";
 
 const url = useStorage('foxy_url', 'http://localhost:8080');
 const accessKey = useStorage('foxy_access_key', 'c8emk0kejqj8rkpn');
@@ -28,11 +29,10 @@ const imageKey = useStorage('foxy_image_key', 'XXM03026.JPG');
 const currentTab = ref<"preview"|"metadata">("preview");
 
 const currentImageUrl = ref<string|null>(null);
-const cacheBuster = ref(Date.now());
 
 
 onMounted(async () => {
-	buildImageUrl();
+	await buildImageUrl();
 	await fetchImageMeta();
 });
 
@@ -97,9 +97,11 @@ async function fetchImageMeta() {
 	}
 
 	let encodedKey = btoa('/'+imageKey.value);
-	let metaUrl = `${url.value}/${accessKey.value}/${encodedKey}/meta`;
+	let metaUrl = `/${accessKey.value}/${encodedKey}/meta`;
 
-	const response = await fetch(metaUrl);
+	const sig = await signHMAC256(secret.value, metaUrl);
+
+	const response = await fetch(url.value + metaUrl + "?s="+sig);
 	if (!response.ok) {
 		imageMeta.value = null;
 		return;
@@ -109,14 +111,14 @@ async function fetchImageMeta() {
 }
 const debouncedFetchImageMeta = pDebounce(fetchImageMeta, 500);
 
-function buildImageUrl() {
+async function buildImageUrl() {
 	if (!url.value || !accessKey.value || !secret.value || !imageKey.value) {
 		currentImageUrl.value = null;
 		return;
 	}
 
 	let encodedKey = btoa('/'+imageKey.value);
-	let newUrl = `${url.value}/${accessKey.value}/${encodedKey}`;
+	let newUrl = `/${accessKey.value}/${encodedKey}`;
 
 	if (imageParams.crop) {
 		newUrl += `/crop:${imageParams.crop}`;
@@ -182,13 +184,14 @@ function buildImageUrl() {
 		newUrl += `/nocache:${nocache.join(',')}`;
 	}
 
-	currentImageUrl.value = newUrl + `?${new Date().getTime()}`;
+	const sig = await signHMAC256(secret.value, newUrl);
+	currentImageUrl.value = url.value + newUrl + `?_=${new Date().getTime()}&s=`+sig;
 }
 
 const debouncedBuildImageUrl = pDebounce(buildImageUrl, 500);
 
-watch(imageParams, () => {
-	debouncedBuildImageUrl();
+watch(imageParams, async () => {
+	await debouncedBuildImageUrl();
 }, { deep: true });
 
 watch([url, imageKey, secret, accessKey], async () => {

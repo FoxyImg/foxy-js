@@ -1,33 +1,24 @@
-# foxy-preview
+# Foxy Preview
 
-This template should help get you started developing with Vue 3 in Vite.
+Foxy Preview is a simple app to preview images in [Foxy Image Proxy](https://github.com/jawngee/foxy).
 
-## Recommended IDE Setup
+![Screenshot](screenshot.webp)
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Getting Started
 
-## Type Support for `.vue` Imports in TS
+1. Make sure you have Foxy Image Proxy running on your local machine.
+2. Clone this repository.
+3. Run `npm install` to install dependencies.
+4. Run `npm run dev` to start the development server.
+5. Open `http://localhost:5173` in your browser.
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+## Usage
 
-## Customize configuration
+You can use Foxy Preview to preview images in [Foxy Image Proxy](https://github.com/jawngee/foxy).
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+Set the `Foxy URL`, `Access Key`, `Secret` fields at the top of the app to connect to your [Foxy Image Proxy](https://github.com/jawngee/foxy) instance.
 
-## Project Setup
+The `Image Key` field is the key of the image you want to preview, eg `path/to/image.jpg`.
 
-```sh
-npm install
-```
+The rest should be self-explanatory.
 
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
