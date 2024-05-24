@@ -215,7 +215,7 @@ watch(isLoaded, () => {
 						<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Width" v-model="imageParams.aspectRatioWidth" :min="0" :max="128" :step="1" :default="0" default-label="None" />
 						<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Height" v-model="imageParams.aspectRatioHeight" :min="0" :max="128" :step="1" :default="0" default-label="None" />
 						<SliderParam v-if="imageParams.crop.length > 0" title="Zoom" v-model="imageParams.zoom" :min="1" :max="10" :step="0.01" :default="1" default-label="None" suffix="x" />
-						<div v-if="imageParams.crop.includes('fill')" class="grid grid-cols-2 gap-3">
+						<div v-if="imageParams.crop.includes('crop')" class="grid grid-cols-2 gap-3">
 							<SelectParam title="Horizontal Gravity" v-model="imageParams.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
 							<SelectParam title="Vertical Gravity" v-model="imageParams.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
 						</div>

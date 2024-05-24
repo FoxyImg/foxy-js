@@ -2,7 +2,7 @@ export const CropOptions = [
 	{ value: "face", label: "Faces" },
 	{ value: "person", label: "People" },
 	{ value: "smart", label: "Smart" },
-	{ value: "fill", label: "Fill" },
+	{ value: "crop", label: "Crop" },
 	{ value: "fit", label: "Fit" },
 ]
 
