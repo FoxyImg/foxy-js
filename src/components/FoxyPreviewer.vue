@@ -2,7 +2,8 @@
 import {computed, onMounted, reactive, ref, watch} from "vue";
 import pDebounce from 'p-debounce';
 
-import HeaderInput from "@/components/UI/HeaderInput.vue";
+import HeaderTextInput from "@/components/header/HeaderTextInput.vue";
+import HeaderImageKeyInput from "@/components/header/HeaderImageKeyInput.vue";
 import SelectParam from "@/components/editors/SelectParam.vue";
 import SliderParam from "@/components/editors/SliderParam.vue";
 import VueJsonPretty from 'vue-json-pretty';
@@ -24,6 +25,7 @@ import TagsParam from "@/components/editors/TagsParam.vue";
 import ColorParam from "@/components/editors/ColorParam.vue";
 import {DefaultImageParams, type ImageParams} from "@/types/params";
 import buildUrl from "@/utils/url-builder";
+import SampleImages from "@/data/sample-images.json";
 
 const url = useStorage('foxy_url', 'http://localhost:8080');
 const accessKey = useStorage('foxy_access_key', 'c8emk0kejqj8rkpn');
@@ -33,10 +35,11 @@ const imageKey = useStorage('foxy_image_key', 'XXM03026.JPG');
 const currentTab = ref<"preview"|"metadata">("preview");
 
 const currentImageUrl = ref<string|null>(null);
+const sampleImages = useStorage<string[]>('foxy_sample_images', SampleImages);
 
 
 onMounted(async () => {
-	await buildImageUrl();
+	buildImageUrl();
 	await fetchImageMeta();
 });
 
@@ -80,13 +83,13 @@ async function fetchImageMeta() {
 }
 const debouncedFetchImageMeta = pDebounce(fetchImageMeta, 500);
 
-async function buildImageUrl() {
+function buildImageUrl() {
 	if (!url.value || !accessKey.value || !secret.value || !imageKey.value) {
 		currentImageUrl.value = null;
 		return;
 	}
 
-	currentImageUrl.value = await buildUrl(url.value, accessKey.value, secret.value, imageKey.value, imageParams);
+	currentImageUrl.value = buildUrl(url.value, accessKey.value, secret.value, imageKey.value, imageParams);
 }
 
 const debouncedBuildImageUrl = pDebounce(buildImageUrl, 500);
@@ -108,14 +111,22 @@ const {
 	size,
 	loadTime,
 } = useImageLoader(currentImageUrl);
+
+watch(isLoaded, () => {
+	if (isLoaded.value && currentImageUrl.value) {
+		if (!sampleImages.value.includes(imageKey.value)) {
+			sampleImages.value.unshift(imageKey.value);
+		}
+	}
+});
 </script>
 <template>
 <div class="fixed inset-0 flex flex-col">
 	<div class="p-3 grid grid-cols-4 gap-5">
-		<HeaderInput label="Foxy URL" v-model="url" />
-		<HeaderInput label="Access Key" v-model="accessKey" />
-		<HeaderInput label="Secret" type="password" v-model="secret" />
-		<HeaderInput label="Image Key" v-model="imageKey" />
+		<HeaderTextInput label="Foxy URL" v-model="url" />
+		<HeaderTextInput label="Access Key" v-model="accessKey" />
+		<HeaderTextInput label="Secret" type="password" v-model="secret" />
+		<HeaderImageKeyInput label="Image Key" v-model="imageKey" :host="url" :access-key="accessKey" :secret="secret" />
 	</div>
 	<div class="flex-1 flex">
 		<div class="flex-1 flex flex-col">
@@ -195,13 +206,14 @@ const {
 				<div class="p-3 flex flex-col gap-5">
 					<EditorPanel title="Cropping / Resizing">
 						<TagsParam title="Crop Mode" :options="CropOptions" v-model="imageParams.crop" placeholder="Select 1 or more crop modes" />
+						<SliderParam v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Index" v-model="imageParams.faceIndex" :min="-1" :max="faceCount - 1" :step="1" :default="-1" default-label="All Faces" />
+						<SliderParam v-if="imageParams.crop.includes('person') && faceCount > 0" title="Person Index" v-model="imageParams.personIndex" :min="-1" :max="peopleCount -1" :step="1" :default="-1" default-label="All People" />
+						<SelectParam v-if="imageParams.crop.includes('smart')" title="Smart Crop Mode" v-model="imageParams.smartMode" :default="null" :options="InterestingOptions" />
 						<SliderParam title="Width" v-model="imageParams.width" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
 						<SliderParam title="Height" v-model="imageParams.height" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
 						<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Width" v-model="imageParams.aspectRatioWidth" :min="0" :max="128" :step="1" :default="0" default-label="None" />
 						<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Height" v-model="imageParams.aspectRatioHeight" :min="0" :max="128" :step="1" :default="0" default-label="None" />
-						<SliderParam v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Index" v-model="imageParams.faceIndex" :min="-1" :max="faceCount - 1" :step="1" :default="-1" default-label="All Faces" />
-						<SliderParam v-if="imageParams.crop.includes('person') && faceCount > 0" title="Person Index" v-model="imageParams.personIndex" :min="-1" :max="peopleCount -1" :step="1" :default="-1" default-label="All People" />
-						<SelectParam v-if="imageParams.crop.includes('smart')" title="Smart Crop Mode" v-model="imageParams.smartMode" :default="null" :options="InterestingOptions" />
+						<SliderParam v-if="imageParams.crop.length > 0" title="Zoom" v-model="imageParams.zoom" :min="1" :max="10" :step="0.01" :default="1" default-label="None" suffix="x" />
 					</EditorPanel>
 					<EditorPanel title="Image Attributes">
 						<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />

@@ -1,7 +1,7 @@
 import type {ImageParams} from "@/types/params";
 import signHMAC256 from "@/utils/sign";
 
-export default async function buildUrl(host:string, accessKey:string|null, secret:string, imageKey:string, imageParams:ImageParams) {
+export default function buildUrl(host:string, accessKey:string|null, secret:string, imageKey:string, imageParams:ImageParams) {
 	let encodedKey = btoa('/'+imageKey);
 	let newUrl = accessKey ? `/${accessKey}/${encodedKey}` : `/${encodedKey}`;
 
@@ -32,6 +32,10 @@ export default async function buildUrl(host:string, accessKey:string|null, secre
 
 	if (imageParams.aspectRatioWidth > 0 && imageParams.aspectRatioHeight > 0) {
 		newUrl += `/ar:${imageParams.aspectRatioWidth}:${imageParams.aspectRatioHeight}`;
+	}
+
+	if (imageParams.zoom > 1) {
+		newUrl += `/zoom:${imageParams.zoom}`;
 	}
 
 	//endregion
@@ -93,6 +97,5 @@ export default async function buildUrl(host:string, accessKey:string|null, secre
 	//endregion
 
 
-	const sig = await signHMAC256(secret, newUrl);
-	return host + newUrl + `?_=${new Date().getTime()}&s=`+sig;
+	return host + newUrl + `?_=${new Date().getTime()}&s=`+signHMAC256(secret, newUrl);
 }
