@@ -12,7 +12,7 @@ import 'vue-json-pretty/lib/styles.css';
 import Tabs from "@/components/UI/Tabs.vue";
 import Tab from "@/components/UI/Tab.vue";
 
-import {CropOptions, InterestingOptions} from "@/types/options";
+import {CropOptions, HGravityOptions, InterestingOptions, VGravityOptions} from "@/types/options";
 import EditorPanel from "@/components/editors/EditorPanel.vue";
 import {useStorage} from "@vueuse/core";
 import Icon from "@/components/UI/Icon.vue";
@@ -45,6 +45,7 @@ onMounted(async () => {
 
 const imageParams = reactive<ImageParams>(JSON.parse(JSON.stringify(DefaultImageParams)));
 const imageMeta = ref<any>(null);
+
 
 const faceCount = computed(() => {
 	if (!imageMeta.value) {
@@ -214,6 +215,10 @@ watch(isLoaded, () => {
 						<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Width" v-model="imageParams.aspectRatioWidth" :min="0" :max="128" :step="1" :default="0" default-label="None" />
 						<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Height" v-model="imageParams.aspectRatioHeight" :min="0" :max="128" :step="1" :default="0" default-label="None" />
 						<SliderParam v-if="imageParams.crop.length > 0" title="Zoom" v-model="imageParams.zoom" :min="1" :max="10" :step="0.01" :default="1" default-label="None" suffix="x" />
+						<div v-if="imageParams.crop.includes('fill')" class="grid grid-cols-2 gap-3">
+							<SelectParam title="Horizontal Gravity" v-model="imageParams.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
+							<SelectParam title="Vertical Gravity" v-model="imageParams.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
+						</div>
 					</EditorPanel>
 					<EditorPanel title="Image Attributes">
 						<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />

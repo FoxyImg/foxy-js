@@ -17,3 +17,15 @@ export const InterestingOptions = {
 	low: "Low",
 	center: "Center",
 }
+
+export const HGravityOptions = {
+	left: "Left",
+	center: "Center",
+	right: "Right",
+}
+
+export const VGravityOptions = {
+	top: "Top",
+	center: "Center",
+	bottom: "Bottom",
+}

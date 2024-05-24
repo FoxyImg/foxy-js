@@ -8,6 +8,8 @@ export type ImageParams = {
 	faceIndex: number,
 	personIndex: number,
 	smartMode: string|null,
+	hGravity: string,
+	vGravity: string,
 
 	backgroundColor: string|null,
 
@@ -32,6 +34,8 @@ export const DefaultImageParams: ImageParams = {
 	faceIndex: -1,
 	personIndex: -1,
 	smartMode: null,
+	hGravity: 'center',
+	vGravity: 'center',
 
 	backgroundColor: null,
 

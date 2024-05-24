@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
 	title: string,
 	modelValue: string|null,
 	default: string|null,
+	allowNull?: boolean,
 	options: { [key:string]: string }
-}>();
+}>(), {
+	allowNull: true,
+});
 
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: string|null): void;
@@ -22,7 +25,7 @@ const currentValue = computed({
 		<div class="flex flex-col items-start gap-1">
 			<label class="text-xxs uppercase text-neutral-600" :class="{'font-bold text-neutral-700': currentValue !== props.default}">{{title}}</label>
 			<select v-model="currentValue" class="w-full border border-neutral-200 text-xs flex-1 rounded-md py-1.5 px-1">
-				<option :selected="currentValue === null" :value="null">None</option>
+				<option v-if="allowNull" :selected="currentValue === null" :value="null">None</option>
 				<option v-for="(param, key, index) in options" :key="key" :value="key" :selected="key === currentValue">{{ param }}</option>
 			</select>
 		</div>

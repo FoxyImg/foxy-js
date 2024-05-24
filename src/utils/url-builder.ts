@@ -38,6 +38,18 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		newUrl += `/zoom:${imageParams.zoom}`;
 	}
 
+	if (imageParams.hGravity || imageParams.vGravity) {
+		const hg = imageParams.hGravity ?? 'center';
+		const vg = imageParams.vGravity ?? 'center';
+
+		let gravity = `${hg}:${vg}`;
+		gravity = gravity === 'center:center' ? 'center' : gravity;
+
+		if (gravity !== 'center') {
+			newUrl += `/gravity:${gravity}`;
+		}
+	}
+
 	//endregion
 
 
