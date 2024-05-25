@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
 	modelValue: number|null,
 	title: string;
 	min: number;
 	max: number;
 	step: number;
-	defaultLabel: string|undefined;
+	defaultLabel?: string;
 	default: number|null;
 	suffix?: string;
-}>();
+	allowDirectEditing?: boolean;
+	valueFormatter?: (value: number|null) => string;
+}>(), {
+	allowDirectEditing: true,
+});
 
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: number|null): void;
@@ -31,6 +35,12 @@ watch(inputRef, (el) => {
 	}
 });
 
+function quickEdit() {
+	if (props.allowDirectEditing) {
+		editing.value = true;
+	}
+}
+
 </script>
 <template>
 	<div class="flex flex-col gap-1.5">
@@ -47,8 +57,9 @@ watch(inputRef, (el) => {
 				@focusout="editing=false"
 				@keyup.enter="editing=false" autofocus
 			/>
-			<div v-else @click="editing = true" class="cursor-pointer underline decoration-dotted text-xxs" :class="{'font-bold text-neutral-700': currentValue !== props.default}">
-				<span v-if="defaultLabel && currentValue === props.default">{{ defaultLabel }}</span>
+			<div v-else @click="quickEdit" class="cursor-pointer underline decoration-dotted text-xxs" :class="{'font-bold text-neutral-700': currentValue !== props.default}">
+				<span v-if="valueFormatter">{{ valueFormatter(currentValue) }}</span>
+				<span v-else-if="defaultLabel && currentValue === props.default">{{ defaultLabel }}</span>
 				<span v-else>{{ currentValue }}{{ props.suffix }}</span>
 			</div>
 		</div>

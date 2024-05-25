@@ -11,6 +11,17 @@ export type ImageParams = {
 	hGravity: string,
 	vGravity: string,
 
+	faceHGravity: string,
+	faceVGravity: string,
+	facePadding: number,
+	faceZoom: number,
+
+
+	personHGravity: string,
+	personVGravity: string,
+	personPadding: number,
+	personZoom: number,
+
 	backgroundColor: string|null,
 
 	debugFaces: boolean,
@@ -36,6 +47,16 @@ export const DefaultImageParams: ImageParams = {
 	smartMode: null,
 	hGravity: 'center',
 	vGravity: 'center',
+
+	faceHGravity: 'center',
+	faceVGravity: 'top',
+	facePadding: 8,
+	faceZoom: 0,
+
+	personHGravity: 'center',
+	personVGravity: 'center',
+	personPadding: 0,
+	personZoom: 0,
 
 	backgroundColor: null,
 

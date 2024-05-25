@@ -18,14 +18,6 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		newUrl += `/h:${imageParams.height}`;
 	}
 
-	if (imageParams.crop.includes('face') && imageParams.faceIndex > -1) {
-		newUrl += `/face:${imageParams.faceIndex}`;
-	}
-
-	if (imageParams.crop.includes('person') && imageParams.personIndex > -1) {
-		newUrl += `/person:${imageParams.personIndex}`;
-	}
-
 	if (imageParams.crop.includes('smart') && imageParams.smartMode) {
 		newUrl += `/smart:${imageParams.smartMode}`;
 	}
@@ -50,6 +42,53 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		}
 	}
 
+	if (imageParams.crop.includes('face') && imageParams.facePadding != 8) {
+		newUrl += `/face:pad:${imageParams.facePadding}`;
+	}
+
+	if (imageParams.crop.includes('face') && imageParams.faceIndex > -1) {
+		newUrl += `/face:index:${imageParams.faceIndex}`;
+	}
+
+	if (imageParams.crop.includes('face') && imageParams.faceIndex < -1) {
+		if (imageParams.faceIndex === -2) {
+			newUrl += `/face:index:largest`;
+		} else {
+			newUrl += `/face:index:smallest`;
+		}
+	}
+
+	if (imageParams.crop.includes('face') && imageParams.faceZoom > 0) {
+		newUrl += `/face:zoom:${imageParams.faceZoom}`;
+	}
+
+	if (imageParams.faceVGravity !== 'top' || imageParams.faceHGravity !== 'center') {
+		newUrl += `/face:gravity:${imageParams.faceHGravity}:${imageParams.faceVGravity}`;
+	}
+
+	if (imageParams.crop.includes('person') && imageParams.personPadding > 0) {
+		newUrl += `/person:pad:${imageParams.personPadding}`;
+	}
+
+	if (imageParams.crop.includes('person') && imageParams.personIndex > -1) {
+		newUrl += `/person:index:${imageParams.personIndex}`;
+	}
+
+	if (imageParams.crop.includes('person') && imageParams.personIndex < -1) {
+		if (imageParams.personIndex === -2) {
+			newUrl += `/person:index:largest`;
+		} else {
+			newUrl += `/person:index:smallest`;
+		}
+	}
+
+	if (imageParams.crop.includes('person') && imageParams.personZoom > 0) {
+		newUrl += `/person:zoom:${imageParams.personZoom}`;
+	}
+
+	if (imageParams.personVGravity !== 'center' || imageParams.personHGravity !== 'center') {
+		newUrl += `/person:gravity:${imageParams.personHGravity}:${imageParams.personVGravity}`;
+	}
 	//endregion
 
 

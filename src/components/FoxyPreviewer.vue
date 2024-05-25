@@ -26,6 +26,7 @@ import ColorParam from "@/components/editors/ColorParam.vue";
 import {DefaultImageParams, type ImageParams} from "@/types/params";
 import buildUrl from "@/utils/url-builder";
 import SampleImages from "@/data/sample-images.json";
+import ObjectSelectParam from "@/components/editors/ObjectSelectParam.vue";
 
 const url = useStorage('foxy_url', 'http://localhost:8080');
 const accessKey = useStorage('foxy_access_key', 'c8emk0kejqj8rkpn');
@@ -45,6 +46,7 @@ onMounted(async () => {
 
 const imageParams = reactive<ImageParams>(JSON.parse(JSON.stringify(DefaultImageParams)));
 const imageMeta = ref<any>(null);
+const constrainDimensions = useStorage('foxy_constrain_dimensions', false);
 
 
 const faceCount = computed(() => {
@@ -99,6 +101,22 @@ watch(imageParams, async () => {
 	await debouncedBuildImageUrl();
 }, { deep: true });
 
+watch(() => [imageParams.width, imageParams.height], (newVal, oldVal) => {
+	if (!constrainDimensions.value) {
+		return;
+	}
+
+	if (oldVal[0] !== newVal[0]) {
+		if (imageParams.height !== newVal[0]) {
+			imageParams.height = newVal[0];
+		}
+	} else if (oldVal[1] !== newVal[1]) {
+		if (imageParams.width !== newVal[1]) {
+			imageParams.width = newVal[1];
+		}
+	}
+});
+
 watch([url, imageKey, secret, accessKey], async () => {
 	imageMeta.value = null;
 	await debouncedBuildImageUrl();
@@ -119,6 +137,34 @@ watch(isLoaded, () => {
 			sampleImages.value.unshift(imageKey.value);
 		}
 	}
+});
+
+const personOptions = computed(() => {
+	const options = [
+		{ label: 'Smallest Person', value: -3 },
+		{ label: 'Largest Person', value: -2 },
+		{ label: 'All People', value: -1 },
+		...imageMeta.value?.people.map((person:any, index:number) => ({
+			label: `Person ${index + 1} - ${person.name}`,
+			value: index,
+		})),
+	];
+
+	return options;
+});
+
+const faceOptions = computed(() => {
+	const options = [
+		{ label: 'Smallest Face', value: -3 },
+		{ label: 'Largest Face', value: -2 },
+		{ label: 'All Faces', value: -1 },
+		...imageMeta.value?.faces.map((face:any, index:number) => ({
+			label: `Face #${index + 1}`,
+			value: index,
+		})),
+	];
+
+	return options;
 });
 </script>
 <template>
@@ -207,11 +253,20 @@ watch(isLoaded, () => {
 				<div class="p-3 flex flex-col gap-5">
 					<EditorPanel title="Cropping / Resizing">
 						<TagsParam title="Crop Mode" :options="CropOptions" v-model="imageParams.crop" placeholder="Select 1 or more crop modes" />
-						<SliderParam v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Index" v-model="imageParams.faceIndex" :min="-1" :max="faceCount - 1" :step="1" :default="-1" default-label="All Faces" />
-						<SliderParam v-if="imageParams.crop.includes('person') && faceCount > 0" title="Person Index" v-model="imageParams.personIndex" :min="-1" :max="peopleCount -1" :step="1" :default="-1" default-label="All People" />
 						<SelectParam v-if="imageParams.crop.includes('smart')" title="Smart Crop Mode" v-model="imageParams.smartMode" :default="null" :options="InterestingOptions" />
-						<SliderParam title="Width" v-model="imageParams.width" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
-						<SliderParam title="Height" v-model="imageParams.height" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
+						<div class="flex items-center gap-1">
+							<div class="flex-1 flex flex-col gap-3">
+								<SliderParam title="Width" v-model="imageParams.width" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
+								<SliderParam title="Height" v-model="imageParams.height" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
+							</div>
+							<div class="flex flex-col items-center justify-center gap-1">
+								<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500" />
+								<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainDimensions}" @click="constrainDimensions = !constrainDimensions">
+									<Icon name="constrain" class="fill-black w-3 h-auto" />
+								</div>
+								<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500 rotate-180 -scale-x-100" />
+							</div>
+						</div>
 						<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Width" v-model="imageParams.aspectRatioWidth" :min="0" :max="128" :step="1" :default="0" default-label="None" />
 						<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Height" v-model="imageParams.aspectRatioHeight" :min="0" :max="128" :step="1" :default="0" default-label="None" />
 						<SliderParam v-if="imageParams.crop.length > 0" title="Zoom" v-model="imageParams.zoom" :min="1" :max="10" :step="0.01" :default="1" default-label="None" suffix="x" />
@@ -219,6 +274,24 @@ watch(isLoaded, () => {
 							<SelectParam title="Horizontal Gravity" v-model="imageParams.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
 							<SelectParam title="Vertical Gravity" v-model="imageParams.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
 						</div>
+						<EditorPanel v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Crop Options">
+							<ObjectSelectParam title="Face Index" v-model="imageParams.faceIndex" :default="-1" :allow-null="false" :options="faceOptions" />
+							<SliderParam title="Face Padding" v-model="imageParams.facePadding" :min="0" :max="256" :step="1" :default="8" suffix="px" />
+							<SliderParam title="Face Zoom" v-model="imageParams.faceZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+							<div class="grid grid-cols-2 gap-3">
+								<SelectParam title="Face Horizontal Gravity" v-model="imageParams.faceHGravity" default="center" :allow-null="false" :options="HGravityOptions" />
+								<SelectParam title="Face Vertical Gravity" v-model="imageParams.faceVGravity" default="top" :allow-null="false" :options="VGravityOptions" />
+							</div>
+						</EditorPanel>
+						<EditorPanel v-if="imageParams.crop.includes('person') && faceCount > 0" title="Person Crop Options">
+							<ObjectSelectParam title="Person Index" v-model="imageParams.personIndex" :default="-1" :allow-null="false" :options="personOptions" />
+							<SliderParam title="Person Padding" v-model="imageParams.personPadding" :min="0" :max="256" :step="1" :default="0" suffix="px" />
+							<SliderParam title="Person Zoom" v-model="imageParams.personZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+							<div class="grid grid-cols-2 gap-3">
+								<SelectParam title="Person Horiz. Gravity" v-model="imageParams.personHGravity" default="center" :allow-null="false" :options="HGravityOptions" />
+								<SelectParam title="Person Vertical Gravity" v-model="imageParams.personVGravity" default="center" :allow-null="false" :options="VGravityOptions" />
+							</div>
+						</EditorPanel>
 					</EditorPanel>
 					<EditorPanel title="Image Attributes">
 						<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
