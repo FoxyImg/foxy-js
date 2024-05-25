@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import SampleImages from "@/data/sample-images.json";
 import {computed} from "vue";
 import buildUrl from "@/utils/url-builder";
 import {DefaultImageParams} from "@/types/params";
 import { hideAllPoppers } from "floating-vue";
-import {useStorage} from "@vueuse/core";
 import Icon from "@/components/UI/Icon.vue";
 
 const props = defineProps<{
@@ -12,12 +10,12 @@ const props = defineProps<{
 	accessKey:string|null,
 	secret:string,
 	modelValue: string|null,
+	sampleImages: string[],
 }>();
-
-const sampleImages = useStorage<string[]>('foxy_sample_images', SampleImages);
 
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: string|null): void;
+	(e: 'removeSampleImage', value: string): void;
 }>();
 
 const currentValue = computed({
@@ -36,7 +34,8 @@ function selectImage(image: string) {
 }
 
 function removeImage(image: string) {
-	sampleImages.value = sampleImages.value.filter((i) => i !== image);
+	// props.sampleImages.value = sampleImages.value.filter((i) => i !== image);
+	emit('removeSampleImage', image);
 }
 
 </script>

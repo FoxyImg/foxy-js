@@ -29,3 +29,18 @@ export const VGravityOptions = {
 	center: "Center",
 	bottom: "Bottom",
 }
+
+export const SourceTypeOptions = {
+	local: "Local",
+	s3: "S3",
+	web: "Web",
+}
+
+export type FoxySource = {
+	type: "web" | "local" | "s3",
+	name: string,
+	url: string|null,
+	key: string|null,
+	secret: string|null,
+	sampleImages: string[]
+}

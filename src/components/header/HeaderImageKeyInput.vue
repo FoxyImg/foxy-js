@@ -13,12 +13,14 @@ const props = withDefaults(defineProps<{
 	accessKey:string|null,
 	secret:string,
 	modelValue: string|null,
+	sampleImages: string[],
 }>(), {
 	type: 'text',
 });
 
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: string|null): void;
+	(e: 'removeSampleImage', value: string): void;
 }>();
 
 function updateModelValue(value: string|null) {
@@ -41,7 +43,7 @@ const currentValue = computed({
 				<VDropdown>
 						<div class="w-4 aspect-square"><Icon name="image-search" class="w-auto h-4" /></div>
 						<template #popper>
-							<HeaderSampleImages v-model="currentValue" :host="host" :access-key="accessKey" :secret="secret" />
+							<HeaderSampleImages v-model="currentValue" :host="host" :access-key="accessKey" :secret="secret" :sample-images="sampleImages" @remove-sample-image="emit('removeSampleImage', $event)" />
 						</template>
 				</VDropdown>
 			</div>
