@@ -11,7 +11,7 @@ import 'vue-json-pretty/lib/styles.css';
 import Tabs from "@/components/UI/Tabs.vue";
 import Tab from "@/components/UI/Tab.vue";
 
-import {CropOptions, HGravityOptions, InterestingOptions, SourceTypeOptions, VGravityOptions} from "@/types/options";
+import {CropOptions, HGravityOptions, InterestingOptions, VGravityOptions} from "@/types/options";
 import EditorPanel from "@/components/editors/EditorPanel.vue";
 import {useStorage} from "@vueuse/core";
 import Icon from "@/components/UI/Icon.vue";
@@ -29,6 +29,8 @@ import SourceEditModal from "@/components/modals/SourceEditModal.vue";
 import useFoxySource from "@/composables/foxy-source";
 import FoxySourceSelector from "@/components/header/FoxySourceSelector.vue";
 import StatusInfo from "@/components/UI/StatusInfo.vue";
+import type {ImageMeta} from "@/types/image-meta";
+import FocalPointParam from "@/components/editors/FocalPointParam.vue";
 
 const url = useStorage('foxy_url', 'http://localhost:8080');
 const accessKey = useStorage('foxy_access_key', 'c8emk0kejqj8rkpn');
@@ -68,7 +70,7 @@ onMounted(async () => {
 });
 
 const imageParams = reactive<ImageParams>(JSON.parse(JSON.stringify(DefaultImageParams)));
-const imageMeta = ref<any>(null);
+const imageMeta = ref<ImageMeta|null>(null);
 const constrainDimensions = useStorage('foxy_constrain_dimensions', false);
 
 
@@ -174,11 +176,14 @@ const personOptions = computed(() => {
 		{ label: 'Smallest Person', value: -3 },
 		{ label: 'Largest Person', value: -2 },
 		{ label: 'All People', value: -1 },
-		...imageMeta.value?.people.map((person:any, index:number) => ({
+	];
+
+	if (imageMeta.value) {
+		options.push(...imageMeta.value.people.map((person:any, index:number) => ({
 			label: `Person ${index + 1} - ${person.name}`,
 			value: index,
-		})),
-	];
+		})));
+	}
 
 	return options;
 });
@@ -188,11 +193,14 @@ const faceOptions = computed(() => {
 		{ label: 'Smallest Face', value: -3 },
 		{ label: 'Largest Face', value: -2 },
 		{ label: 'All Faces', value: -1 },
-		...imageMeta.value?.faces.map((face:any, index:number) => ({
+	];
+
+	if (imageMeta.value) {
+		options.push(...imageMeta.value.faces.map((face:any, index:number) => ({
 			label: `Face #${index + 1}`,
 			value: index,
-		})),
-	];
+		})));
+	}
 
 	return options;
 });
@@ -313,24 +321,29 @@ function removeSampleImage(imageKey:string) {
 								<SelectParam title="Horizontal Gravity" v-model="imageParams.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
 								<SelectParam title="Vertical Gravity" v-model="imageParams.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
 							</div>
-							<EditorPanel v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Crop Options">
-								<ObjectSelectParam title="Face Index" v-model="imageParams.faceIndex" :default="-1" :allow-null="false" :options="faceOptions" />
-								<SliderParam title="Face Padding" v-model="imageParams.facePadding" :min="0" :max="256" :step="1" :default="8" suffix="px" />
-								<SliderParam title="Face Zoom" v-model="imageParams.faceZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
-								<div class="grid grid-cols-2 gap-3">
-									<SelectParam title="Face Horizontal Gravity" v-model="imageParams.faceHGravity" default="center" :allow-null="false" :options="HGravityOptions" />
-									<SelectParam title="Face Vertical Gravity" v-model="imageParams.faceVGravity" default="top" :allow-null="false" :options="VGravityOptions" />
-								</div>
-							</EditorPanel>
-							<EditorPanel v-if="imageParams.crop.includes('person') && peopleCount > 0" title="Person Crop Options">
-								<ObjectSelectParam title="Person Index" v-model="imageParams.personIndex" :default="-1" :allow-null="false" :options="personOptions" />
-								<SliderParam title="Person Padding" v-model="imageParams.personPadding" :min="0" :max="256" :step="1" :default="0" suffix="px" />
-								<SliderParam title="Person Zoom" v-model="imageParams.personZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
-								<div class="grid grid-cols-2 gap-3">
-									<SelectParam title="Person Horiz. Gravity" v-model="imageParams.personHGravity" default="center" :allow-null="false" :options="HGravityOptions" />
-									<SelectParam title="Person Vertical Gravity" v-model="imageParams.personVGravity" default="center" :allow-null="false" :options="VGravityOptions" />
-								</div>
-							</EditorPanel>
+						</EditorPanel>
+						<EditorPanel v-if="imageParams.crop.includes('focus')" title="Focal Point">
+							<FocalPointParam v-model="imageParams.focalPoint" :current-source="currentSource" :image-meta="imageMeta" :image-key="imageKey" />
+							<SliderParam title="Focal Point Zoom" v-model="imageParams.focalPointZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+						</EditorPanel>
+						<EditorPanel v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Crop Options">
+							<ObjectSelectParam title="Face Index" v-model="imageParams.faceIndex" :default="-1" :allow-null="false" :options="faceOptions" />
+							<SliderParam title="Face Padding" v-model="imageParams.facePadding" :min="0" :max="256" :step="1" :default="8" suffix="px" />
+							<SliderParam title="Face Zoom" v-model="imageParams.faceZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+							<div class="grid grid-cols-2 gap-3">
+								<SelectParam title="Face Horizontal Gravity" v-model="imageParams.faceHGravity" default="center" :allow-null="false" :options="HGravityOptions" />
+								<SelectParam title="Face Vertical Gravity" v-model="imageParams.faceVGravity" default="top" :allow-null="false" :options="VGravityOptions" />
+							</div>
+							<ToggleParam title="Focus Face" v-model="imageParams.faceFocus" />
+						</EditorPanel>
+						<EditorPanel v-if="imageParams.crop.includes('person') && peopleCount > 0" title="Person Crop Options">
+							<ObjectSelectParam title="Person Index" v-model="imageParams.personIndex" :default="-1" :allow-null="false" :options="personOptions" />
+							<SliderParam title="Person Padding" v-model="imageParams.personPadding" :min="0" :max="256" :step="1" :default="0" suffix="px" />
+							<SliderParam title="Person Zoom" v-model="imageParams.personZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+							<div class="grid grid-cols-2 gap-3">
+								<SelectParam title="Person Horiz. Gravity" v-model="imageParams.personHGravity" default="center" :allow-null="false" :options="HGravityOptions" />
+								<SelectParam title="Person Vertical Gravity" v-model="imageParams.personVGravity" default="center" :allow-null="false" :options="VGravityOptions" />
+							</div>
 						</EditorPanel>
 						<EditorPanel title="Image Attributes">
 							<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />

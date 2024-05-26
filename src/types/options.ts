@@ -4,6 +4,7 @@ export const CropOptions = [
 	{ value: "smart", label: "Smart" },
 	{ value: "crop", label: "Crop" },
 	{ value: "fit", label: "Fit" },
+	{ value: "focus", label: "Focus" },
 ]
 
 export const DebugOptions = {

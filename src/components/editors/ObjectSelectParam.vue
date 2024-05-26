@@ -6,7 +6,7 @@ const props = withDefaults(defineProps<{
 	modelValue: string|number|null,
 	default: string|number|null,
 	allowNull?: boolean,
-	options: { label: string, value: string }[]
+	options: { label: string, value: string|number }[]
 }>(), {
 	allowNull: true,
 });

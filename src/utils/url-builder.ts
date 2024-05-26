@@ -42,29 +42,35 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		}
 	}
 
-	if (imageParams.crop.includes('face') && imageParams.facePadding != 8) {
-		newUrl += `/face:pad:${imageParams.facePadding}`;
-	}
+	if (imageParams.crop.includes('face')) {
+		if (imageParams.facePadding != 8) {
+			newUrl += `/face:pad:${imageParams.facePadding}`;
+		}
 
-	if (imageParams.crop.includes('face') && imageParams.faceIndex > -1) {
-		newUrl += `/face:index:${imageParams.faceIndex}`;
-	}
+		if (imageParams.faceIndex > -1) {
+			newUrl += `/face:index:${imageParams.faceIndex}`;
+		} else if (imageParams.faceIndex < -1) {
+			if (imageParams.faceIndex === -2) {
+				newUrl += `/face:index:largest`;
+			} else {
+				newUrl += `/face:index:smallest`;
+			}
+		}
 
-	if (imageParams.crop.includes('face') && imageParams.faceIndex < -1) {
-		if (imageParams.faceIndex === -2) {
-			newUrl += `/face:index:largest`;
-		} else {
-			newUrl += `/face:index:smallest`;
+		if (imageParams.faceZoom > 0) {
+			newUrl += `/face:zoom:${imageParams.faceZoom}`;
+		}
+
+		if (imageParams.faceVGravity !== 'top' || imageParams.faceHGravity !== 'center') {
+			newUrl += `/face:gravity:${imageParams.faceHGravity}:${imageParams.faceVGravity}`;
+		}
+
+		if (imageParams.faceFocus) {
+			newUrl += '/face:focus';
 		}
 	}
 
-	if (imageParams.crop.includes('face') && imageParams.faceZoom > 0) {
-		newUrl += `/face:zoom:${imageParams.faceZoom}`;
-	}
 
-	if (imageParams.faceVGravity !== 'top' || imageParams.faceHGravity !== 'center') {
-		newUrl += `/face:gravity:${imageParams.faceHGravity}:${imageParams.faceVGravity}`;
-	}
 
 	if (imageParams.crop.includes('person') && imageParams.personPadding > 0) {
 		newUrl += `/person:pad:${imageParams.personPadding}`;
@@ -88,6 +94,16 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 
 	if (imageParams.personVGravity !== 'center' || imageParams.personHGravity !== 'center') {
 		newUrl += `/person:gravity:${imageParams.personHGravity}:${imageParams.personVGravity}`;
+	}
+
+	if (imageParams.crop.includes('focus')) {
+		const fpx = imageParams.focalPoint.x.toFixed(4);
+		const fpy = imageParams.focalPoint.y.toFixed(4);
+		newUrl += `/fp:${fpx}:${fpy}`;
+
+		if (imageParams.focalPointZoom > 0) {
+			newUrl += `/fp:zoom:${imageParams.focalPointZoom}`;
+		}
 	}
 	//endregion
 
