@@ -37,7 +37,7 @@ const accessKey = useStorage('foxy_access_key', 'c8emk0kejqj8rkpn');
 const secret = useStorage('foxy_secret', 'Jxs4mwG6oJXSxDNLE6JWnMieNxBGqSD4');
 const imageKey = useStorage('foxy_image_key', 'XXM03026.JPG');
 
-const currentTab = ref<"preview"|"metadata">("preview");
+const currentTab = ref<"preview"|"metadata"|"preset">("preview");
 
 const currentImageUrl = ref<string|null>(null);
 
@@ -66,6 +66,7 @@ const sampleImages = computed(() => {
 
 onMounted(async () => {
 	buildImageUrl();
+	await fetchCurrentPreset();
 	await fetchImageMeta();
 });
 
@@ -83,6 +84,7 @@ const debugParams = reactive<DebugParams>({
 });
 
 const imageMeta = ref<ImageMeta|null>(null);
+const currentPreset = ref<any|null>(null);
 const constrainDimensions = useStorage('foxy_constrain_dimensions', false);
 
 
@@ -131,11 +133,29 @@ function buildImageUrl() {
 
 	currentImageUrl.value = buildUrl(currentSource.value.url, currentSource.value.key, currentSource.value.secret, imageKey.value, imageParams, debugParams);
 }
-
 const debouncedBuildImageUrl = pDebounce(buildImageUrl, 500);
+
+async function fetchCurrentPreset() {
+	if (!currentSource.value || !currentSource.value?.key || !currentSource.value?.secret || !currentSource.value?.url || !imageKey.value) {
+		currentPreset.value = null;
+		return;
+	}
+
+	const presetUrl = buildUrl(currentSource.value.url, currentSource.value.key, currentSource.value.secret, imageKey.value, imageParams, null, true);
+	console.log(presetUrl);
+	const response = await fetch(presetUrl);
+	if (!response.ok) {
+		currentPreset.value = null;
+		return;
+	}
+
+	currentPreset.value = await response.json();
+}
+const debouncedFetchCurrentPreset = pDebounce(fetchCurrentPreset, 500);
 
 watch(imageParams, async () => {
 	await debouncedBuildImageUrl();
+	await debouncedFetchCurrentPreset();
 }, { deep: true });
 
 watch(() => [imageParams.width, imageParams.height], (newVal, oldVal) => {
@@ -158,12 +178,14 @@ watch(currentSource, async () => {
 	imageMeta.value = null;
 	imageKey.value = currentSource.value?.sampleImages[0] ?? null;
 	await debouncedBuildImageUrl();
+	await debouncedFetchCurrentPreset();
 	await debouncedFetchImageMeta();
 }, { deep: true });
 
 watch(imageKey, async () => {
 	imageMeta.value = null;
 	await debouncedBuildImageUrl();
+	await debouncedFetchCurrentPreset();
 	await debouncedFetchImageMeta();
 }, { deep: true });
 
@@ -225,6 +247,12 @@ function removeSampleImage(imageKey:string) {
 
 	sampleImages.value.splice(idx, 1);
 }
+
+async function reload() {
+	buildImageUrl();
+	await fetchCurrentPreset();
+	await fetchImageMeta();
+}
 </script>
 <template>
 	<div class="fixed inset-0 flex flex-col">
@@ -237,6 +265,7 @@ function removeSampleImage(imageKey:string) {
 				<Tabs>
 					<Tab v-model="currentTab" value="preview">Preview</Tab>
 					<Tab v-if="imageMeta" v-model="currentTab" value="metadata">Metadata</Tab>
+					<Tab v-if="currentPreset" v-model="currentTab" value="preset">Preset</Tab>
 				</Tabs>
 				<div class="bg-neutral-100 p-0.5"></div>
 				<div class="flex-1 relative">
@@ -263,7 +292,7 @@ function removeSampleImage(imageKey:string) {
 								<StatusInfo v-tooltip="`${peopleCount} people found.`" v-if="imageMeta && isLoaded" class="cursor-pointer"><Icon name="person" class="fill-black w-3 h-auto"/> {{ peopleCount }}</StatusInfo>
 							</div>
 							<div class="flex-1 flex items-center justify-end gap-3 ">
-								<div class="cursor-pointer aspect-square rounded-full bg-white/50 hover:bg-white backdrop-blur-lg p-1.5" @click="buildImageUrl">
+								<div class="cursor-pointer aspect-square rounded-full bg-white/50 hover:bg-white backdrop-blur-lg p-1.5" @click="reload">
 									<Icon name="reload" class="fill-current w-4 h-auto" />
 								</div>
 								<div>
@@ -303,6 +332,11 @@ function removeSampleImage(imageKey:string) {
 					<template v-else-if="currentTab === 'metadata'">
 						<div class="absolute left-0 top-0 right-0 bottom-0 overflow-y-auto px-3 py-1.5">
 							<VueJsonPretty :data="imageMeta" :showLineNumber="true" :showIcon="true" :showDoubleQuotes="false" :showLength="true" />
+						</div>
+					</template>
+					<template v-else-if="currentTab === 'preset'">
+						<div class="absolute left-0 top-0 right-0 bottom-0 overflow-y-auto px-3 py-1.5">
+							<VueJsonPretty :data="currentPreset" :showLineNumber="true" :showIcon="true" :showDoubleQuotes="false" :showLength="true" />
 						</div>
 					</template>
 				</div>
