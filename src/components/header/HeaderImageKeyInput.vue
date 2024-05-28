@@ -9,9 +9,9 @@ import HeaderSampleImages from "@/components/header/HeaderSampleImages.vue";
 const props = withDefaults(defineProps<{
 	label: string,
 	type?: string,
-	host:string,
-	accessKey:string|null,
-	secret:string,
+	host:string|null|undefined,
+	accessKey:string|null|undefined,
+	secret:string|null|undefined,
 	modelValue: string|null,
 	sampleImages: string[],
 }>(), {
@@ -39,7 +39,7 @@ const currentValue = computed({
 		<SmallLabel>{{ label }}</SmallLabel>
 		<div class="w-full relative">
 			<input :type="type" class="w-full border border-neutral-200 rounded-md px-2 py-1 text-sm" v-model="currentValue" />
-			<div class="absolute right-1 top-1/2 -translate-y-1/2 cursor-pointer">
+			<div v-if="host && accessKey && secret" class="absolute right-1 top-1/2 -translate-y-1/2 cursor-pointer">
 				<VDropdown>
 						<div class="w-4 aspect-square"><Icon name="image-search" class="w-auto h-4" /></div>
 						<template #popper>

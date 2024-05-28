@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
-import type {FoxySource} from "@/types/options";
 import Icon from "@/components/UI/Icon.vue";
+import type {FoxySource} from "@/types/foxy-source";
 
 const props = defineProps<{
 	modelValue: string|null,

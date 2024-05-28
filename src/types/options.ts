@@ -37,11 +37,3 @@ export const SourceTypeOptions = {
 	web: "Web",
 }
 
-export type FoxySource = {
-	type: "web" | "local" | "s3",
-	name: string,
-	url: string|null,
-	key: string|null,
-	secret: string|null,
-	sampleImages: string[]
-}

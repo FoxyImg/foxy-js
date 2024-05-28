@@ -1,193 +1,119 @@
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref, watch} from "vue";
-import pDebounce from 'p-debounce';
+import {computed, onMounted, ref, watch} from "vue";
+import copy from "copy-to-clipboard";
+import {storeToRefs} from "pinia";
+import {useStorage} from "@vueuse/core";
 
 import HeaderImageKeyInput from "@/components/header/HeaderImageKeyInput.vue";
 import SelectParam from "@/components/editors/SelectParam.vue";
 import SliderParam from "@/components/editors/SliderParam.vue";
-import VueJsonPretty from 'vue-json-pretty';
-
-import 'vue-json-pretty/lib/styles.css';
+import EditorPanel from "@/components/editors/EditorPanel.vue";
 import Tabs from "@/components/UI/Tabs.vue";
 import Tab from "@/components/UI/Tab.vue";
-
-import {CropOptions, HGravityOptions, InterestingOptions, VGravityOptions} from "@/types/options";
-import EditorPanel from "@/components/editors/EditorPanel.vue";
-import {useStorage} from "@vueuse/core";
 import Icon from "@/components/UI/Icon.vue";
 import LoaderFeedback from "@/components/UI/LoaderFeedback.vue";
-import useImageLoader from "@/composables/image-loader";
 import ToggleParam from "@/components/editors/ToggleParam.vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
-import signHMAC256 from "@/utils/sign";
 import TagsParam from "@/components/editors/TagsParam.vue";
 import ColorParam from "@/components/editors/ColorParam.vue";
-import {type DebugParams, DefaultImageParams, type ImageParams} from "@/types/params";
-import buildUrl from "@/utils/url-builder";
 import ObjectSelectParam from "@/components/editors/ObjectSelectParam.vue";
 import SourceEditModal from "@/components/modals/SourceEditModal.vue";
-import useFoxySource from "@/composables/foxy-source";
 import FoxySourceSelector from "@/components/header/FoxySourceSelector.vue";
 import StatusInfo from "@/components/UI/StatusInfo.vue";
-import type {ImageMeta} from "@/types/image-meta";
 import FocalPointParam from "@/components/editors/FocalPointParam.vue";
+import FoxyAppSelector from "@/components/header/FoxyAppSelector.vue";
+import FoxyAppEditModal from "@/components/modals/FoxyAppEditModal.vue";
 
-const url = useStorage('foxy_url', 'http://localhost:8080');
-const accessKey = useStorage('foxy_access_key', 'c8emk0kejqj8rkpn');
-const secret = useStorage('foxy_secret', 'Jxs4mwG6oJXSxDNLE6JWnMieNxBGqSD4');
-const imageKey = useStorage('foxy_image_key', 'XXM03026.JPG');
+import VueJsonPretty from 'vue-json-pretty';
+import 'vue-json-pretty/lib/styles.css';
 
-const currentTab = ref<"preview"|"metadata"|"preset">("preview");
+import {CropOptions, HGravityOptions, InterestingOptions, VGravityOptions} from "@/types/options";
 
-const currentImageUrl = ref<string|null>(null);
+import useImageLoader from "@/composables/image-loader";
+import useFoxySourceEditor from "@/composables/foxy-source-editor";
+import useFoxyAppEditor from "@/composables/foxy-app-editor";
+
+import {useFoxyAppStore} from "@/stores/foxy-app-store";
+import {useImageParamsStore} from "@/stores/image-params-store";
 
 const {
+	apps,
+	currentAppId,
+	currentApp,
 	currentSources,
 	currentSourceId,
 	currentSource,
+	sampleImages,
+	imageKey,
+} = storeToRefs(useFoxyAppStore());
 
+const {
+	removeSampleImage
+} = useFoxyAppStore();
+
+const {
+	currentImageUrl,
+	imageParams,
+	debugParams,
+	imageMeta,
+	faceCount,
+	peopleCount,
+	currentPresetJSONObject,
+} = storeToRefs(useImageParamsStore());
+
+const {
+	buildImageUrl,
+	fetchImageMeta,
+	fetchCurrentPresetJSONObject,
+	reload,
+} = useImageParamsStore();
+
+const {
+	editingFoxyApp,
+	showFoxyAppEditor,
+	foxyAppEditorMode,
+
+	newFoxyApp,
+	editFoxyApp,
+	saveFoxyApp,
+	deleteFoxyApp,
+} = useFoxyAppEditor();
+
+const {
 	editingFoxySource,
 	showFoxySourceEditor,
 	foxyEditorMode,
+
 	newFoxySource,
 	editFoxySource,
 	saveFoxySource,
 	deleteFoxySource,
-} = useFoxySource();
-
-const sampleImages = computed(() => {
-	if (currentSource.value === null) {
-		return [];
-	}
-
-	return currentSource.value!.sampleImages;
-});
-
+} = useFoxySourceEditor();
 
 onMounted(async () => {
 	buildImageUrl();
-	await fetchCurrentPreset();
+	await fetchCurrentPresetJSONObject();
 	await fetchImageMeta();
 });
 
-const imageParams = reactive<ImageParams>(JSON.parse(JSON.stringify(DefaultImageParams)));
-const debugParams = reactive<DebugParams>({
-	faces: false,
-	allFaces: false,
-	people: false,
-	allPeople: false,
-	otherLabels: false,
-
-	disableSourceCache: false,
-	disableMetaCache: false,
-	disableRenderCache: false,
-});
-
-const imageMeta = ref<ImageMeta|null>(null);
-const currentPreset = ref<any|null>(null);
+const currentTab = ref<"preview"|"metadata"|"preset">("preview");
 const constrainDimensions = useStorage('foxy_constrain_dimensions', false);
 
-
-const faceCount = computed(() => {
-	if (!imageMeta.value) {
-		return 0;
-	}
-
-	return imageMeta.value.faces.length;
-});
-
-const peopleCount = computed(() => {
-	if (!imageMeta.value || !imageMeta.value.people) {
-		return 0;
-	}
-
-	return imageMeta.value.people.length;
-});
-
-async function fetchImageMeta() {
-	if (!currentSource.value || !currentSource.value?.key || !currentSource.value?.secret || !currentSource.value?.url || !imageKey.value) {
-		imageMeta.value = null;
-		return;
-	}
-
-	let encodedKey = btoa('/'+imageKey.value);
-	let metaUrl = `/${currentSource.value.key}/${encodedKey}/meta`;
-
-	const sig = signHMAC256(currentSource.value.secret, metaUrl);
-
-	const response = await fetch(currentSource.value.url + metaUrl + "?s="+sig);
-	if (!response.ok) {
-		imageMeta.value = null;
-		return;
-	}
-
-	imageMeta.value = await response.json();
-}
-const debouncedFetchImageMeta = pDebounce(fetchImageMeta, 500);
-
-function buildImageUrl() {
-	if (!currentSource.value || !currentSource.value?.key || !currentSource.value?.secret || !currentSource.value?.url || !imageKey.value) {
-		currentImageUrl.value = null;
-		return;
-	}
-
-	currentImageUrl.value = buildUrl(currentSource.value.url, currentSource.value.key, currentSource.value.secret, imageKey.value, imageParams, debugParams);
-}
-const debouncedBuildImageUrl = pDebounce(buildImageUrl, 500);
-
-async function fetchCurrentPreset() {
-	if (!currentSource.value || !currentSource.value?.key || !currentSource.value?.secret || !currentSource.value?.url || !imageKey.value) {
-		currentPreset.value = null;
-		return;
-	}
-
-	const presetUrl = buildUrl(currentSource.value.url, currentSource.value.key, currentSource.value.secret, imageKey.value, imageParams, null, true);
-	console.log(presetUrl);
-	const response = await fetch(presetUrl);
-	if (!response.ok) {
-		currentPreset.value = null;
-		return;
-	}
-
-	currentPreset.value = await response.json();
-}
-const debouncedFetchCurrentPreset = pDebounce(fetchCurrentPreset, 500);
-
-watch(imageParams, async () => {
-	await debouncedBuildImageUrl();
-	await debouncedFetchCurrentPreset();
-}, { deep: true });
-
-watch(() => [imageParams.width, imageParams.height], (newVal, oldVal) => {
+watch(() => [imageParams.value.width, imageParams.value.height], (newVal, oldVal) => {
 	if (!constrainDimensions.value) {
 		return;
 	}
 
 	if (oldVal[0] !== newVal[0]) {
-		if (imageParams.height !== newVal[0]) {
-			imageParams.height = newVal[0];
+		if (imageParams.value.height !== newVal[0]) {
+			imageParams.value.height = newVal[0];
 		}
 	} else if (oldVal[1] !== newVal[1]) {
-		if (imageParams.width !== newVal[1]) {
-			imageParams.width = newVal[1];
+		if (imageParams.value.width !== newVal[1]) {
+			imageParams.value.width = newVal[1];
 		}
 	}
 });
-
-watch(currentSource, async () => {
-	imageMeta.value = null;
-	imageKey.value = currentSource.value?.sampleImages[0] ?? null;
-	await debouncedBuildImageUrl();
-	await debouncedFetchCurrentPreset();
-	await debouncedFetchImageMeta();
-}, { deep: true });
-
-watch(imageKey, async () => {
-	imageMeta.value = null;
-	await debouncedBuildImageUrl();
-	await debouncedFetchCurrentPreset();
-	await debouncedFetchImageMeta();
-}, { deep: true });
 
 const {
 	isLoading,
@@ -198,7 +124,7 @@ const {
 } = useImageLoader(currentImageUrl);
 
 watch(isLoaded, () => {
-	if (isLoaded.value && currentImageUrl.value && !error.value) {
+	if (isLoaded.value && currentImageUrl.value && !error.value && imageKey.value) {
 		if (!sampleImages.value.includes(imageKey.value)) {
 			sampleImages.value.unshift(imageKey.value);
 		}
@@ -238,34 +164,20 @@ const faceOptions = computed(() => {
 
 	return options;
 });
-
-function removeSampleImage(imageKey:string) {
-	const idx = sampleImages.value.indexOf(imageKey);
-	if (idx === -1) {
-		return;
-	}
-
-	sampleImages.value.splice(idx, 1);
-}
-
-async function reload() {
-	buildImageUrl();
-	await fetchCurrentPreset();
-	await fetchImageMeta();
-}
 </script>
 <template>
 	<div class="fixed inset-0 flex flex-col">
 		<div class="p-3 flex items-center gap-3">
+			<FoxyAppSelector :apps="apps" v-model="currentAppId" @add-app="newFoxyApp" @edit-app="editFoxyApp" @delete-app="deleteFoxyApp" />
 			<FoxySourceSelector :sources="currentSources" v-model="currentSourceId" @new-source="newFoxySource" @edit-source="editFoxySource" @save-source="saveFoxySource" @delete-source="deleteFoxySource" />
-			<HeaderImageKeyInput class="flex-1" label="Image Key" v-model="imageKey" :host="url" :access-key="accessKey" :secret="secret" :sample-images="sampleImages" @remove-sample-image="removeSampleImage" />
+			<HeaderImageKeyInput class="flex-1" label="Image Key" v-model="imageKey" :host="currentApp?.url" :access-key="currentSource?.key" :secret="currentApp?.secret" :sample-images="sampleImages" @remove-sample-image="removeSampleImage" />
 		</div>
 		<div class="flex-1 flex">
 			<div class="flex-1 flex flex-col">
 				<Tabs>
 					<Tab v-model="currentTab" value="preview">Preview</Tab>
 					<Tab v-if="imageMeta" v-model="currentTab" value="metadata">Metadata</Tab>
-					<Tab v-if="currentPreset" v-model="currentTab" value="preset">Preset</Tab>
+					<Tab v-if="currentPresetJSONObject" v-model="currentTab" value="preset">Preset</Tab>
 				</Tabs>
 				<div class="bg-neutral-100 p-0.5"></div>
 				<div class="flex-1 relative">
@@ -336,7 +248,7 @@ async function reload() {
 					</template>
 					<template v-else-if="currentTab === 'preset'">
 						<div class="absolute left-0 top-0 right-0 bottom-0 overflow-y-auto px-3 py-1.5">
-							<VueJsonPretty :data="currentPreset" :showLineNumber="true" :showIcon="true" :showDoubleQuotes="false" :showLength="true" />
+							<VueJsonPretty :data="currentPresetJSONObject" :showLineNumber="true" :showIcon="true" :showDoubleQuotes="false" :showLength="true" />
 						</div>
 					</template>
 				</div>
@@ -368,7 +280,7 @@ async function reload() {
 								<SelectParam title="Vertical Gravity" v-model="imageParams.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
 							</div>
 						</EditorPanel>
-						<EditorPanel v-if="imageParams.crop.includes('focus')" title="Focal Point">
+						<EditorPanel v-if="imageParams.crop.includes('focus') && imageKey" title="Focal Point">
 							<FocalPointParam v-model="imageParams.focalPoint" :current-source="currentSource" :image-meta="imageMeta" :image-key="imageKey" />
 							<SliderParam title="Focal Point Zoom" v-model="imageParams.focalPointZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
 						</EditorPanel>
@@ -401,6 +313,9 @@ async function reload() {
 	</div>
 
 	<teleport to="#modals">
+		<fade-transition>
+			<FoxyAppEditModal v-if="showFoxyAppEditor" v-model="editingFoxyApp" :editing="foxyAppEditorMode === 'edit'" @close="showFoxyAppEditor = false" @save="saveFoxyApp" />
+		</fade-transition>
 		<fade-transition>
 			<SourceEditModal v-if="showFoxySourceEditor" v-model="editingFoxySource" :editing="foxyEditorMode === 'edit'" @close="showFoxySourceEditor = false" @save="saveFoxySource" />
 		</fade-transition>

@@ -12,11 +12,17 @@ import Transitions from '@noction/vue-bezier'
 
 import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
 
+import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 import { createApp } from 'vue'
 import App from './App.vue'
 
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+
 createApp(App)
+	.use(pinia)
 	.use(Transitions)
 	.use(autoAnimatePlugin)
 	.use(FloatingVue)

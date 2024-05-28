@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import ModalContainer from "@/components/UI/ModalContainer.vue";
-import {type FoxySource, SourceTypeOptions} from "@/types/options";
+import {SourceTypeOptions} from "@/types/options";
 import {nextTick, onMounted, reactive, ref} from "vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
+import type {FoxySource} from "@/types/foxy-source";
 
 const props = defineProps<{
 	editing: boolean,
@@ -68,16 +69,8 @@ function jsonSelected() {
 				</select>
 			</div>
 			<div class="flex flex-col gap-1">
-				<SmallLabel>Source URL</SmallLabel>
-				<input type="text" v-model="currentSource.url" class="border border-neutral-200 rounded-md px-2 py-1 text-sm">
-			</div>
-			<div class="flex flex-col gap-1">
 				<SmallLabel>Access Key</SmallLabel>
 				<input type="text" v-model="currentSource.key" class="border border-neutral-200 rounded-md px-2 py-1 text-sm">
-			</div>
-			<div class="flex flex-col gap-1">
-				<SmallLabel>Secret</SmallLabel>
-				<input type="password" v-model="currentSource.secret" class="border border-neutral-200 rounded-md px-2 py-1 text-sm">
 			</div>
 			<div class="flex flex-col gap-1">
 				<SmallLabel>Sample Image Keys</SmallLabel>
