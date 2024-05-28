@@ -1,7 +1,7 @@
-import type {ImageParams} from "@/types/params";
+import type {BoxCropParams, DebugParams, ImageParams} from "@/types/params";
 import signHMAC256 from "@/utils/sign";
 
-export default function buildUrl(host:string, accessKey:string|null, secret:string, imageKey:string, imageParams:ImageParams) {
+export default function buildUrl(host:string, accessKey:string|null, secret:string, imageKey:string, imageParams:ImageParams, debugParams:DebugParams|null = null, preset:boolean = false) {
 	let encodedKey = btoa('/'+imageKey);
 	let newUrl = accessKey ? `/${accessKey}/${encodedKey}` : `/${encodedKey}`;
 
@@ -42,58 +42,40 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		}
 	}
 
-	if (imageParams.crop.includes('face')) {
-		if (imageParams.facePadding != 8) {
-			newUrl += `/face:pad:${imageParams.facePadding}`;
+	const processBoxParams = (noun:string, params:BoxCropParams) => {
+		if (params.padding != 8) {
+			newUrl += `/${noun}:pad:${params.padding}`;
 		}
 
-		if (imageParams.faceIndex > -1) {
-			newUrl += `/face:index:${imageParams.faceIndex}`;
-		} else if (imageParams.faceIndex < -1) {
-			if (imageParams.faceIndex === -2) {
-				newUrl += `/face:index:largest`;
+		if (params.index > -1) {
+			newUrl += `/${noun}:index:${params.index}`;
+		} else if (params.index < -1) {
+			if (params.index === -2) {
+				newUrl += `/${noun}:index:largest`;
 			} else {
-				newUrl += `/face:index:smallest`;
+				newUrl += `/${noun}:index:smallest`;
 			}
 		}
 
-		if (imageParams.faceZoom > 0) {
-			newUrl += `/face:zoom:${imageParams.faceZoom}`;
+		if (params.zoom > 0) {
+			newUrl += `/${noun}:zoom:${params.zoom}`;
 		}
 
-		if (imageParams.faceVGravity !== 'top' || imageParams.faceHGravity !== 'center') {
-			newUrl += `/face:gravity:${imageParams.faceHGravity}:${imageParams.faceVGravity}`;
+		if (params.vGravity !== 'top' || params.hGravity !== 'center') {
+			newUrl += `/${noun}:gravity:${params.hGravity}:${params.vGravity}`;
 		}
 
-		if (imageParams.faceFocus) {
-			newUrl += '/face:focus';
-		}
-	}
-
-
-
-	if (imageParams.crop.includes('person') && imageParams.personPadding > 0) {
-		newUrl += `/person:pad:${imageParams.personPadding}`;
-	}
-
-	if (imageParams.crop.includes('person') && imageParams.personIndex > -1) {
-		newUrl += `/person:index:${imageParams.personIndex}`;
-	}
-
-	if (imageParams.crop.includes('person') && imageParams.personIndex < -1) {
-		if (imageParams.personIndex === -2) {
-			newUrl += `/person:index:largest`;
-		} else {
-			newUrl += `/person:index:smallest`;
+		if (params.focus) {
+			newUrl += `/${noun}:focus`;
 		}
 	}
 
-	if (imageParams.crop.includes('person') && imageParams.personZoom > 0) {
-		newUrl += `/person:zoom:${imageParams.personZoom}`;
+	if (imageParams.crop.includes('face')) {
+		processBoxParams('face', imageParams.face);
 	}
 
-	if (imageParams.personVGravity !== 'center' || imageParams.personHGravity !== 'center') {
-		newUrl += `/person:gravity:${imageParams.personHGravity}:${imageParams.personVGravity}`;
+	if (imageParams.crop.includes('person')) {
+		processBoxParams('person', imageParams.person);
 	}
 
 	if (imageParams.crop.includes('focus')) {
@@ -119,50 +101,53 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 	//region Debug Params
 	const debug:string[] = [];
 
-	if (imageParams.debugFaces) {
-		debug.push('faces');
+	if (debugParams) {
+		if (debugParams.faces) {
+			debug.push('faces');
+		}
+
+		if (debugParams.allFaces) {
+			debug.push('all-faces');
+		}
+
+		if (debugParams.people) {
+			debug.push('people');
+		}
+
+		if (debugParams.allPeople) {
+			debug.push('all-people');
+		}
+
+		if (debugParams.otherLabels) {
+			debug.push('other-labels');
+		}
+
+		if (debug.length > 0) {
+			newUrl += `/debug:${debug.join(',')}`;
+		}
+
+		const nocache:string[] = [];
+
+		if (debugParams.disableSourceCache) {
+			nocache.push('source');
+		}
+
+		if (debugParams.disableMetaCache) {
+			nocache.push('meta');
+		}
+
+		if (debugParams.disableRenderCache) {
+			nocache.push('render');
+		}
+
+		if (nocache.length > 0) {
+			newUrl += `/nocache:${nocache.join(',')}`;
+		}
 	}
 
-	if (imageParams.debugAllFaces) {
-		debug.push('all-faces');
-	}
-
-	if (imageParams.debugPeople) {
-		debug.push('people');
-	}
-
-	if (imageParams.debugAllPeople) {
-		debug.push('all-people');
-	}
-
-	if (imageParams.debugOtherLabels) {
-		debug.push('other-labels');
-	}
-
-	if (debug.length > 0) {
-		newUrl += `/debug:${debug.join(',')}`;
-	}
-
-	const nocache:string[] = [];
-
-	if (imageParams.disableSourceCache) {
-		nocache.push('source');
-	}
-
-	if (imageParams.disableMetaCache) {
-		nocache.push('meta');
-	}
-
-	if (imageParams.disableRenderCache) {
-		nocache.push('render');
-	}
-
-	if (nocache.length > 0) {
-		newUrl += `/nocache:${nocache.join(',')}`;
-	}
 
 	//endregion
 
 
-	return host + newUrl + `?_=${new Date().getTime()}&s=`+signHMAC256(secret, newUrl);
+	return host + newUrl + `?_=${new Date().getTime()}&s=`+signHMAC256(secret, newUrl)+(preset ? '&preset': '');
 }

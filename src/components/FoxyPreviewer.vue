@@ -22,7 +22,7 @@ import SmallLabel from "@/components/UI/SmallLabel.vue";
 import signHMAC256 from "@/utils/sign";
 import TagsParam from "@/components/editors/TagsParam.vue";
 import ColorParam from "@/components/editors/ColorParam.vue";
-import {DefaultImageParams, type ImageParams} from "@/types/params";
+import {type DebugParams, DefaultImageParams, type ImageParams} from "@/types/params";
 import buildUrl from "@/utils/url-builder";
 import ObjectSelectParam from "@/components/editors/ObjectSelectParam.vue";
 import SourceEditModal from "@/components/modals/SourceEditModal.vue";
@@ -70,6 +70,18 @@ onMounted(async () => {
 });
 
 const imageParams = reactive<ImageParams>(JSON.parse(JSON.stringify(DefaultImageParams)));
+const debugParams = reactive<DebugParams>({
+	faces: false,
+	allFaces: false,
+	people: false,
+	allPeople: false,
+	otherLabels: false,
+
+	disableSourceCache: false,
+	disableMetaCache: false,
+	disableRenderCache: false,
+});
+
 const imageMeta = ref<ImageMeta|null>(null);
 const constrainDimensions = useStorage('foxy_constrain_dimensions', false);
 
@@ -117,7 +129,7 @@ function buildImageUrl() {
 		return;
 	}
 
-	currentImageUrl.value = buildUrl(currentSource.value.url, currentSource.value.key, currentSource.value.secret, imageKey.value, imageParams);
+	currentImageUrl.value = buildUrl(currentSource.value.url, currentSource.value.key, currentSource.value.secret, imageKey.value, imageParams, debugParams);
 }
 
 const debouncedBuildImageUrl = pDebounce(buildImageUrl, 500);
@@ -264,18 +276,18 @@ function removeSampleImage(imageKey:string) {
 											<SmallLabel>Debug Options</SmallLabel>
 											<EditorPanel title="Image Recognition" class="w-[400px]">
 												<div class="grid grid-cols-2 gap-3">
-													<ToggleParam title="Outline Faces" v-model="imageParams.debugFaces" />
-													<ToggleParam title="Outline All Faces" v-model="imageParams.debugAllFaces" />
-													<ToggleParam title="Outline People" v-model="imageParams.debugPeople" />
-													<ToggleParam title="Outline All People" v-model="imageParams.debugAllPeople" />
-													<ToggleParam title="Outline Other Labels" v-model="imageParams.debugOtherLabels" />
+													<ToggleParam title="Outline Faces" v-model="debugParams.faces" />
+													<ToggleParam title="Outline All Faces" v-model="debugParams.allFaces" />
+													<ToggleParam title="Outline People" v-model="debugParams.people" />
+													<ToggleParam title="Outline All People" v-model="debugParams.allPeople" />
+													<ToggleParam title="Outline Other Labels" v-model="debugParams.otherLabels" />
 												</div>
 											</EditorPanel>
 											<EditorPanel title="Caching" class="w-[400px]">
 												<div class="grid grid-cols-2 gap-3">
-													<ToggleParam title="Disable Source Cache" v-model="imageParams.disableSourceCache" />
-													<ToggleParam title="Disable Meta Cache" v-model="imageParams.disableMetaCache" />
-													<ToggleParam title="Disable Render Cache" v-model="imageParams.disableRenderCache" />
+													<ToggleParam title="Disable Source Cache" v-model="debugParams.disableSourceCache" />
+													<ToggleParam title="Disable Meta Cache" v-model="debugParams.disableMetaCache" />
+													<ToggleParam title="Disable Render Cache" v-model="debugParams.disableRenderCache" />
 												</div>
 											</EditorPanel>
 											</div>
@@ -327,22 +339,22 @@ function removeSampleImage(imageKey:string) {
 							<SliderParam title="Focal Point Zoom" v-model="imageParams.focalPointZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
 						</EditorPanel>
 						<EditorPanel v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Crop Options">
-							<ObjectSelectParam title="Face Index" v-model="imageParams.faceIndex" :default="-1" :allow-null="false" :options="faceOptions" />
-							<SliderParam title="Face Padding" v-model="imageParams.facePadding" :min="0" :max="256" :step="1" :default="8" suffix="px" />
-							<SliderParam title="Face Zoom" v-model="imageParams.faceZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+							<ObjectSelectParam title="Face Index" v-model="imageParams.face.index" :default="-1" :allow-null="false" :options="faceOptions" />
+							<SliderParam title="Face Padding" v-model="imageParams.face.padding" :min="0" :max="256" :step="1" :default="8" suffix="px" />
+							<SliderParam title="Face Zoom" v-model="imageParams.face.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
 							<div class="grid grid-cols-2 gap-3">
-								<SelectParam title="Face Horizontal Gravity" v-model="imageParams.faceHGravity" default="center" :allow-null="false" :options="HGravityOptions" />
-								<SelectParam title="Face Vertical Gravity" v-model="imageParams.faceVGravity" default="top" :allow-null="false" :options="VGravityOptions" />
+								<SelectParam title="Face Horizontal Gravity" v-model="imageParams.face.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
+								<SelectParam title="Face Vertical Gravity" v-model="imageParams.face.vGravity" default="top" :allow-null="false" :options="VGravityOptions" />
 							</div>
-							<ToggleParam title="Focus Face" v-model="imageParams.faceFocus" />
+							<ToggleParam title="Focus Face" v-model="imageParams.face.focus" />
 						</EditorPanel>
 						<EditorPanel v-if="imageParams.crop.includes('person') && peopleCount > 0" title="Person Crop Options">
-							<ObjectSelectParam title="Person Index" v-model="imageParams.personIndex" :default="-1" :allow-null="false" :options="personOptions" />
-							<SliderParam title="Person Padding" v-model="imageParams.personPadding" :min="0" :max="256" :step="1" :default="0" suffix="px" />
-							<SliderParam title="Person Zoom" v-model="imageParams.personZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+							<ObjectSelectParam title="Person Index" v-model="imageParams.person.index" :default="-1" :allow-null="false" :options="personOptions" />
+							<SliderParam title="Person Padding" v-model="imageParams.person.padding" :min="0" :max="256" :step="1" :default="0" suffix="px" />
+							<SliderParam title="Person Zoom" v-model="imageParams.person.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
 							<div class="grid grid-cols-2 gap-3">
-								<SelectParam title="Person Horiz. Gravity" v-model="imageParams.personHGravity" default="center" :allow-null="false" :options="HGravityOptions" />
-								<SelectParam title="Person Vertical Gravity" v-model="imageParams.personVGravity" default="center" :allow-null="false" :options="VGravityOptions" />
+								<SelectParam title="Person Horiz. Gravity" v-model="imageParams.person.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
+								<SelectParam title="Person Vertical Gravity" v-model="imageParams.person.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
 							</div>
 						</EditorPanel>
 						<EditorPanel title="Image Attributes">

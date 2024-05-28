@@ -1,3 +1,13 @@
+
+export type BoxCropParams = {
+	index: number,
+	hGravity: 'left' | 'center' | 'right',
+	vGravity: 'top' | 'center' | 'bottom',
+	padding: number,
+	zoom: number,
+	focus: boolean,
+}
+
 export type ImageParams = {
 	crop: string[],
 	width: number,
@@ -5,33 +15,24 @@ export type ImageParams = {
 	aspectRatioWidth: number,
 	aspectRatioHeight: number,
 	zoom: number,
-	faceIndex: number,
-	personIndex: number,
 	smartMode: string|null,
 	hGravity: string,
 	vGravity: string,
 	focalPoint: { x: number, y: number },
 	focalPointZoom: number,
 
-	faceHGravity: string,
-	faceVGravity: string,
-	facePadding: number,
-	faceZoom: number,
-	faceFocus: boolean,
-
-	personHGravity: string,
-	personVGravity: string,
-	personPadding: number,
-	personZoom: number,
-	personFocus: boolean,
+	face: BoxCropParams,
+	person: BoxCropParams,
 
 	backgroundColor: string|null,
+}
 
-	debugFaces: boolean,
-	debugAllFaces: boolean,
-	debugPeople: boolean,
-	debugAllPeople: boolean,
-	debugOtherLabels: boolean,
+export type DebugParams = {
+	faces: boolean,
+	allFaces: boolean,
+	people: boolean,
+	allPeople: boolean,
+	otherLabels: boolean,
 
 	disableSourceCache: boolean,
 	disableMetaCache: boolean,
@@ -45,41 +46,33 @@ export const DefaultImageParams: ImageParams = {
 	aspectRatioWidth: 0,
 	aspectRatioHeight: 0,
 	zoom: 1,
-	faceIndex: -1,
-	personIndex: -1,
 	smartMode: null,
 	hGravity: 'center',
 	vGravity: 'center',
 	focalPoint: { x: 0.5, y: 0.5 },
 	focalPointZoom: 0,
 
-	faceHGravity: 'center',
-	faceVGravity: 'top',
-	facePadding: 8,
-	faceZoom: 0,
-	faceFocus: false,
+	face: {
+		index: -1,
+		hGravity: 'center',
+		vGravity: 'top',
+		padding: 8,
+		zoom: 0,
+		focus: false,
+	},
 
-	personHGravity: 'center',
-	personVGravity: 'center',
-	personPadding: 0,
-	personZoom: 0,
-	personFocus: false,
+	person: {
+		index: -1,
+		hGravity: 'center',
+		vGravity: 'center',
+		padding: 0,
+		zoom: 0,
+		focus: false,
+	},
 
 	backgroundColor: null,
-
-	debugFaces: false,
-	debugAllFaces: false,
-	debugPeople: false,
-	debugAllPeople: false,
-	debugOtherLabels: false,
-
-	disableSourceCache: false,
-	disableMetaCache: false,
-	disableRenderCache: false,
 }
 
 export function buildImageParams(imageParams: Partial<ImageParams>) {
-	const params = JSON.parse(JSON.stringify(DefaultImageParams));
-	Object.assign(params, imageParams);
-	return params;
+	return Object.assign(structuredClone(DefaultImageParams), imageParams);
 }
