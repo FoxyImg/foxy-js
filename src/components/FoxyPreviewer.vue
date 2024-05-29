@@ -24,9 +24,6 @@ import FocalPointParam from "@/components/editors/FocalPointParam.vue";
 import FoxyAppSelector from "@/components/header/FoxyAppSelector.vue";
 import FoxyAppEditModal from "@/components/modals/FoxyAppEditModal.vue";
 
-import VueJsonPretty from 'vue-json-pretty';
-import 'vue-json-pretty/lib/styles.css';
-
 import {CropOptions, HGravityOptions, InterestingOptions, VGravityOptions} from "@/types/options";
 
 import useImageLoader from "@/composables/image-loader";
@@ -35,6 +32,11 @@ import useFoxyAppEditor from "@/composables/foxy-app-editor";
 
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import {useImageParamsStore} from "@/stores/image-params-store";
+import JSONViewer from "@/components/UI/JSONViewer.vue";
+import useFoxyPresetEditor from "@/composables/foxy-preset-editor";
+import FoxyPresetSelector from "@/components/header/FoxyPresetSelector.vue";
+import FoxyPresetEditModal from "@/components/modals/FoxyPresetEditModal.vue";
+import ImageLink from "@/components/UI/ImageLink.vue";
 
 const {
 	apps,
@@ -45,6 +47,10 @@ const {
 	currentSource,
 	sampleImages,
 	imageKey,
+	currentPresetId,
+	currentPresets,
+	currentPreset,
+	currentPresetChanged,
 } = storeToRefs(useFoxyAppStore());
 
 const {
@@ -53,6 +59,7 @@ const {
 
 const {
 	currentImageUrl,
+	currentPresetImageUrl,
 	imageParams,
 	debugParams,
 	imageMeta,
@@ -66,6 +73,7 @@ const {
 	fetchImageMeta,
 	fetchCurrentPresetJSONObject,
 	reload,
+	resetParams,
 } = useImageParamsStore();
 
 const {
@@ -89,6 +97,19 @@ const {
 	saveFoxySource,
 	deleteFoxySource,
 } = useFoxySourceEditor();
+
+const {
+		foxyPresetName,
+		showFoxyPresetEditor,
+		foxyPresetEditorMode,
+
+		saveFoxyPreset,
+		updateCurrentFoxyPreset,
+		editFoxyPreset,
+		newFoxyPreset,
+		deleteFoxyPreset,
+		syncFoxyPresets,
+} = useFoxyPresetEditor();
 
 onMounted(async () => {
 	buildImageUrl();
@@ -171,6 +192,7 @@ const faceOptions = computed(() => {
 			<FoxyAppSelector :apps="apps" v-model="currentAppId" @add-app="newFoxyApp" @edit-app="editFoxyApp" @delete-app="deleteFoxyApp" />
 			<FoxySourceSelector :sources="currentSources" v-model="currentSourceId" @new-source="newFoxySource" @edit-source="editFoxySource" @save-source="saveFoxySource" @delete-source="deleteFoxySource" />
 			<HeaderImageKeyInput class="flex-1" label="Image Key" v-model="imageKey" :host="currentApp?.url" :access-key="currentSource?.key" :secret="currentApp?.secret" :sample-images="sampleImages" @remove-sample-image="removeSampleImage" />
+			<FoxyPresetSelector :presets="currentPresets" v-model="currentPresetId" :preset-changed="currentPresetChanged" @new-preset="newFoxyPreset" @edit-preset="editFoxyPreset" @delete-preset="deleteFoxyPreset" @sync-presets="syncFoxyPresets" @update-preset="updateCurrentFoxyPreset" />
 		</div>
 		<div class="flex-1 flex">
 			<div class="flex-1 flex flex-col">
@@ -180,7 +202,7 @@ const faceOptions = computed(() => {
 					<Tab v-if="currentPresetJSONObject" v-model="currentTab" value="preset">Preset</Tab>
 				</Tabs>
 				<div class="bg-neutral-100 p-0.5"></div>
-				<div class="flex-1 relative">
+				<div class="flex-1 relative flex flex-col">
 					<template v-if="currentTab === 'preview' || !imageMeta">
 						<div class="group absolute left-0 top-0 right-0 bottom-0 flex items-center justify-center preview-area">
 							<div v-if="error" class="absolute left-1/2 top-1/2 -translate-x-1/2 flex flex-col items-center justify-center bg-white/15 p-2 rounded-lg backdrop-blur overflow-hidden transform-gpu">
@@ -235,26 +257,21 @@ const faceOptions = computed(() => {
 										</template>
 									</VDropdown>
 								</div>
-								<a v-if="currentImageUrl" :href="currentImageUrl" target="_blank" class="aspect-square rounded-full bg-white/50 hover:bg-white backdrop-blur-lg p-1.5">
-									<Icon name="link" class="fill-current w-4 h-auto" />
-								</a>
+								<ImageLink v-if="currentImageUrl" :image-url="currentImageUrl" action-title="Copy Image URL" icon-name="link" />
+								<ImageLink v-if="currentPresetImageUrl" :image-url="currentPresetImageUrl" action-title="Copy Preset Image URL" icon-name="bookmark" />
 							</div>
 						</div>
 					</template>
 					<template v-else-if="currentTab === 'metadata'">
-						<div class="absolute left-0 top-0 right-0 bottom-0 overflow-y-auto px-3 py-1.5">
-							<VueJsonPretty :data="imageMeta" :showLineNumber="true" :showIcon="true" :showDoubleQuotes="false" :showLength="true" />
-						</div>
+						<JSONViewer :json-object="imageMeta" class="absolute left-0 top-0 right-0 bottom-0" />
 					</template>
 					<template v-else-if="currentTab === 'preset'">
-						<div class="absolute left-0 top-0 right-0 bottom-0 overflow-y-auto px-3 py-1.5">
-							<VueJsonPretty :data="currentPresetJSONObject" :showLineNumber="true" :showIcon="true" :showDoubleQuotes="false" :showLength="true" />
-						</div>
+						<JSONViewer :json-object="currentPresetJSONObject" class="absolute left-0 top-0 right-0 bottom-0" />
 					</template>
 				</div>
 			</div>
 			<div class="relative min-w-[400px]">
-				<div class="absolute top-0 left-0 w-full h-full overflow-y-auto bg-neutral-100">
+				<div class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100">
 					<div class="p-3 flex flex-col gap-5">
 						<EditorPanel title="Cropping / Resizing">
 							<TagsParam title="Crop Mode" :options="CropOptions" v-model="imageParams.crop" placeholder="Select 1 or more crop modes" />
@@ -281,7 +298,7 @@ const faceOptions = computed(() => {
 							</div>
 						</EditorPanel>
 						<EditorPanel v-if="imageParams.crop.includes('focus') && imageKey" title="Focal Point">
-							<FocalPointParam v-model="imageParams.focalPoint" :current-source="currentSource" :image-meta="imageMeta" :image-key="imageKey" />
+							<FocalPointParam v-model="imageParams.focalPoint"/>
 							<SliderParam title="Focal Point Zoom" v-model="imageParams.focalPointZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
 						</EditorPanel>
 						<EditorPanel v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Crop Options">
@@ -306,6 +323,11 @@ const faceOptions = computed(() => {
 						<EditorPanel title="Image Attributes">
 							<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
 						</EditorPanel>
+						<EditorPanel>
+							<div class="flex items-center justify-center">
+								<div @click="resetParams" class="cursor-pointer text-xs hover:text-blue-900">Reset All</div>
+							</div>
+						</EditorPanel>
 					</div>
 				</div>
 			</div>
@@ -318,6 +340,9 @@ const faceOptions = computed(() => {
 		</fade-transition>
 		<fade-transition>
 			<SourceEditModal v-if="showFoxySourceEditor" v-model="editingFoxySource" :editing="foxyEditorMode === 'edit'" @close="showFoxySourceEditor = false" @save="saveFoxySource" />
+		</fade-transition>
+		<fade-transition>
+			<FoxyPresetEditModal v-if="showFoxyPresetEditor" v-model="foxyPresetName" :editing="foxyPresetEditorMode === 'edit'" @close="showFoxyPresetEditor = false" @save="saveFoxyPreset" />
 		</fade-transition>
 	</teleport>
 </template>

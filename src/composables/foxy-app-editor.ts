@@ -70,7 +70,7 @@ export default function useFoxyAppEditor() {
 			return;
 		}
 
-		editingFoxyApp.value = structuredClone({...currentApp.value});
+		editingFoxyApp.value = JSON.parse(JSON.stringify(currentApp.value));
 		foxyAppEditorMode.value = "edit";
 		showFoxyAppEditor.value = true;
 	}

@@ -1,7 +1,6 @@
 import {defineStore} from "pinia";
 import {type FoxyApp} from "@/types/foxy-app";
-import {computed, ref} from "vue";
-import {useStorage} from "@vueuse/core";
+import {computed, ref, watch} from "vue";
 import SecureLS from "secure-ls";
 
 export const useFoxyAppStore = defineStore("foxy-app-store", () => {
@@ -16,7 +15,7 @@ export const useFoxyAppStore = defineStore("foxy-app-store", () => {
 		return apps.value.find((app) => app.id === currentAppId.value) ?? null;
 	});
 
-	const currentSourceId = useStorage<string|null>('foxy_current_source_id', null);
+	const currentSourceId = ref<string|null>(null);
 	const currentSource = computed(() => {
 		if (!currentSourceId.value || !currentApp.value) {
 			return null;
@@ -40,7 +39,8 @@ export const useFoxyAppStore = defineStore("foxy-app-store", () => {
 		return currentSource.value!.sampleImages;
 	});
 
-	const currentPresetId = useStorage<string|null>('foxy_current_preset_id', null);
+	const currentPresetChanged = ref(false);
+	const currentPresetId = ref<string|null>(null);
 	const currentPreset = computed(() => {
 		if (!currentPresetId.value || !currentApp.value) {
 			return null;
@@ -69,6 +69,10 @@ export const useFoxyAppStore = defineStore("foxy-app-store", () => {
 		sampleImages.value.splice(idx, 1);
 	}
 
+	watch(currentAppId, () => {
+		currentPresetChanged.value = false;
+	});
+
 	return {
 		apps,
 		currentAppId,
@@ -80,6 +84,7 @@ export const useFoxyAppStore = defineStore("foxy-app-store", () => {
 		currentSources,
 		sampleImages,
 
+		currentPresetChanged,
 		currentPresetId,
 		currentPreset,
 		currentPresets,

@@ -1,16 +1,26 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type {Face, ImageMeta} from "@/types/image-meta";
-import type {FoxySource} from "@/types/options";
 import buildUrl from "@/utils/url-builder";
 import {buildImageParams} from "@/types/params";
 import Icon from "@/components/UI/Icon.vue";
+import {storeToRefs} from "pinia";
+import {useFoxyAppStore} from "@/stores/foxy-app-store";
+import {useImageParamsStore} from "@/stores/image-params-store";
+
+const {
+	currentApp,
+	currentSource,
+	imageKey,
+} = storeToRefs(useFoxyAppStore());
+
+const {
+	imageMeta,
+} = storeToRefs(useImageParamsStore());
+
 
 const props = defineProps<{
 	modelValue: {x: number, y:number},
-	currentSource: FoxySource|null,
-	imageKey: string,
-	imageMeta: ImageMeta|null,
 }>();
 
 const emit = defineEmits(['update:modelValue']);
@@ -32,11 +42,11 @@ const focalPointStyle = computed(() => {
 });
 
 const imageUrl = computed(() => {
-	if (!props.currentSource || !props.currentSource.url || !props.currentSource.key || !props.currentSource.secret || !props.imageKey) {
+	if (!currentSource.value || !currentApp.value || !currentApp.value.url || !currentSource.value.key || !currentApp.value.secret || !imageKey.value) {
 		return null;
 	}
 
-	return buildUrl(props.currentSource.url, props.currentSource.key, props.currentSource.secret, props.imageKey, buildImageParams({ width: 300 }));
+	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.secret, imageKey.value, buildImageParams({ width: 300 }));
 });
 
 let boundingRect:DOMRect|null = null;

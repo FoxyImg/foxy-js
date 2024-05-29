@@ -1,73 +1,191 @@
 import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
-import {ref, toRaw} from "vue";
-import {DefaultFoxySource, type FoxySource} from "@/types/foxy-source";
+import {ref} from "vue";
+import {useImageParamsStore} from "@/stores/image-params-store";
+import {extractChanges} from "@/utils/extract-changes";
+import {DefaultFoxyPreset} from "@/types/foxy-preset";
+import {properCase} from "@/utils/ucfirst";
+import slugify from "slugify";
 
-export default function useFoxySourceEditor() {
+export default function useFoxyPresetEditor() {
 	const {
-		currentSourceId,
-		currentSource,
-		currentSources,
+		currentApp,
+		currentPresetId,
+		currentPresets,
+		currentPreset,
 	} = storeToRefs(useFoxyAppStore());
 
-	const editingFoxySource = ref<FoxySource>(structuredClone(DefaultFoxySource));
-	const showFoxySourceEditor = ref(false);
-	const foxyEditorMode = ref<"create"|"edit">("create");
+	const {
+		currentPresetJSONObject,
+	} = storeToRefs(useImageParamsStore());
 
-	const saveFoxySource = () => {
-		if (editingFoxySource.value.key === null) {
+	const foxyPresetName = ref<string|null>(null);
+	const showFoxyPresetEditor = ref(false);
+	const foxyPresetEditorMode = ref<"create"|"edit">("create");
+
+	const saveFoxyPreset = async () => {
+		if (!foxyPresetName.value || foxyPresetName.value.length === 0) {
 			return;
 		}
 
-		const idx = currentSources.value.findIndex((source) => source.key === editingFoxySource.value.key);
-		if (idx === -1) {
-			currentSources.value.push(editingFoxySource.value);
+		if (foxyPresetEditorMode.value === "create") {
+			await saveNewFoxyPreset();
+			return;
+		}
+
+		if (!currentApp.value || !currentPreset.value || !currentPresetId.value) {
+			return;
+		}
+
+		const existingPreset = JSON.parse(JSON.stringify(currentPreset.value));
+		const newSlug = slugify(foxyPresetName.value, {
+			lower: true,
+			strict: true,
+			replacement: '-',
+		});
+
+
+		const deletePresetResponse = await fetch(`${currentApp.value.url}/presets/${currentApp.value.id}/${currentPresetId.value}`, {
+			method: "DELETE",
+			headers: {
+				'Authorization': `Bearer ${currentApp.value.secret}`,
+			},
+		});
+
+		if (!deletePresetResponse.ok) {
+			console.error("Could not delete preset");
+			return;
+		}
+
+		delete currentPresets.value[currentPresetId.value];
+
+		const newPresetResponse = await fetch(`${currentApp.value.url}/presets/${currentApp.value.id}/${newSlug}`, {
+			method: "POST",
+			headers: {
+				'Authorization': `Bearer ${currentApp.value.secret}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(existingPreset),
+		});
+
+		if (newPresetResponse.ok) {
+			currentPresets.value[newSlug] = existingPreset;
+			currentPresetId.value = newSlug;
+		}
+	}
+
+	const saveNewFoxyPreset = async () => {
+		if (!currentApp.value || !foxyPresetName.value || foxyPresetName.value.length === 0) {
+			return;
+		}
+
+		const newSlug = slugify(foxyPresetName.value, {
+			lower: true,
+			strict: true,
+			replacement: '-',
+		});
+
+		const newPresetResponse = await fetch(`${currentApp.value.url}/presets/${currentApp.value.id}/${newSlug}`, {
+			method: "POST",
+			headers: {
+				'Authorization': `Bearer ${currentApp.value.secret}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(currentPresetJSONObject.value),
+		});
+
+		if (newPresetResponse.ok) {
+			currentPresets.value[newSlug] = JSON.parse(JSON.stringify(currentPresetJSONObject.value));
+			currentPresetId.value = newSlug;
+		}
+	}
+
+	const updateCurrentFoxyPreset = async () => {
+		if (!currentApp.value || !currentPresetId.value) {
+			return;
+		}
+
+		const newPresetResponse = await fetch(`${currentApp.value.url}/presets/${currentApp.value.id}/${currentPresetId.value}`, {
+			method: "PUT",
+			headers: {
+				'Authorization': `Bearer ${currentApp.value.secret}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(currentPresetJSONObject.value),
+		});
+
+		if (newPresetResponse.ok) {
+			currentPresets.value[currentPresetId.value] = JSON.parse(JSON.stringify(currentPresetJSONObject.value));
+		}
+	}
+
+	const deleteFoxyPreset = async () => {
+		if (!currentApp.value || !currentPresetId.value) {
+			return;
+		}
+
+		const deletePresetResponse = await fetch(`${currentApp.value.url}/presets/${currentApp.value.id}/${currentPresetId.value}`, {
+			method: "DELETE",
+			headers: {
+				'Authorization': `Bearer ${currentApp.value.secret}`,
+			},
+		});
+
+		if (deletePresetResponse.ok) {
+			delete currentPresets.value[currentPresetId.value];
+			currentPresetId.value = null;
+		}
+	}
+
+	const syncFoxyPresets = async () => {
+		if (currentApp.value === null) {
+			return;
+		}
+
+		const presetsResponse = await fetch(`${currentApp.value.url}/presets/${currentApp.value.id}`, {
+			headers: {
+				'Authorization': `Bearer ${currentApp.value.secret}`,
+			}
+		});
+
+		if (!presetsResponse.ok) {
+			console.error("Could not fetch presets", presetsResponse.status, presetsResponse.statusText);
 		} else {
-			currentSources.value[idx] = editingFoxySource.value;
-		}
-
-		showFoxySourceEditor.value = false;
-	}
-
-	const editFoxySource = () => {
-		if (currentSource.value === null) {
-			return;
-		}
-
-		editingFoxySource.value = structuredClone(toRaw(currentSource.value));
-		foxyEditorMode.value = "edit";
-		showFoxySourceEditor.value = true;
-	}
-
-	const newFoxySource = () => {
-		editingFoxySource.value = structuredClone(DefaultFoxySource);
-		foxyEditorMode.value = "create";
-		showFoxySourceEditor.value = true;
-	}
-
-	const deleteFoxySource = () => {
-		if (confirm("Are you sure you want to delete this source?")) {
-			const idx = currentSources.value.findIndex((source) => source.key === currentSourceId.value);
-			if (idx === -1) {
-				return;
+			const presets = await presetsResponse.json();
+			for(const presetId of Object.keys(presets)) {
+				presets[presetId] = extractChanges(presets[presetId], DefaultFoxyPreset, ["vision"]);
 			}
 
-			currentSources.value.splice(idx, 1);
-			currentSourceId.value = null;
+			currentApp.value.presets = presets;
 		}
+	}
+
+	const editFoxyPreset = () => {
+		if (!currentPresetId.value) {
+			return;
+		}
+
+		foxyPresetName.value = properCase(currentPresetId.value.replaceAll(/[-_]/g, " "));
+		foxyPresetEditorMode.value = "edit";
+		showFoxyPresetEditor.value = true;
+	}
+
+	const newFoxyPreset = () => {
+		foxyPresetName.value = null;
+		foxyPresetEditorMode.value = "create";
+		showFoxyPresetEditor.value = true;
 	}
 
 	return {
-		currentSourceId,
-		currentSource,
-		currentSources,
+		foxyPresetName,
+		showFoxyPresetEditor,
+		foxyPresetEditorMode,
 
-		editingFoxySource,
-		showFoxySourceEditor,
-		foxyEditorMode,
-		newFoxySource,
-		editFoxySource,
-		saveFoxySource,
-		deleteFoxySource,
+		saveFoxyPreset,
+		updateCurrentFoxyPreset,
+		editFoxyPreset,
+		newFoxyPreset,
+		deleteFoxyPreset,
+		syncFoxyPresets,
 	}
 };

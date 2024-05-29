@@ -74,5 +74,5 @@ export const DefaultImageParams: ImageParams = {
 }
 
 export function buildImageParams(imageParams: Partial<ImageParams>) {
-	return Object.assign(structuredClone(DefaultImageParams), imageParams);
+	return Object.assign(JSON.parse(JSON.stringify(DefaultImageParams)), imageParams);
 }

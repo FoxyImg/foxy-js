@@ -10,7 +10,7 @@ export default function useFoxySourceEditor() {
 		currentSources,
 	} = storeToRefs(useFoxyAppStore());
 
-	const editingFoxySource = ref<FoxySource>(structuredClone(DefaultFoxySource));
+	const editingFoxySource = ref<FoxySource>(JSON.parse(JSON.stringify(DefaultFoxySource)));
 	const showFoxySourceEditor = ref(false);
 	const foxyEditorMode = ref<"create"|"edit">("create");
 
@@ -34,13 +34,13 @@ export default function useFoxySourceEditor() {
 			return;
 		}
 
-		editingFoxySource.value = structuredClone(toRaw(currentSource.value));
+		editingFoxySource.value = JSON.parse(JSON.stringify(currentSource.value));
 		foxyEditorMode.value = "edit";
 		showFoxySourceEditor.value = true;
 	}
 
 	const newFoxySource = () => {
-		editingFoxySource.value = structuredClone(DefaultFoxySource);
+		editingFoxySource.value = JSON.parse(JSON.stringify(DefaultFoxySource));
 		foxyEditorMode.value = "create";
 		showFoxySourceEditor.value = true;
 	}
