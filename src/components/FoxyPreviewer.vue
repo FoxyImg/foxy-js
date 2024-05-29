@@ -325,7 +325,7 @@ const faceOptions = computed(() => {
 						</EditorPanel>
 						<EditorPanel>
 							<div class="flex items-center justify-center">
-								<div @click="resetParams" class="cursor-pointer text-xs hover:text-blue-900">Reset All</div>
+								<div @click="resetParams" class="cursor-pointer text-xs hover:text-blue-600">Reset All</div>
 							</div>
 						</EditorPanel>
 					</div>

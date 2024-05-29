@@ -45,5 +45,7 @@ body {
 	--ms-font-size: theme('fontSize.xxs');
 	--ms-option-font-size: theme('fontSize.xs');
 	--ms-tag-font-size: theme('fontSize.xxs');
+	--ms-tag-bg: theme('colors.blue.600');
+	--ms-tag-bg-disabled: #9CA3AF;
 }
 </style>

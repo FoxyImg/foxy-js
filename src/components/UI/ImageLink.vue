@@ -22,7 +22,7 @@ function copyUrl(url:string) {
 				<Icon :name="iconName" class="fill-current w-4 h-auto" />
 			</a>
 			<template #popper>
-				<div @click="copyUrl(imageUrl)" class="cursor-pointer text-xs px-3 py-2 hover:text-blue-700 flex items-center gap-1">
+				<div @click="copyUrl(imageUrl)" class="cursor-pointer text-xs px-3 py-2 hover:text-blue-600 flex items-center gap-1">
 					<Icon name="copy-icon" class="fill-black w-4 h-auto" />
 					{{ actionTitle}}
 				</div>

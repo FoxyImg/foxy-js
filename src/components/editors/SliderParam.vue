@@ -140,8 +140,8 @@ function quickEdit() {
 .range:focus::-webkit-slider-thumb, .range.in-use::-webkit-slider-thumb {
 	appearance: none;
 	cursor: pointer;
-	background: #2271b1;
-	border: 1px solid #2271b1;
+	background: theme('colors.blue.600');
+	border: 1px solid theme('colors.blue.600');
 	width: 15px;
 	height: 15px;
 	border-radius: 15px;
@@ -151,8 +151,8 @@ function quickEdit() {
 .range:focus::-moz-slider-thumb, .range.in-use::-moz-slider-thumb {
 	appearance: none;
 	cursor: pointer;
-	background: #2271b1;
-	border: 1px solid #2271b1;
+	background: theme('colors.blue.600');
+	border: 1px solid theme('colors.blue.600');
 	width: 15px;
 	height: 15px;
 	border-radius: 15px;
