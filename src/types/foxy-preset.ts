@@ -17,6 +17,14 @@ export type FoxyFocalPointPreset = {
 	zoom: number|null
 }
 
+export type FoxyBorderPreset = {
+	color: string,
+	left: number,
+	top: number,
+	right: number,
+	bottom: number,
+}
+
 export type FoxyExportPreset = {
 	format: "webp" | "png" | "jpg" | "avif" | null,
 	quality: number | null
@@ -39,6 +47,8 @@ export type FoxyFullPreset = {
 	interesting: number|null,
 	focalPoint: FoxyFocalPointPreset|null,
 	bgColor: string|null,
+	padding: FoxyBorderPreset|null,
+	border: FoxyBorderPreset|null,
 	rotate: number|null,
 	flipH: boolean|null,
 	flipV: boolean|null,
@@ -88,6 +98,8 @@ export const DefaultFoxyPreset: FoxyFullPreset = {
 		zoom: null
 	},
 	bgColor: "#00000000",
+	padding: null,
+	border: null,
 	rotate: null,
 	flipH: null,
 	flipV: null,

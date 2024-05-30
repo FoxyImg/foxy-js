@@ -153,6 +153,22 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		params.hGravity = ifExists(foxyPreset.hGravity, params.hGravity);
 		params.vGravity = ifExists(foxyPreset.vGravity, params.vGravity);
 
+		if (exists(foxyPreset.padding)) {
+			params.padding.color = ifExists(foxyPreset.padding!.color, params.padding.color);
+			params.padding.left = ifExists(foxyPreset.padding!.left, params.padding.left);
+			params.padding.top = ifExists(foxyPreset.padding!.top, params.padding.top);
+			params.padding.right = ifExists(foxyPreset.padding!.right, params.padding.right);
+			params.padding.bottom = ifExists(foxyPreset.padding!.bottom, params.padding.bottom);
+		}
+
+		if (exists(foxyPreset.border)) {
+			params.border.color = ifExists(foxyPreset.border!.color, params.border.color);
+			params.border.left = ifExists(foxyPreset.border!.left, params.border.left);
+			params.border.top = ifExists(foxyPreset.border!.top, params.border.top);
+			params.border.right = ifExists(foxyPreset.border!.right, params.border.right);
+			params.border.bottom = ifExists(foxyPreset.border!.bottom, params.border.bottom);
+		}
+
 		if (exists(foxyPreset.focalPoint)) {
 			params.focalPoint = {
 				x: ifExists(foxyPreset.focalPoint!.x, params.focalPoint.x),

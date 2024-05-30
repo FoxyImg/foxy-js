@@ -119,6 +119,8 @@ onMounted(async () => {
 
 const currentTab = ref<"preview"|"metadata"|"preset">("preview");
 const constrainDimensions = useStorage('foxy_constrain_dimensions', false);
+const constrainPadding = useStorage('foxy_constrain_padding', true);
+const constrainBorder = useStorage('foxy_constrain_border', true);
 
 watch(() => [imageParams.value.width, imageParams.value.height], (newVal, oldVal) => {
 	if (!constrainDimensions.value) {
@@ -133,6 +135,54 @@ watch(() => [imageParams.value.width, imageParams.value.height], (newVal, oldVal
 		if (imageParams.value.width !== newVal[1]) {
 			imageParams.value.width = newVal[1];
 		}
+	}
+});
+
+watch(() => [imageParams.value.padding.top, imageParams.value.padding.left, imageParams.value.padding.right, imageParams.value.padding.bottom], (newVal, oldVal) => {
+	if (!constrainPadding.value) {
+		return;
+	}
+
+	if (oldVal[0] !== newVal[0]) {
+		imageParams.value.padding.left = newVal[0];
+		imageParams.value.padding.right = newVal[0];
+		imageParams.value.padding.bottom = newVal[0];
+	} else if (oldVal[1] !== newVal[1]) {
+		imageParams.value.padding.top = newVal[1];
+		imageParams.value.padding.right = newVal[1];
+		imageParams.value.padding.bottom = newVal[1];
+	} else if (oldVal[2] !== newVal[2]) {
+		imageParams.value.padding.top = newVal[2];
+		imageParams.value.padding.left = newVal[2];
+		imageParams.value.padding.bottom = newVal[2];
+	} else if (oldVal[3] !== newVal[3]) {
+		imageParams.value.padding.top = newVal[3];
+		imageParams.value.padding.left = newVal[3];
+		imageParams.value.padding.right = newVal[3];
+	}
+});
+
+watch(() => [imageParams.value.border.top, imageParams.value.border.left, imageParams.value.border.right, imageParams.value.border.bottom], (newVal, oldVal) => {
+	if (!constrainBorder.value) {
+		return;
+	}
+
+	if (oldVal[0] !== newVal[0]) {
+		imageParams.value.border.left = newVal[0];
+		imageParams.value.border.right = newVal[0];
+		imageParams.value.border.bottom = newVal[0];
+	} else if (oldVal[1] !== newVal[1]) {
+		imageParams.value.border.top = newVal[1];
+		imageParams.value.border.right = newVal[1];
+		imageParams.value.border.bottom = newVal[1];
+	} else if (oldVal[2] !== newVal[2]) {
+		imageParams.value.border.top = newVal[2];
+		imageParams.value.border.left = newVal[2];
+		imageParams.value.border.bottom = newVal[2];
+	} else if (oldVal[3] !== newVal[3]) {
+		imageParams.value.border.top = newVal[3];
+		imageParams.value.border.left = newVal[3];
+		imageParams.value.border.right = newVal[3];
 	}
 });
 
@@ -322,6 +372,42 @@ const faceOptions = computed(() => {
 						</EditorPanel>
 						<EditorPanel title="Image Attributes">
 							<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
+						</EditorPanel>
+						<EditorPanel title="Padding">
+							<ColorParam title="Padding Color" v-model="imageParams.padding.color" :default="null" />
+							<div class="flex items-center gap-1">
+								<div class="flex-1 flex flex-col gap-3">
+									<SliderParam title="Top Padding" v-model="imageParams.padding.top" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+									<SliderParam title="Right Padding" v-model="imageParams.padding.right" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+									<SliderParam title="Bottom Padding" v-model="imageParams.padding.bottom" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+									<SliderParam title="Left Padding" v-model="imageParams.padding.left" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+								</div>
+								<div class="flex flex-col items-center justify-center gap-[8px]">
+									<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300" />
+									<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainPadding}" @click="constrainPadding = !constrainPadding">
+										<Icon name="constrain" class="fill-black w-3 h-auto" />
+									</div>
+									<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300 rotate-180 -scale-x-100" />
+								</div>
+							</div>
+						</EditorPanel>
+						<EditorPanel title="Border">
+							<ColorParam title="Border Color" v-model="imageParams.border.color" :default="null" />
+							<div class="flex items-center gap-1">
+								<div class="flex-1 flex flex-col gap-3">
+									<SliderParam title="Top Border" v-model="imageParams.border.top" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+									<SliderParam title="Right Border" v-model="imageParams.border.right" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+									<SliderParam title="Bottom Border" v-model="imageParams.border.bottom" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+									<SliderParam title="Left Border" v-model="imageParams.border.left" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+								</div>
+								<div class="flex flex-col items-center justify-center gap-[8px]">
+									<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300" />
+									<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainBorder}" @click="constrainBorder = !constrainBorder">
+										<Icon name="constrain" class="fill-black w-3 h-auto" />
+									</div>
+									<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300 rotate-180 -scale-x-100" />
+								</div>
+							</div>
 						</EditorPanel>
 						<EditorPanel>
 							<div class="flex items-center justify-center">

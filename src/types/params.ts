@@ -8,6 +8,14 @@ export type BoxCropParams = {
 	focus: boolean,
 }
 
+export type BorderParams = {
+	color: string|null,
+	left: number,
+	top: number,
+	right: number,
+	bottom: number,
+}
+
 export type ImageParams = {
 	crop: string[],
 	width: number,
@@ -25,6 +33,9 @@ export type ImageParams = {
 	person: BoxCropParams,
 
 	backgroundColor: string|null,
+
+	padding: BorderParams,
+	border: BorderParams,
 }
 
 export type DebugParams = {
@@ -71,6 +82,22 @@ export const DefaultImageParams: ImageParams = {
 	},
 
 	backgroundColor: null,
+
+	padding: {
+		color: null,
+		left: 0,
+		top: 0,
+		right: 0,
+		bottom: 0,
+	},
+
+	border: {
+		color: null,
+		left: 0,
+		top: 0,
+		right: 0,
+		bottom: 0,
+	},
 }
 
 export function buildImageParams(imageParams: Partial<ImageParams>) {

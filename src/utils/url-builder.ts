@@ -30,6 +30,26 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		newUrl += `/zoom:${imageParams.zoom}`;
 	}
 
+	if (imageParams.padding.left > 0 || imageParams.padding.top > 0 || imageParams.padding.right > 0 || imageParams.padding.bottom > 0) {
+		if (imageParams.padding.left === imageParams.padding.top && imageParams.padding.top === imageParams.padding.right && imageParams.padding.right == imageParams.padding.bottom) {
+			newUrl += `/pad:${imageParams.padding.color ?? '00000000'}:${imageParams.padding.left}`;
+		} else if (imageParams.padding.left === imageParams.padding.right && imageParams.padding.top == imageParams.padding.bottom) {
+			newUrl += `/pad:${imageParams.padding.color}:${imageParams.padding.left}:${imageParams.padding.top}`;
+		} else {
+			newUrl += `/pad:${imageParams.padding.color}:${imageParams.padding.left}:${imageParams.padding.top}:${imageParams.padding.right}:${imageParams.padding.bottom}`;
+		}
+	}
+
+	if (imageParams.border.left > 0 || imageParams.border.top > 0 || imageParams.border.right > 0 || imageParams.border.bottom > 0) {
+		if (imageParams.border.left === imageParams.border.top && imageParams.border.top === imageParams.border.right && imageParams.border.right == imageParams.border.bottom) {
+			newUrl += `/border:${imageParams.border.color ?? '00000000'}:${imageParams.border.left}`;
+		} else if (imageParams.border.left === imageParams.border.right && imageParams.border.top == imageParams.border.bottom) {
+			newUrl += `/border:${imageParams.border.color}:${imageParams.border.left}:${imageParams.border.top}`;
+		} else {
+			newUrl += `/border:${imageParams.border.color}:${imageParams.border.left}:${imageParams.border.top}:${imageParams.border.right}:${imageParams.border.bottom}`;
+		}
+	}
+
 	if (imageParams.hGravity || imageParams.vGravity) {
 		const hg = imageParams.hGravity ?? 'center';
 		const vg = imageParams.vGravity ?? 'center';
