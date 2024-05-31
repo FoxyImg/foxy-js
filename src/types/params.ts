@@ -16,6 +16,26 @@ export type BorderParams = {
 	bottom: number,
 }
 
+export type Rect = {
+	left: number,
+	top: number,
+	width: number,
+	height: number,
+}
+
+export type RedactParams = {
+	faces: string[],
+	people: string[],
+	regions: Rect[],
+	blur: number,
+	expandMask: number,
+	blurMask: number,
+	pixelateMask: number,
+	useColor: boolean,
+	color: string|null,
+	pixelate: number,
+}
+
 export type ImageParams = {
 	crop: string[],
 	width: number,
@@ -36,6 +56,8 @@ export type ImageParams = {
 
 	padding: BorderParams,
 	border: BorderParams,
+
+	redact: RedactParams,
 }
 
 export type DebugParams = {
@@ -97,6 +119,19 @@ export const DefaultImageParams: ImageParams = {
 		top: 0,
 		right: 0,
 		bottom: 0,
+	},
+
+	redact: {
+		faces: [],
+		people: [],
+		regions: [],
+		blur: 0,
+		expandMask: 0,
+		pixelateMask: 0,
+		blurMask: 0,
+		useColor: false,
+		color: null,
+		pixelate: 0,
 	},
 }
 

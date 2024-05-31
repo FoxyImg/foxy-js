@@ -107,6 +107,48 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 			newUrl += `/fp:zoom:${imageParams.focalPointZoom}`;
 		}
 	}
+
+	if (imageParams.redact.faces.length > 0 || imageParams.redact.people.length > 0 || imageParams.redact.regions.length > 0) {
+		if (imageParams.redact.faces.length > 0) {
+			newUrl += `/redact:faces:${imageParams.redact.faces.join(',')}`;
+		}
+
+		if (imageParams.redact.people.length > 0) {
+			newUrl += `/redact:people:${imageParams.redact.people.join(',')}`;
+		}
+
+		if (imageParams.redact.regions.length > 0) {
+			for(const region of imageParams.redact.regions) {
+				if (region.width > 0 && region.height > 0) {
+					newUrl += `/redact:region:${region.left},${region.top},${region.width},${region.height}`;
+				}
+			}
+		}
+
+		if (imageParams.redact.blur > 0) {
+			newUrl += `/redact:blur:${imageParams.redact.blur}`;
+		}
+
+		if (imageParams.redact.useColor) {
+			newUrl += `/redact:color:${imageParams.redact.color}`;
+		}
+
+		if (imageParams.redact.pixelate > 0) {
+			newUrl += `/redact:pixelate:${imageParams.redact.pixelate}`;
+		}
+
+		if (imageParams.redact.expandMask > 0) {
+			newUrl += `/redact:mask:expand:${imageParams.redact.expandMask}`;
+		}
+
+		if (imageParams.redact.blurMask > 0) {
+			newUrl += `/redact:mask:blur:${imageParams.redact.blurMask}`;
+		}
+
+		if (imageParams.redact.pixelateMask > 0) {
+			newUrl += `/redact:mask:pixelate:${imageParams.redact.pixelateMask}`;
+		}
+	}
 	//endregion
 
 

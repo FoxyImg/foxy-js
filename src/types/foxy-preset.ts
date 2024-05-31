@@ -33,6 +33,26 @@ export type FoxyExportPreset = {
 	nearLossless: boolean | null,
 }
 
+export type FoxyRect = {
+	left: number,
+	top: number,
+	width: number,
+	height: number,
+}
+
+export type FoxyRedactPreset = {
+	faces: number[]|null,
+	people: number[]|null,
+	regions: FoxyRect[]|null,
+	blur: number|null,
+	blurMask: number|null,
+	expandMask: number|null,
+	pixelateMask: number|null,
+	useColor: boolean|null,
+	color: string|null,
+	pixelate: number|null,
+}
+
 export type FoxyFullPreset = {
 	vision: boolean,
 	crop: string[]|null,
@@ -49,6 +69,8 @@ export type FoxyFullPreset = {
 	bgColor: string|null,
 	padding: FoxyBorderPreset|null,
 	border: FoxyBorderPreset|null,
+	redact: FoxyRedactPreset|null,
+
 	rotate: number|null,
 	flipH: boolean|null,
 	flipV: boolean|null,
@@ -100,6 +122,18 @@ export const DefaultFoxyPreset: FoxyFullPreset = {
 	bgColor: "#00000000",
 	padding: null,
 	border: null,
+	redact: {
+		faces: [],
+		people: [],
+		regions: [],
+		blur: 0,
+		blurMask: 0,
+		expandMask: 0,
+		pixelateMask: 0,
+		useColor: false,
+		color: null,
+		pixelate: 0,
+	},
 	rotate: null,
 	flipH: null,
 	flipV: null,

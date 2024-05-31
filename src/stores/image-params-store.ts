@@ -169,6 +169,19 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			params.border.bottom = ifExists(foxyPreset.border!.bottom, params.border.bottom);
 		}
 
+		if (exists(foxyPreset.redact)) {
+			params.redact.faces = foxyPreset.redact!.faces ? foxyPreset.redact!.faces.map((face) => face === -1 ? 'all' : `${face}`) : params.redact.faces;
+			params.redact.people = foxyPreset.redact!.people ? foxyPreset.redact!.people.map((person) => person === -1 ? 'all' : `${person}`) : params.redact.people;
+			params.redact.regions = ifExists(foxyPreset.redact!.regions, params.redact.regions);
+			params.redact.blur = ifExists(foxyPreset.redact!.blur, params.redact.blur);
+			params.redact.expandMask = ifExists(foxyPreset.redact!.expandMask, params.redact.expandMask);
+			params.redact.blurMask = ifExists(foxyPreset.redact!.blurMask, params.redact.blurMask);
+			params.redact.pixelateMask = ifExists(foxyPreset.redact!.pixelateMask, params.redact.pixelateMask);
+			params.redact.useColor = ifExists(foxyPreset.redact!.useColor, params.redact.useColor);
+			params.redact.color = ifExists(foxyPreset.redact!.color, params.redact.color);
+			params.redact.pixelate = ifExists(foxyPreset.redact!.pixelate, params.redact.pixelate);
+		}
+
 		if (exists(foxyPreset.focalPoint)) {
 			params.focalPoint = {
 				x: ifExists(foxyPreset.focalPoint!.x, params.focalPoint.x),

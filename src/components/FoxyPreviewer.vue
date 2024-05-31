@@ -37,6 +37,7 @@ import useFoxyPresetEditor from "@/composables/foxy-preset-editor";
 import FoxyPresetSelector from "@/components/header/FoxyPresetSelector.vue";
 import FoxyPresetEditModal from "@/components/modals/FoxyPresetEditModal.vue";
 import ImageLink from "@/components/UI/ImageLink.vue";
+import RedactRegionParam from "@/components/editors/RedactRegionParam.vue";
 
 const {
 	apps,
@@ -209,10 +210,25 @@ const personOptions = computed(() => {
 		{ label: 'All People', value: -1 },
 	];
 
-	if (imageMeta.value) {
+	if (imageMeta.value && imageMeta.value.people && imageMeta.value.people.length > 0) {
 		options.push(...imageMeta.value.people.map((person:any, index:number) => ({
 			label: `Person ${index + 1} - ${person.name}`,
 			value: index,
+		})));
+	}
+
+	return options;
+});
+
+const redactPersonOptions = computed(() => {
+	const options = [
+		{ label: 'All People', value: 'all' },
+	];
+
+	if (imageMeta.value && imageMeta.value.people && imageMeta.value.people.length > 0) {
+		options.push(...imageMeta.value.people.map((person:any, index:number) => ({
+			label: `Person ${index + 1} - ${person.name}`,
+			value: `${index}`,
 		})));
 	}
 
@@ -226,10 +242,25 @@ const faceOptions = computed(() => {
 		{ label: 'All Faces', value: -1 },
 	];
 
-	if (imageMeta.value) {
+	if (imageMeta.value && imageMeta.value.faces && imageMeta.value.faces.length > 0) {
 		options.push(...imageMeta.value.faces.map((face:any, index:number) => ({
 			label: `Face #${index + 1}`,
 			value: index,
+		})));
+	}
+
+	return options;
+});
+
+const redactFaceOptions = computed(() => {
+	const options = [
+		{ label: 'All Faces', value: "all" },
+	];
+
+	if (imageMeta.value && imageMeta.value.faces && imageMeta.value.faces.length > 0) {
+		options.push(...imageMeta.value.faces.map((face:any, index:number) => ({
+			label: `Face #${index + 1}`,
+			value: `${index}`,
 		})));
 	}
 
@@ -408,6 +439,18 @@ const faceOptions = computed(() => {
 									<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300 rotate-180 -scale-x-100" />
 								</div>
 							</div>
+						</EditorPanel>
+						<EditorPanel title="Redact">
+							<TagsParam title="Faces" :options="redactFaceOptions" v-model="imageParams.redact.faces" placeholder="Faces to redact" />
+							<TagsParam title="People" :options="redactPersonOptions" v-model="imageParams.redact.people" placeholder="People to redact" />
+							<RedactRegionParam v-model="imageParams.redact.regions" />
+							<SliderParam title="Blur" v-model="imageParams.redact.blur" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="" />
+							<SliderParam title="Pixelate" v-model="imageParams.redact.pixelate" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+							<ToggleParam title="Use Fill Color" v-model="imageParams.redact.useColor" />
+							<ColorParam v-if="imageParams.redact.useColor" title="Fill Color" v-model="imageParams.redact.color" :default="null" />
+							<SliderParam title="Blur Mask" v-model="imageParams.redact.blurMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="" />
+							<SliderParam title="Expand Mask" v-model="imageParams.redact.expandMask" :min="0" :max="200" :step="1" :default="0" default-label="None" suffix="%" />
+							<SliderParam title="Pixelate Mask" v-model="imageParams.redact.pixelateMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
 						</EditorPanel>
 						<EditorPanel>
 							<div class="flex items-center justify-center">
