@@ -38,6 +38,7 @@ import FoxyPresetSelector from "@/components/header/FoxyPresetSelector.vue";
 import FoxyPresetEditModal from "@/components/modals/FoxyPresetEditModal.vue";
 import ImageLink from "@/components/UI/ImageLink.vue";
 import RedactRegionParam from "@/components/editors/RedactRegionParam.vue";
+import {StylizeOrderOptions} from "@/types/params";
 
 const {
 	apps,
@@ -403,6 +404,11 @@ const redactFaceOptions = computed(() => {
 						</EditorPanel>
 						<EditorPanel title="Image Attributes">
 							<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
+						</EditorPanel>
+						<EditorPanel title="Stylize">
+							<TagsParam title="Stylize Order" :options="StylizeOrderOptions" v-model="imageParams.stylize.order" placeholder="Order to process stylize operations" />
+							<SliderParam title="Blur" v-model="imageParams.stylize.blur" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+							<SliderParam title="Pixelate" v-model="imageParams.stylize.pixelate" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
 						</EditorPanel>
 						<EditorPanel title="Padding">
 							<ColorParam title="Padding Color" v-model="imageParams.padding.color" :default="null" />

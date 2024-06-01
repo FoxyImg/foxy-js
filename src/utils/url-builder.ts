@@ -159,6 +159,24 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 
 	//endregion
 
+	//region Stylize
+	let hasStyle = false;
+	if (imageParams.stylize.blur > 0) {
+		hasStyle = true;
+		newUrl += `/blur:${imageParams.stylize.blur}`;
+	}
+
+	if (imageParams.stylize.pixelate > 0) {
+		hasStyle = true;
+		newUrl += `/px:${imageParams.stylize.pixelate}`;
+	}
+
+	if (hasStyle) {
+		newUrl += `/stylize:order:${imageParams.stylize.order.join(',')}`;
+	}
+
+	//endregion
+
 
 	//region Debug Params
 	const debug:string[] = [];

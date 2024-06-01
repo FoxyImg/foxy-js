@@ -8,8 +8,7 @@ import pDebounce from "p-debounce";
 import type {ImageMeta} from "@/types/image-meta";
 import signHMAC256 from "@/utils/sign";
 import SecureLS from "secure-ls";
-import {DefaultFoxyPreset, type FoxyBoundsPreset, type FoxyFullPreset, type FoxyPreset} from "@/types/foxy-preset";
-import {extractChanges} from "@/utils/extract-changes";
+import {type FoxyBoundsPreset, type FoxyPreset} from "@/types/foxy-preset";
 import calcAspectRatio from "@/utils/aspect-ratio";
 import exists from "@/utils/exists";
 
@@ -110,9 +109,14 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			return;
 		}
 
-		const presetObj = await response.json() as FoxyFullPreset;
-		const diffed = extractChanges(presetObj, DefaultFoxyPreset, ["vision"]);
-		currentPresetJSONObject.value = diffed ?? presetObj;
+		const presetObj = await response.json();
+		console.log("presetObj", presetObj);
+		for(const key of Object.keys(presetObj)) {
+			if (typeof presetObj[key] === 'object' && Object.keys(presetObj[key]).length === 0) {
+				delete presetObj[key];
+			}
+		}
+		currentPresetJSONObject.value = presetObj;
 	}
 	const debouncedFetchCurrentPresetJSONObject = pDebounce(fetchCurrentPresetJSONObject, 500);
 
@@ -131,27 +135,62 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 	function foxyPresetToImageParams(foxyPreset: FoxyPreset) {
 		const params = JSON.parse(JSON.stringify(DefaultImageParams));
 
-		if (exists(foxyPreset.crop) && foxyPreset.crop!.length > 0) {
-			params.crop = foxyPreset.crop!;
-		}
-
 		const ifExists = <T, N>(value: T|undefined|null, defaultValue: N): N  =>{
 			return exists(value) ? value as N : defaultValue;
 		}
 
-		params.width = ifExists(foxyPreset.width, params.width);
-		params.height = ifExists(foxyPreset.height, params.height);
+		const processBoxParams = (foxyBox:FoxyBoundsPreset, paramsBox:BoxCropParams) => {
+			let index = ifExists(foxyBox.index, paramsBox.index);
+			if (exists(foxyBox.largest)) {
+				index = foxyBox.largest! ? -2 : index;
+			} else if (exists(foxyBox.smallest)) {
+				index = foxyBox.smallest! ? -3 : index;
+			}
 
-		if (exists(foxyPreset.aspectRatio)) {
-			const ar = calcAspectRatio(foxyPreset.aspectRatio!, 50);
-			params.aspectRatioWidth = ar[0];
-			params.aspectRatioHeight = ar[1];
+			paramsBox.index = index;
+			paramsBox.padding = ifExists(foxyBox.padding, paramsBox.padding);
+			paramsBox.zoom = foxyBox.zoom ? foxyBox.zoom * 100 : paramsBox.zoom;
+			paramsBox.hGravity = ifExists(foxyBox.hGravity, paramsBox.hGravity);
+			paramsBox.vGravity = ifExists(foxyBox.vGravity, paramsBox.vGravity);
+			paramsBox.focus = ifExists(foxyBox.focus, paramsBox.focus);
 		}
 
-		params.zoom = ifExists(foxyPreset.zoom, params.zoom);
-		params.smartMode = ifExists(foxyPreset.interesting, params.smartMode);
-		params.hGravity = ifExists(foxyPreset.hGravity, params.hGravity);
-		params.vGravity = ifExists(foxyPreset.vGravity, params.vGravity);
+		if (exists(foxyPreset.size)) {
+			if (exists(foxyPreset.size!.crop) && foxyPreset.size!.crop!.length > 0) {
+				params.crop = foxyPreset.size!.crop!;
+			}
+
+			params.width = ifExists(foxyPreset.size!.width, params.width);
+			params.height = ifExists(foxyPreset.size!.height, params.height);
+
+			if (exists(foxyPreset.size!.aspectRatio)) {
+				const ar = calcAspectRatio(foxyPreset.size!.aspectRatio!, 50);
+				params.aspectRatioWidth = ar[0];
+				params.aspectRatioHeight = ar[1];
+			}
+
+			params.zoom = ifExists(foxyPreset.size!.zoom, params.zoom);
+			params.smartMode = ifExists(foxyPreset.size!.interesting, params.smartMode);
+			params.hGravity = ifExists(foxyPreset.size!.hGravity, params.hGravity);
+			params.vGravity = ifExists(foxyPreset.size!.vGravity, params.vGravity);
+
+			if (exists(foxyPreset.size!.focalPoint)) {
+				params.focalPoint = {
+					x: ifExists(foxyPreset.size!.focalPoint!.x, params.focalPoint.x),
+					y: ifExists(foxyPreset.size!.focalPoint!.y, params.focalPoint.y),
+				};
+
+				params.focalPointZoom = ifExists(foxyPreset.size!.focalPoint!.zoom, params.focalPointZoom);
+			}
+
+			if (exists(foxyPreset.size!.face)) {
+				processBoxParams(foxyPreset.size!.face!, params.face);
+			}
+
+			if (exists(foxyPreset.size!.person)) {
+				processBoxParams(foxyPreset.size!.person!, params.person);
+			}
+		}
 
 		if (exists(foxyPreset.padding)) {
 			params.padding.color = ifExists(foxyPreset.padding!.color, params.padding.color);
@@ -180,39 +219,6 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			params.redact.useColor = ifExists(foxyPreset.redact!.useColor, params.redact.useColor);
 			params.redact.color = ifExists(foxyPreset.redact!.color, params.redact.color);
 			params.redact.pixelate = ifExists(foxyPreset.redact!.pixelate, params.redact.pixelate);
-		}
-
-		if (exists(foxyPreset.focalPoint)) {
-			params.focalPoint = {
-				x: ifExists(foxyPreset.focalPoint!.x, params.focalPoint.x),
-				y: ifExists(foxyPreset.focalPoint!.y, params.focalPoint.y),
-			};
-
-			params.focalPointZoom = ifExists(foxyPreset.focalPoint!.zoom, params.focalPointZoom);
-		}
-
-		const processBoxParams = (foxyBox:FoxyBoundsPreset, paramsBox:BoxCropParams) => {
-			let index = ifExists(foxyBox.index, paramsBox.index);
-			if (exists(foxyBox.largest)) {
-				index = foxyBox.largest! ? -2 : index;
-			} else if (exists(foxyBox.smallest)) {
-				index = foxyBox.smallest! ? -3 : index;
-			}
-
-			paramsBox.index = index;
-			paramsBox.padding = ifExists(foxyBox.padding, paramsBox.padding);
-			paramsBox.zoom = foxyBox.zoom ? foxyBox.zoom * 100 : paramsBox.zoom;
-			paramsBox.hGravity = ifExists(foxyBox.hGravity, paramsBox.hGravity);
-			paramsBox.vGravity = ifExists(foxyBox.vGravity, paramsBox.vGravity);
-			paramsBox.focus = ifExists(foxyBox.focus, paramsBox.focus);
-		}
-
-		if (exists(foxyPreset.face)) {
-			processBoxParams(foxyPreset.face!, params.face);
-		}
-
-		if (exists(foxyPreset.person)) {
-			processBoxParams(foxyPreset.person!, params.person);
 		}
 
 		if (exists(foxyPreset.bgColor)) {

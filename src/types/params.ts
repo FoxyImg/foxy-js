@@ -36,6 +36,17 @@ export type RedactParams = {
 	pixelate: number,
 }
 
+export const StylizeOrderOptions = [
+	{ label: 'Blur', value: 'blur' },
+	{ label: 'Pixelate', value: 'px' },
+];
+
+export type StylizeParams = {
+	blur: number,
+	pixelate: number,
+	order: string[],
+}
+
 export type ImageParams = {
 	crop: string[],
 	width: number,
@@ -48,6 +59,8 @@ export type ImageParams = {
 	vGravity: string,
 	focalPoint: { x: number, y: number },
 	focalPointZoom: number,
+
+	stylize: StylizeParams,
 
 	face: BoxCropParams,
 	person: BoxCropParams,
@@ -84,6 +97,12 @@ export const DefaultImageParams: ImageParams = {
 	vGravity: 'center',
 	focalPoint: { x: 0.5, y: 0.5 },
 	focalPointZoom: 0,
+
+	stylize: {
+		blur: 0,
+		pixelate: 0,
+		order: ['blur', 'px'],
+	},
 
 	face: {
 		index: -1,

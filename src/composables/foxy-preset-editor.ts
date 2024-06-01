@@ -2,8 +2,6 @@ import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import {ref} from "vue";
 import {useImageParamsStore} from "@/stores/image-params-store";
-import {extractChanges} from "@/utils/extract-changes";
-import {DefaultFoxyPreset} from "@/types/foxy-preset";
 import {properCase} from "@/utils/ucfirst";
 import slugify from "slugify";
 
@@ -152,10 +150,6 @@ export default function useFoxyPresetEditor() {
 			console.error("Could not fetch presets", presetsResponse.status, presetsResponse.statusText);
 		} else {
 			const presets = await presetsResponse.json();
-			for(const presetId of Object.keys(presets)) {
-				presets[presetId] = extractChanges(presets[presetId], DefaultFoxyPreset, ["vision"]);
-			}
-
 			currentApp.value.presets = presets;
 		}
 	}
