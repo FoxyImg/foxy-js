@@ -73,12 +73,16 @@ export type FoxyStylizePreset = {
 	order: string[]|null,
 }
 
+export type FoxyBackgroundPreset = {
+	color: string|null,
+}
+
 export type FoxyFullPreset = {
 	vision: boolean,
 
 	size: FoxySizePreset|null,
 
-	bgColor: string|null,
+	background: FoxyBackgroundPreset|null,
 
 	padding: FoxyBorderPreset|null,
 	border: FoxyBorderPreset|null,

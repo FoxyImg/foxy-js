@@ -5,63 +5,6 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 	let encodedKey = btoa('/'+imageKey);
 	let newUrl = accessKey ? `/${accessKey}/${encodedKey}` : `/${encodedKey}`;
 
-	//region Crop Params
-	if (imageParams.crop.length > 0) {
-		newUrl += `/crop:${imageParams.crop.join(',')}`;
-	}
-
-	if (imageParams.width > 0) {
-		newUrl += `/w:${imageParams.width}`;
-	}
-
-	if (imageParams.height > 0) {
-		newUrl += `/h:${imageParams.height}`;
-	}
-
-	if (imageParams.crop.includes('smart') && imageParams.smartMode) {
-		newUrl += `/smart:${imageParams.smartMode}`;
-	}
-
-	if (imageParams.aspectRatioWidth > 0 && imageParams.aspectRatioHeight > 0) {
-		newUrl += `/ar:${imageParams.aspectRatioWidth}:${imageParams.aspectRatioHeight}`;
-	}
-
-	if (imageParams.zoom > 1) {
-		newUrl += `/zoom:${imageParams.zoom}`;
-	}
-
-	if (imageParams.padding.left > 0 || imageParams.padding.top > 0 || imageParams.padding.right > 0 || imageParams.padding.bottom > 0) {
-		if (imageParams.padding.left === imageParams.padding.top && imageParams.padding.top === imageParams.padding.right && imageParams.padding.right == imageParams.padding.bottom) {
-			newUrl += `/pad:${imageParams.padding.color ?? '00000000'}:${imageParams.padding.left}`;
-		} else if (imageParams.padding.left === imageParams.padding.right && imageParams.padding.top == imageParams.padding.bottom) {
-			newUrl += `/pad:${imageParams.padding.color}:${imageParams.padding.left}:${imageParams.padding.top}`;
-		} else {
-			newUrl += `/pad:${imageParams.padding.color}:${imageParams.padding.left}:${imageParams.padding.top}:${imageParams.padding.right}:${imageParams.padding.bottom}`;
-		}
-	}
-
-	if (imageParams.border.left > 0 || imageParams.border.top > 0 || imageParams.border.right > 0 || imageParams.border.bottom > 0) {
-		if (imageParams.border.left === imageParams.border.top && imageParams.border.top === imageParams.border.right && imageParams.border.right == imageParams.border.bottom) {
-			newUrl += `/border:${imageParams.border.color ?? '00000000'}:${imageParams.border.left}`;
-		} else if (imageParams.border.left === imageParams.border.right && imageParams.border.top == imageParams.border.bottom) {
-			newUrl += `/border:${imageParams.border.color}:${imageParams.border.left}:${imageParams.border.top}`;
-		} else {
-			newUrl += `/border:${imageParams.border.color}:${imageParams.border.left}:${imageParams.border.top}:${imageParams.border.right}:${imageParams.border.bottom}`;
-		}
-	}
-
-	if (imageParams.hGravity || imageParams.vGravity) {
-		const hg = imageParams.hGravity ?? 'center';
-		const vg = imageParams.vGravity ?? 'center';
-
-		let gravity = `${hg}:${vg}`;
-		gravity = gravity === 'center:center' ? 'center' : gravity;
-
-		if (gravity !== 'center') {
-			newUrl += `/gravity:${gravity}`;
-		}
-	}
-
 	const processBoxParams = (noun:string, params:BoxCropParams) => {
 		if (params.padding != 8) {
 			newUrl += `/${noun}:pad:${params.padding}`;
@@ -90,63 +33,125 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		}
 	}
 
-	if (imageParams.crop.includes('face')) {
-		processBoxParams('face', imageParams.face);
+	//region Crop Params
+	if (imageParams.width > 0) {
+		newUrl += `/w:${imageParams.width}`;
 	}
 
-	if (imageParams.crop.includes('person')) {
-		processBoxParams('person', imageParams.person);
-	}
-
-	if (imageParams.crop.includes('focus')) {
-		const fpx = imageParams.focalPoint.x.toFixed(4);
-		const fpy = imageParams.focalPoint.y.toFixed(4);
-		newUrl += `/fp:${fpx}:${fpy}`;
-
-		if (imageParams.focalPointZoom > 0) {
-			newUrl += `/fp:zoom:${imageParams.focalPointZoom}`;
-		}
-	}
-
-	if (imageParams.redact.faces.length > 0 || imageParams.redact.people.length > 0 || imageParams.redact.regions.length > 0) {
-		if (imageParams.redact.faces.length > 0) {
-			newUrl += `/redact:faces:${imageParams.redact.faces.join(',')}`;
+	if (imageParams.enableCrop) {
+		if (imageParams.crop.length > 0) {
+			newUrl += `/crop:${imageParams.crop.join(',')}`;
 		}
 
-		if (imageParams.redact.people.length > 0) {
-			newUrl += `/redact:people:${imageParams.redact.people.join(',')}`;
+		if (imageParams.height > 0) {
+			newUrl += `/h:${imageParams.height}`;
 		}
 
-		if (imageParams.redact.regions.length > 0) {
-			for(const region of imageParams.redact.regions) {
-				if (region.width > 0 && region.height > 0) {
-					newUrl += `/redact:region:${region.left},${region.top},${region.width},${region.height}`;
-				}
+		if (imageParams.crop.includes('smart') && imageParams.smartMode) {
+			newUrl += `/smart:${imageParams.smartMode}`;
+		}
+
+		if (imageParams.aspectRatioWidth > 0 && imageParams.aspectRatioHeight > 0) {
+			newUrl += `/ar:${imageParams.aspectRatioWidth}:${imageParams.aspectRatioHeight}`;
+		}
+
+		if (imageParams.zoom > 1) {
+			newUrl += `/zoom:${imageParams.zoom}`;
+		}
+
+		if (imageParams.padding.left > 0 || imageParams.padding.top > 0 || imageParams.padding.right > 0 || imageParams.padding.bottom > 0) {
+			if (imageParams.padding.left === imageParams.padding.top && imageParams.padding.top === imageParams.padding.right && imageParams.padding.right == imageParams.padding.bottom) {
+				newUrl += `/pad:${imageParams.padding.color ?? '00000000'}:${imageParams.padding.left}`;
+			} else if (imageParams.padding.left === imageParams.padding.right && imageParams.padding.top == imageParams.padding.bottom) {
+				newUrl += `/pad:${imageParams.padding.color}:${imageParams.padding.left}:${imageParams.padding.top}`;
+			} else {
+				newUrl += `/pad:${imageParams.padding.color}:${imageParams.padding.left}:${imageParams.padding.top}:${imageParams.padding.right}:${imageParams.padding.bottom}`;
 			}
 		}
 
-		if (imageParams.redact.blur > 0) {
-			newUrl += `/redact:blur:${imageParams.redact.blur}`;
+		if (imageParams.border.left > 0 || imageParams.border.top > 0 || imageParams.border.right > 0 || imageParams.border.bottom > 0) {
+			if (imageParams.border.left === imageParams.border.top && imageParams.border.top === imageParams.border.right && imageParams.border.right == imageParams.border.bottom) {
+				newUrl += `/border:${imageParams.border.color ?? '00000000'}:${imageParams.border.left}`;
+			} else if (imageParams.border.left === imageParams.border.right && imageParams.border.top == imageParams.border.bottom) {
+				newUrl += `/border:${imageParams.border.color}:${imageParams.border.left}:${imageParams.border.top}`;
+			} else {
+				newUrl += `/border:${imageParams.border.color}:${imageParams.border.left}:${imageParams.border.top}:${imageParams.border.right}:${imageParams.border.bottom}`;
+			}
 		}
 
-		if (imageParams.redact.useColor) {
-			newUrl += `/redact:color:${imageParams.redact.color}`;
+		if (imageParams.hGravity || imageParams.vGravity) {
+			const hg = imageParams.hGravity ?? 'center';
+			const vg = imageParams.vGravity ?? 'center';
+
+			let gravity = `${hg}:${vg}`;
+			gravity = gravity === 'center:center' ? 'center' : gravity;
+
+			if (gravity !== 'center') {
+				newUrl += `/gravity:${gravity}`;
+			}
 		}
 
-		if (imageParams.redact.pixelate > 0) {
-			newUrl += `/redact:pixelate:${imageParams.redact.pixelate}`;
+		if (imageParams.crop.includes('face')) {
+			processBoxParams('face', imageParams.face);
 		}
 
-		if (imageParams.redact.expandMask > 0) {
-			newUrl += `/redact:mask:expand:${imageParams.redact.expandMask}`;
+		if (imageParams.crop.includes('person')) {
+			processBoxParams('person', imageParams.person);
 		}
 
-		if (imageParams.redact.blurMask > 0) {
-			newUrl += `/redact:mask:blur:${imageParams.redact.blurMask}`;
-		}
+		if (imageParams.crop.includes('focus')) {
+			const fpx = imageParams.focalPoint.x.toFixed(4);
+			const fpy = imageParams.focalPoint.y.toFixed(4);
+			newUrl += `/fp:${fpx}:${fpy}`;
 
-		if (imageParams.redact.pixelateMask > 0) {
-			newUrl += `/redact:mask:pixelate:${imageParams.redact.pixelateMask}`;
+			if (imageParams.focalPointZoom > 0) {
+				newUrl += `/fp:zoom:${imageParams.focalPointZoom}`;
+			}
+		}
+	}
+
+
+	if (imageParams.enableRedact) {
+		if (imageParams.redact.faces.length > 0 || imageParams.redact.people.length > 0 || imageParams.redact.regions.length > 0) {
+			if (imageParams.redact.faces.length > 0) {
+				newUrl += `/redact:faces:${imageParams.redact.faces.join(',')}`;
+			}
+
+			if (imageParams.redact.people.length > 0) {
+				newUrl += `/redact:people:${imageParams.redact.people.join(',')}`;
+			}
+
+			if (imageParams.redact.regions.length > 0) {
+				for(const region of imageParams.redact.regions) {
+					if (region.width > 0 && region.height > 0) {
+						newUrl += `/redact:region:${region.left},${region.top},${region.width},${region.height}`;
+					}
+				}
+			}
+
+			if (imageParams.redact.blur > 0) {
+				newUrl += `/redact:blur:${imageParams.redact.blur}`;
+			}
+
+			if (imageParams.redact.useColor) {
+				newUrl += `/redact:color:${imageParams.redact.color}`;
+			}
+
+			if (imageParams.redact.pixelate > 0) {
+				newUrl += `/redact:pixelate:${imageParams.redact.pixelate}`;
+			}
+
+			if (imageParams.redact.expandMask > 0) {
+				newUrl += `/redact:mask:expand:${imageParams.redact.expandMask}`;
+			}
+
+			if (imageParams.redact.blurMask > 0) {
+				newUrl += `/redact:mask:blur:${imageParams.redact.blurMask}`;
+			}
+
+			if (imageParams.redact.pixelateMask > 0) {
+				newUrl += `/redact:mask:pixelate:${imageParams.redact.pixelateMask}`;
+			}
 		}
 	}
 	//endregion
@@ -160,19 +165,42 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 	//endregion
 
 	//region Stylize
-	let hasStyle = false;
-	if (imageParams.stylize.blur > 0) {
-		hasStyle = true;
-		newUrl += `/blur:${imageParams.stylize.blur}`;
-	}
+	if (imageParams.enableStylize) {
+		let hasStyle = false;
+		if (imageParams.stylize.blur > 0) {
+			hasStyle = true;
+			newUrl += `/blur:${imageParams.stylize.blur}`;
+		}
 
-	if (imageParams.stylize.pixelate > 0) {
-		hasStyle = true;
-		newUrl += `/px:${imageParams.stylize.pixelate}`;
-	}
+		if (imageParams.stylize.pixelate > 0) {
+			hasStyle = true;
+			newUrl += `/px:${imageParams.stylize.pixelate}`;
+		}
 
-	if (hasStyle) {
-		newUrl += `/stylize:order:${imageParams.stylize.order.join(',')}`;
+		if (hasStyle) {
+			newUrl += `/stylize:order:${imageParams.stylize.order.join(',')}`;
+		}
+
+		if (imageParams.stylize.brightness !== 100) {
+			newUrl += `/bri:${imageParams.stylize.brightness}`;
+		}
+
+		if (imageParams.stylize.saturation !== 100) {
+			newUrl += `/sat:${imageParams.stylize.saturation}`;
+		}
+
+		if (imageParams.stylize.hue !== 0) {
+			newUrl += `/hue:${imageParams.stylize.hue}`;
+		}
+
+		if (imageParams.stylize.gradientMap.opacity > 0) {
+			newUrl += `/gm:${imageParams.stylize.gradientMap.opacity}:${imageParams.stylize.gradientMap.blendMode}`;
+			for(const stop of imageParams.stylize.gradientMap.stops) {
+				if (stop.enabled) {
+					newUrl += `:${Math.floor(stop.stop).toFixed(0)},${stop.color.replaceAll('#', '')}`;
+				}
+			}
+		}
 	}
 
 	//endregion
@@ -225,6 +253,29 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		}
 	}
 
+
+	//endregion
+
+	//region Export
+	if (imageParams.export.format !== 'webp') {
+		newUrl += `/fmt:${imageParams.export.format}`;
+	}
+
+	if (imageParams.export.quality !== 85) {
+		newUrl += `/q:${imageParams.export.quality}`;
+	}
+
+	if (imageParams.export.format === 'webp' && imageParams.export.reductionEffort !== 4) {
+		newUrl += `/reduction:${imageParams.export.reductionEffort}`;
+	}
+
+	if (imageParams.export.lossless) {
+		newUrl += `/lossless:1`;
+	}
+
+	if (imageParams.export.nearLossless) {
+		newUrl += `/nloss:1`;
+	}
 
 	//endregion
 

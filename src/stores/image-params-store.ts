@@ -221,8 +221,9 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			params.redact.pixelate = ifExists(foxyPreset.redact!.pixelate, params.redact.pixelate);
 		}
 
-		if (exists(foxyPreset.bgColor)) {
-			params.backgroundColor = foxyPreset.bgColor!.startsWith('#') ? foxyPreset.bgColor!.substring(1) : foxyPreset.bgColor!;
+		if (exists(foxyPreset.background)) {
+			const color = ifExists(foxyPreset.background!.color, '#00000000');
+			params.backgroundColor = color.startsWith('#') ? color.substring(1) : color;
 		}
 
 		return params;

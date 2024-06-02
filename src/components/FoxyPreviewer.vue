@@ -38,7 +38,8 @@ import FoxyPresetSelector from "@/components/header/FoxyPresetSelector.vue";
 import FoxyPresetEditModal from "@/components/modals/FoxyPresetEditModal.vue";
 import ImageLink from "@/components/UI/ImageLink.vue";
 import RedactRegionParam from "@/components/editors/RedactRegionParam.vue";
-import {StylizeOrderOptions} from "@/types/params";
+import {BlendModeOptions, BlendModes, DefaultImageParams, ExportFormatOptions, StylizeOrderOptions} from "@/types/params";
+import GradientMapParam from "@/components/editors/GradientMapParam.vue";
 
 const {
 	apps,
@@ -355,7 +356,7 @@ const redactFaceOptions = computed(() => {
 			<div class="relative min-w-[400px]">
 				<div class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100">
 					<div class="p-3 flex flex-col gap-5">
-						<EditorPanel title="Cropping / Resizing">
+						<EditorPanel title="Cropping / Resizing" v-model="imageParams.enableCrop" :show-toggle="true" :disabled="!imageParams.enableCrop">
 							<TagsParam title="Crop Mode" :options="CropOptions" v-model="imageParams.crop" placeholder="Select 1 or more crop modes" />
 							<SelectParam v-if="imageParams.crop.includes('smart')" title="Smart Crop Mode" v-model="imageParams.smartMode" :default="null" :options="InterestingOptions" />
 							<div class="flex items-center gap-1">
@@ -379,11 +380,11 @@ const redactFaceOptions = computed(() => {
 								<SelectParam title="Vertical Gravity" v-model="imageParams.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
 							</div>
 						</EditorPanel>
-						<EditorPanel v-if="imageParams.crop.includes('focus') && imageKey" title="Focal Point">
+						<EditorPanel v-if="imageParams.crop.includes('focus') && imageKey" title="Focal Point"  :disabled="!imageParams.enableCrop">
 							<FocalPointParam v-model="imageParams.focalPoint"/>
 							<SliderParam title="Focal Point Zoom" v-model="imageParams.focalPointZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
 						</EditorPanel>
-						<EditorPanel v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Crop Options">
+						<EditorPanel v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Crop Options"  :disabled="!imageParams.enableCrop">
 							<ObjectSelectParam title="Face Index" v-model="imageParams.face.index" :default="-1" :allow-null="false" :options="faceOptions" />
 							<SliderParam title="Face Padding" v-model="imageParams.face.padding" :min="0" :max="256" :step="1" :default="8" suffix="px" />
 							<SliderParam title="Face Zoom" v-model="imageParams.face.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
@@ -393,7 +394,7 @@ const redactFaceOptions = computed(() => {
 							</div>
 							<ToggleParam title="Focus Face" v-model="imageParams.face.focus" />
 						</EditorPanel>
-						<EditorPanel v-if="imageParams.crop.includes('person') && peopleCount > 0" title="Person Crop Options">
+						<EditorPanel v-if="imageParams.crop.includes('person') && peopleCount > 0" title="Person Crop Options"  :disabled="!imageParams.enableCrop">
 							<ObjectSelectParam title="Person Index" v-model="imageParams.person.index" :default="-1" :allow-null="false" :options="personOptions" />
 							<SliderParam title="Person Padding" v-model="imageParams.person.padding" :min="0" :max="256" :step="1" :default="0" suffix="px" />
 							<SliderParam title="Person Zoom" v-model="imageParams.person.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
@@ -405,12 +406,18 @@ const redactFaceOptions = computed(() => {
 						<EditorPanel title="Image Attributes">
 							<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
 						</EditorPanel>
-						<EditorPanel title="Stylize">
+						<EditorPanel title="Stylize"  v-model="imageParams.enableStylize" :show-toggle="true" :disabled="!imageParams.enableStylize">
 							<TagsParam title="Stylize Order" :options="StylizeOrderOptions" v-model="imageParams.stylize.order" placeholder="Order to process stylize operations" />
 							<SliderParam title="Blur" v-model="imageParams.stylize.blur" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
 							<SliderParam title="Pixelate" v-model="imageParams.stylize.pixelate" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+							<SliderParam title="Brightness" v-model="imageParams.stylize.brightness" :min="0" :max="200" :step="1" :default="100" suffix="%" />
+							<SliderParam title="Saturation" v-model="imageParams.stylize.saturation" :min="0" :max="200" :step="1" :default="100" suffix="%" />
+							<SliderParam title="Hue" v-model="imageParams.stylize.hue" :min="-360" :max="360" :step="1" :default="0" suffix="°" />
+							<GradientMapParam title="Gradient Map" :default="DefaultImageParams.stylize.gradientMap.stops" v-model="imageParams.stylize.gradientMap.stops" :enabled="imageParams.stylize.gradientMap.opacity > 0" />
+							<SliderParam title="Gradient Map Opacity" v-model="imageParams.stylize.gradientMap.opacity" :min="0" :max="100" :step="1" :default="0" default-label="Disabled" suffix="%" />
+							<ObjectSelectParam title="Gradient Map Mode" v-model="imageParams.stylize.gradientMap.blendMode" :default="BlendModes.BlendModeOver" :allow-null="false" :options="BlendModeOptions" />
 						</EditorPanel>
-						<EditorPanel title="Padding">
+						<EditorPanel title="Padding"  v-model="imageParams.enablePadding" :show-toggle="true" :disabled="!imageParams.enablePadding">
 							<ColorParam title="Padding Color" v-model="imageParams.padding.color" :default="null" />
 							<div class="flex items-center gap-1">
 								<div class="flex-1 flex flex-col gap-3">
@@ -428,7 +435,7 @@ const redactFaceOptions = computed(() => {
 								</div>
 							</div>
 						</EditorPanel>
-						<EditorPanel title="Border">
+						<EditorPanel title="Border" v-model="imageParams.enableBorder" :show-toggle="true" :disabled="!imageParams.enableBorder">
 							<ColorParam title="Border Color" v-model="imageParams.border.color" :default="null" />
 							<div class="flex items-center gap-1">
 								<div class="flex-1 flex flex-col gap-3">
@@ -446,7 +453,7 @@ const redactFaceOptions = computed(() => {
 								</div>
 							</div>
 						</EditorPanel>
-						<EditorPanel title="Redact">
+						<EditorPanel title="Redact" v-model="imageParams.enableRedact" :show-toggle="true" :disabled="!imageParams.enableRedact">
 							<TagsParam title="Faces" :options="redactFaceOptions" v-model="imageParams.redact.faces" placeholder="Faces to redact" />
 							<TagsParam title="People" :options="redactPersonOptions" v-model="imageParams.redact.people" placeholder="People to redact" />
 							<RedactRegionParam v-model="imageParams.redact.regions" />
@@ -457,6 +464,13 @@ const redactFaceOptions = computed(() => {
 							<SliderParam title="Blur Mask" v-model="imageParams.redact.blurMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="" />
 							<SliderParam title="Expand Mask" v-model="imageParams.redact.expandMask" :min="0" :max="200" :step="1" :default="0" default-label="None" suffix="%" />
 							<SliderParam title="Pixelate Mask" v-model="imageParams.redact.pixelateMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+						</EditorPanel>
+						<EditorPanel title="Format">
+							<ObjectSelectParam title="File Format" v-model="imageParams.export.format" default="webp" :allow-null="false" :options="ExportFormatOptions" />
+							<SliderParam title="Quality" v-model="imageParams.export.quality" :min="0" :max="100" :step="1" :default="85" />
+							<SliderParam v-if="imageParams.export.format === 'webp'" title="Reduction Effort" v-model="imageParams.export.reductionEffort" :min="0" :max="6" :step="1" :default="4" />
+							<ToggleParam title="Lossless" v-model="imageParams.export.lossless" />
+							<ToggleParam title="Near Lossless" v-model="imageParams.export.nearLossless" />
 						</EditorPanel>
 						<EditorPanel>
 							<div class="flex items-center justify-center">
