@@ -1,8 +1,8 @@
-import type {BoxCropParams, DebugParams, ImageParams} from "@/types/params";
+import {BlendModes, type BoxCropParams, type DebugParams, type ImageParams} from "@/types/params";
 import signHMAC256 from "@/utils/sign";
 
 export default function buildUrl(host:string, accessKey:string|null, secret:string, imageKey:string, imageParams:ImageParams, debugParams:DebugParams|null = null, preset:boolean = false) {
-	let encodedKey = btoa('/'+imageKey);
+	let encodedKey = btoa('/'+imageKey).replaceAll('=', '');
 	let newUrl = accessKey ? `/${accessKey}/${encodedKey}` : `/${encodedKey}`;
 
 	const processBoxParams = (noun:string, params:BoxCropParams) => {
@@ -180,25 +180,74 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		if (hasStyle) {
 			newUrl += `/stylize:order:${imageParams.stylize.order.join(',')}`;
 		}
+	}
 
-		if (imageParams.stylize.brightness !== 100) {
-			newUrl += `/bri:${imageParams.stylize.brightness}`;
+	//endregion
+
+	//region Adjustments
+	if (imageParams.enableAdjustments) {
+		if (imageParams.adjustments.brightness !== 100) {
+			newUrl += `/bri:${imageParams.adjustments.brightness}`;
 		}
 
-		if (imageParams.stylize.saturation !== 100) {
-			newUrl += `/sat:${imageParams.stylize.saturation}`;
+		if (imageParams.adjustments.saturation !== 100) {
+			newUrl += `/sat:${imageParams.adjustments.saturation}`;
 		}
 
-		if (imageParams.stylize.hue !== 0) {
-			newUrl += `/hue:${imageParams.stylize.hue}`;
+		if (imageParams.adjustments.hue !== 0) {
+			newUrl += `/hue:${imageParams.adjustments.hue}`;
 		}
 
-		if (imageParams.stylize.gradientMap.opacity > 0) {
-			newUrl += `/gm:${imageParams.stylize.gradientMap.opacity}:${imageParams.stylize.gradientMap.blendMode}`;
-			for(const stop of imageParams.stylize.gradientMap.stops) {
-				if (stop.enabled) {
-					newUrl += `:${Math.floor(stop.stop).toFixed(0)},${stop.color.replaceAll('#', '')}`;
-				}
+		if (imageParams.adjustments.contrast !== 1) {
+			newUrl += `/con:${imageParams.adjustments.contrast}`;
+		}
+
+		if (imageParams.adjustments.exposure !== 0) {
+			newUrl += `/exp:${imageParams.adjustments.exposure}`;
+		}
+
+		if (imageParams.adjustments.gamma !== 1) {
+			newUrl += `/gamma:${imageParams.adjustments.gamma}`;
+		}
+
+		if (imageParams.adjustments.vibrance > 0) {
+			newUrl += `/vib:${imageParams.adjustments.vibrance}`;
+		}
+
+		if (imageParams.adjustments.texture > 0) {
+			newUrl += `/texture:${imageParams.adjustments.texture}`;
+			if (imageParams.adjustments.textureDensity < 100) {
+				newUrl += `:${imageParams.adjustments.textureDensity}`;
+			}
+		}
+
+		if (imageParams.adjustments.invert) {
+			newUrl += "/invert:true"
+		}
+	}
+
+	//endregion
+
+	//region Gradient Map
+	if (imageParams.enableGradientMap && imageParams.gradientMap.opacity > 0) {
+		if (!imageParams.gradientMap.monochrome) {
+			newUrl += "/gm:mono:false";
+		}
+
+		if (imageParams.gradientMap.blur > 0) {
+			newUrl += `/gm:blur:${imageParams.gradientMap.blur}`;
+		}
+
+		if (imageParams.gradientMap.blendMode !== BlendModes.BlendModeOver) {
+			newUrl += `/gm:blend:${imageParams.gradientMap.blendMode}`;
+		}
+
+		newUrl += `/gm:opacity:${imageParams.gradientMap.opacity}`;
+
+		newUrl += "/gm:stops";
+		for(const stop of imageParams.gradientMap.stops) {
+			if (stop.enabled) {
+				newUrl += `:${Math.floor(stop.stop).toFixed(0)},${stop.color.replaceAll('#', '')}`;
 			}
 		}
 	}

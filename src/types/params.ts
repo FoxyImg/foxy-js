@@ -106,17 +106,28 @@ export const BlendModeOptions = [
 export type GradientMap = {
 	stops: GradientStops[],
 	opacity: number,
+	monochrome: boolean,
+	blur: number,
 	blendMode: BlendModes,
 }
 
 export type StylizeParams = {
+	order: string[],
 	blur: number,
 	pixelate: number,
+}
+
+export type AdjustmentsParams = {
 	brightness: number,
 	saturation: number,
 	hue: number,
-	order: string[],
-	gradientMap: GradientMap,
+	contrast: number,
+	exposure: number,
+	gamma: number,
+	vibrance: number,
+	invert: boolean,
+	texture: number,
+	textureDensity: number,
 }
 
 
@@ -155,6 +166,12 @@ export type ImageParams = {
 
 	enableStylize: boolean,
 	stylize: StylizeParams,
+
+	enableGradientMap: boolean,
+	gradientMap: GradientMap,
+
+	enableAdjustments: boolean,
+	adjustments: AdjustmentsParams,
 
 	backgroundColor: string|null,
 
@@ -200,18 +217,33 @@ export const DefaultImageParams: ImageParams = {
 	stylize: {
 		blur: 0,
 		pixelate: 0,
+		order: ['blur', 'px'],
+	},
+
+	enableAdjustments: true,
+	adjustments: {
 		brightness: 100,
 		saturation: 100,
+		contrast: 1,
+		exposure: 0,
+		gamma: 1,
 		hue: 0,
-		order: ['blur', 'px'],
-		gradientMap: {
-			stops: [
-				{ enabled: true, stop: 0, color: '#000000' },
-				{ enabled: true, stop: 100, color: '#ffffff' },
-			],
-			opacity: 0,
-			blendMode: BlendModes.BlendModeOver,
-		}
+		vibrance: 0,
+		invert: false,
+		texture: 0,
+		textureDensity: 100,
+	},
+
+	enableGradientMap: true,
+	gradientMap: {
+		monochrome: true,
+		blur: 0,
+		stops: [
+			{ enabled: true, stop: 0, color: '#000000' },
+			{ enabled: true, stop: 100, color: '#ffffff' },
+		],
+		opacity: 0,
+		blendMode: BlendModes.BlendModeOver,
 	},
 
 	face: {

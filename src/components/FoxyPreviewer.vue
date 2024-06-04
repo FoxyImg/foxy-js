@@ -406,16 +406,29 @@ const redactFaceOptions = computed(() => {
 						<EditorPanel title="Image Attributes">
 							<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
 						</EditorPanel>
+						<EditorPanel title="Adjustments"  v-model="imageParams.enableAdjustments" :show-toggle="true" :disabled="!imageParams.enableAdjustments">
+							<SliderParam title="Brightness" v-model="imageParams.adjustments.brightness" :min="0" :max="200" :step="1" :default="100" suffix="%" />
+							<SliderParam title="Saturation" v-model="imageParams.adjustments.saturation" :min="0" :max="200" :step="1" :default="100" suffix="%" />
+							<SliderParam title="Vibrance" v-model="imageParams.adjustments.vibrance" :min="0" :max="100" :step="1" :default="0" default-label="None" />
+							<SliderParam title="Contrast" v-model="imageParams.adjustments.contrast" :min="0" :max="3" :step="0.01" :default="1" />
+							<SliderParam title="Exposure" v-model="imageParams.adjustments.exposure" :min="-3" :max="3" :step="0.01" :default="0" />
+							<SliderParam title="Gamma" v-model="imageParams.adjustments.gamma" :min="0.01" :max="10" :step="0.01" :default="1" />
+							<SliderParam title="Texture" v-model="imageParams.adjustments.texture" :min="0" :max="50" :step="0.1" :default="0" default-label="None" />
+							<SliderParam title="Texture Density" v-model="imageParams.adjustments.textureDensity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
+							<SliderParam title="Hue" v-model="imageParams.adjustments.hue" :min="-360" :max="360" :step="1" :default="0" suffix="°" />
+							<ToggleParam title="Invert" v-model="imageParams.adjustments.invert" />
+						</EditorPanel>
 						<EditorPanel title="Stylize"  v-model="imageParams.enableStylize" :show-toggle="true" :disabled="!imageParams.enableStylize">
 							<TagsParam title="Stylize Order" :options="StylizeOrderOptions" v-model="imageParams.stylize.order" placeholder="Order to process stylize operations" />
 							<SliderParam title="Blur" v-model="imageParams.stylize.blur" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
 							<SliderParam title="Pixelate" v-model="imageParams.stylize.pixelate" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-							<SliderParam title="Brightness" v-model="imageParams.stylize.brightness" :min="0" :max="200" :step="1" :default="100" suffix="%" />
-							<SliderParam title="Saturation" v-model="imageParams.stylize.saturation" :min="0" :max="200" :step="1" :default="100" suffix="%" />
-							<SliderParam title="Hue" v-model="imageParams.stylize.hue" :min="-360" :max="360" :step="1" :default="0" suffix="°" />
-							<GradientMapParam title="Gradient Map" :default="DefaultImageParams.stylize.gradientMap.stops" v-model="imageParams.stylize.gradientMap.stops" :enabled="imageParams.stylize.gradientMap.opacity > 0" />
-							<SliderParam title="Gradient Map Opacity" v-model="imageParams.stylize.gradientMap.opacity" :min="0" :max="100" :step="1" :default="0" default-label="Disabled" suffix="%" />
-							<ObjectSelectParam title="Gradient Map Mode" v-model="imageParams.stylize.gradientMap.blendMode" :default="BlendModes.BlendModeOver" :allow-null="false" :options="BlendModeOptions" />
+						</EditorPanel>
+						<EditorPanel title="Gradient Map"  v-model="imageParams.enableGradientMap" :show-toggle="true" :disabled="!imageParams.enableGradientMap">
+							<GradientMapParam title="Gradient Map" :default="DefaultImageParams.gradientMap.stops" v-model="imageParams.gradientMap.stops" :enabled="imageParams.gradientMap.opacity > 0" />
+							<SliderParam title="Gradient Map Opacity" v-model="imageParams.gradientMap.opacity" :min="0" :max="100" :step="1" :default="0" default-label="Disabled" suffix="%" />
+							<ObjectSelectParam title="Gradient Map Mode" v-model="imageParams.gradientMap.blendMode" :default="BlendModes.BlendModeOver" :allow-null="false" :options="BlendModeOptions" />
+							<SliderParam title="Blur" v-model="imageParams.gradientMap.blur" :min="0" :max="320" :step="1" :default="0" default-label="None" suffix="px" />
+							<ToggleParam title="Map Monochrome Image" v-model="imageParams.gradientMap.monochrome" />
 						</EditorPanel>
 						<EditorPanel title="Padding"  v-model="imageParams.enablePadding" :show-toggle="true" :disabled="!imageParams.enablePadding">
 							<ColorParam title="Padding Color" v-model="imageParams.padding.color" :default="null" />

@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import type {GradientMap, GradientStops} from "@/types/params";
+import type {GradientStops} from "@/types/params";
 import {computed, onMounted, onUnmounted, ref} from "vue";
-import {arraysAreEqual} from "@/utils/array-equality";
-import {ColorPicker} from "vue3-colorpicker";
 import GradientEditor from "@/components/UI/GradientEditor.vue";
-import Toggle from "@/components/UI/Toggle.vue";
-import SliderParam from "@/components/editors/SliderParam.vue";
+import GradienMapPresetsSelector from "@/components/editors/GradienMapPresetsSelector.vue";
+import Icon from "@/components/UI/Icon.vue";
 
 const props = defineProps<{
 	title: string,
@@ -23,11 +21,34 @@ const currentValue = computed({
 	set: (value) => emit('update:modelValue', value),
 });
 
+function reverseGradient() {
+	const stops = JSON.parse(JSON.stringify(currentValue.value));
+	stops.forEach((stop:GradientStops) => {
+		stop.stop = 100 - stop.stop;
+	});
+
+	currentValue.value = stops;
+}
+
+
 </script>
 <template>
 	<div class="flex flex-col gap-2">
-		<div class="flex items-center gap-1 text-xs text-neutral-600">
-			<label :class="{'font-bold text-neutral-700': enabled}">{{  title  }}</label>
+		<div class="flex items-center justify-between">
+			<div class="flex items-center gap-1 text-xs text-neutral-600">
+				<label :class="{'font-bold text-neutral-700': enabled}">{{  title  }}</label>
+				<VDropdown>
+					<div class="cursor-pointer aspect-square">
+						<Icon name="bookmark" class="w-3 h-auto stroke-neutral-500" />
+					</div>
+					<template #popper>
+						<GradienMapPresetsSelector />
+					</template>
+				</VDropdown>
+			</div>
+			<div class="cursor-pointer flex items-center justify-center" @click="reverseGradient">
+				<Icon name="reverse" class="w-3.5 h-auto stroke-neutral-500" />
+			</div>
 		</div>
 		<GradientEditor v-model="currentValue" />
 	</div>

@@ -35,10 +35,35 @@ watch(inputRef, (el) => {
 	}
 });
 
+const decimalPlaces = computed(() => {
+	if (props.step >= 1) {
+		return 0;
+	} else if (props.step >= 0.1) {
+		return 1;
+	} else if (props.step >= 0.01) {
+		return 2;
+	} else if (props.step >= 0.001) {
+		return 3;
+	}
+
+	return 0;
+});
+
 function quickEdit() {
 	if (props.allowDirectEditing) {
 		editing.value = true;
 	}
+}
+
+function onWheel(e: WheelEvent) {
+	if (currentValue.value === null && props.default === null) {
+		return;
+	}
+
+	e.preventDefault();
+	const amount = (-1 * (e.deltaY * 0.5)) * props.step;
+	console.log(amount);
+	currentValue.value = Math.max(props.min, Math.min((currentValue.value ?? props.default!) + amount, props.max));
 }
 
 </script>
@@ -57,10 +82,10 @@ function quickEdit() {
 				@focusout="editing=false"
 				@keyup.enter="editing=false" autofocus
 			/>
-			<div v-else @click="quickEdit" class="cursor-pointer underline decoration-dotted text-xxs" :class="{'font-bold text-neutral-700': currentValue !== props.default}">
+			<div v-else @click="quickEdit" @wheel="onWheel" class="cursor-pointer underline decoration-dotted text-xxs" :class="{'font-bold text-neutral-700': currentValue !== props.default}">
 				<span v-if="valueFormatter">{{ valueFormatter(currentValue) }}</span>
 				<span v-else-if="defaultLabel && currentValue === props.default">{{ defaultLabel }}</span>
-				<span v-else>{{ currentValue }}{{ props.suffix }}</span>
+				<span v-else>{{ currentValue?.toFixed(decimalPlaces) }}{{ props.suffix }}</span>
 			</div>
 		</div>
 		<input

@@ -1,6 +1,6 @@
 import {defineStore, storeToRefs} from "pinia";
 import {computed, reactive, ref, watch} from "vue";
-import type {BoxCropParams, DebugParams, ImageParams} from "@/types/params";
+import type {BoxCropParams, DebugParams, GradientMap, ImageParams} from "@/types/params";
 import {DefaultImageParams} from "@/types/params";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import buildUrl from "@/utils/url-builder";
@@ -43,6 +43,8 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		disableMetaCache: false,
 		disableRenderCache: false,
 	});
+
+	const gradientMapPresets = ref<GradientMap[]>([]);
 
 	const imageMeta = ref<ImageMeta|null>(null);
 	const currentPresetJSONObject = ref<any|null>(null);
@@ -270,6 +272,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		peopleCount,
 		currentPresetJSONObject,
 		currentPresetImageUrl,
+		gradientMapPresets,
 
 		buildImageUrl,
 		debouncedBuildImageUrl,
