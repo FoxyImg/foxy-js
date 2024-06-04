@@ -146,6 +146,48 @@ export type ExportParams = {
 	nearLossless: boolean,
 }
 
+export const RotationModeOptions = [
+	{ label: 'None', value: 'none' },
+	{ label: 'Fit', value: 'fit' },
+	{ label: 'Fill', value: 'fill' },
+]
+
+export type RotationParams = {
+	rotation: number,
+	mode: string
+}
+
+export const WatermarkRotationOptions = [
+	{ label: 'None', value: 0 },
+	{ label: '90', value: 90 },
+	{ label: '180', value: 180 },
+	{ label: '270', value: 270 },
+]
+
+export type WatermarkDropShadowParams = {
+	enabled: boolean,
+	opacity: number,
+	blur: number,
+	color: string,
+	offsetX: number,
+	offsetY: number,
+}
+
+export type WatermarkParams = {
+	text: string,
+	font: string,
+	vAlign: 'top'|'center'|'bottom',
+	hAlign: 'left'|'center'|'right',
+	width: number,
+	height: number,
+	opacity: number,
+	color: string,
+	hPadding: number,
+	vPadding: number,
+	rotate: number,
+	dropShadow: WatermarkDropShadowParams,
+}
+
 
 export type ImageParams = {
 	enableCrop: boolean,
@@ -163,6 +205,9 @@ export type ImageParams = {
 
 	face: BoxCropParams,
 	person: BoxCropParams,
+
+	enabledRotation: boolean,
+	rotation: RotationParams,
 
 	enableStylize: boolean,
 	stylize: StylizeParams,
@@ -183,6 +228,9 @@ export type ImageParams = {
 
 	enableRedact: boolean,
 	redact: RedactParams,
+
+	enabledWatermark: boolean,
+	watermark: WatermarkParams,
 
 	export: ExportParams,
 }
@@ -212,6 +260,12 @@ export const DefaultImageParams: ImageParams = {
 	vGravity: 'center',
 	focalPoint: { x: 0.5, y: 0.5 },
 	focalPointZoom: 0,
+
+	enabledRotation: true,
+	rotation: {
+		rotation: 0,
+		mode: 'none',
+	},
 
 	enableStylize: true,
 	stylize: {
@@ -296,6 +350,29 @@ export const DefaultImageParams: ImageParams = {
 		useColor: false,
 		color: null,
 		pixelate: 0,
+	},
+
+	enabledWatermark: true,
+	watermark: {
+		text: '',
+		font: 'sans',
+		vAlign: 'bottom',
+		hAlign: 'right',
+		width: 80,
+		height: 6,
+		opacity: 100,
+		color: '#FFFFFF',
+		hPadding: 18,
+		vPadding: 18,
+		rotate: 0,
+		dropShadow: {
+			enabled: false,
+			opacity: 100,
+			blur: 3,
+			color: '#000000',
+			offsetX: 1,
+			offsetY: 1,
+		},
 	},
 
 	export: {

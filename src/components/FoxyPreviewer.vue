@@ -38,8 +38,16 @@ import FoxyPresetSelector from "@/components/header/FoxyPresetSelector.vue";
 import FoxyPresetEditModal from "@/components/modals/FoxyPresetEditModal.vue";
 import ImageLink from "@/components/UI/ImageLink.vue";
 import RedactRegionParam from "@/components/editors/RedactRegionParam.vue";
-import {BlendModeOptions, BlendModes, DefaultImageParams, ExportFormatOptions, StylizeOrderOptions} from "@/types/params";
+import {
+	BlendModeOptions,
+	BlendModes,
+	DefaultImageParams,
+	ExportFormatOptions,
+	RotationModeOptions,
+	StylizeOrderOptions, WatermarkRotationOptions
+} from "@/types/params";
 import GradientMapParam from "@/components/editors/GradientMapParam.vue";
+import TextParam from "@/components/editors/TextParam.vue";
 
 const {
 	apps,
@@ -356,7 +364,7 @@ const redactFaceOptions = computed(() => {
 			<div class="relative min-w-[400px]">
 				<div class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100">
 					<div class="p-3 flex flex-col gap-5">
-						<EditorPanel title="Cropping / Resizing" v-model="imageParams.enableCrop" :show-toggle="true" :disabled="!imageParams.enableCrop">
+						<EditorPanel title="Cropping / Resizing" collapse-key="crop-editor" v-model="imageParams.enableCrop" :show-toggle="true" :disabled="!imageParams.enableCrop">
 							<TagsParam title="Crop Mode" :options="CropOptions" v-model="imageParams.crop" placeholder="Select 1 or more crop modes" />
 							<SelectParam v-if="imageParams.crop.includes('smart')" title="Smart Crop Mode" v-model="imageParams.smartMode" :default="null" :options="InterestingOptions" />
 							<div class="flex items-center gap-1">
@@ -380,11 +388,11 @@ const redactFaceOptions = computed(() => {
 								<SelectParam title="Vertical Gravity" v-model="imageParams.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
 							</div>
 						</EditorPanel>
-						<EditorPanel v-if="imageParams.crop.includes('focus') && imageKey" title="Focal Point"  :disabled="!imageParams.enableCrop">
+						<EditorPanel v-if="imageParams.crop.includes('focus') && imageKey" collapse-key="focal-point-editor" title="Focal Point"  :disabled="!imageParams.enableCrop">
 							<FocalPointParam v-model="imageParams.focalPoint"/>
 							<SliderParam title="Focal Point Zoom" v-model="imageParams.focalPointZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
 						</EditorPanel>
-						<EditorPanel v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Crop Options"  :disabled="!imageParams.enableCrop">
+						<EditorPanel v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Crop Options" collapse-key="face-crop-options"  :disabled="!imageParams.enableCrop">
 							<ObjectSelectParam title="Face Index" v-model="imageParams.face.index" :default="-1" :allow-null="false" :options="faceOptions" />
 							<SliderParam title="Face Padding" v-model="imageParams.face.padding" :min="0" :max="256" :step="1" :default="8" suffix="px" />
 							<SliderParam title="Face Zoom" v-model="imageParams.face.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
@@ -394,7 +402,7 @@ const redactFaceOptions = computed(() => {
 							</div>
 							<ToggleParam title="Focus Face" v-model="imageParams.face.focus" />
 						</EditorPanel>
-						<EditorPanel v-if="imageParams.crop.includes('person') && peopleCount > 0" title="Person Crop Options"  :disabled="!imageParams.enableCrop">
+						<EditorPanel v-if="imageParams.crop.includes('person') && peopleCount > 0" title="Person Crop Options" collapse-key="person-crop-options"  :disabled="!imageParams.enableCrop">
 							<ObjectSelectParam title="Person Index" v-model="imageParams.person.index" :default="-1" :allow-null="false" :options="personOptions" />
 							<SliderParam title="Person Padding" v-model="imageParams.person.padding" :min="0" :max="256" :step="1" :default="0" suffix="px" />
 							<SliderParam title="Person Zoom" v-model="imageParams.person.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
@@ -403,10 +411,14 @@ const redactFaceOptions = computed(() => {
 								<SelectParam title="Person Vertical Gravity" v-model="imageParams.person.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
 							</div>
 						</EditorPanel>
-						<EditorPanel title="Image Attributes">
+						<EditorPanel title="Image Attributes" collapse-key="image-attributes">
 							<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
 						</EditorPanel>
-						<EditorPanel title="Adjustments"  v-model="imageParams.enableAdjustments" :show-toggle="true" :disabled="!imageParams.enableAdjustments">
+						<EditorPanel title="Rotation" collapse-key="rotation-editor" v-model="imageParams.enabledRotation" :show-toggle="true" :disabled="!imageParams.enabledRotation">
+							<SliderParam title="Rotation" v-model="imageParams.rotation.rotation" :min="0" :max="360" :step="1" :default="0" suffix="°" />
+							<ObjectSelectParam title="Rotation Mode" v-model="imageParams.rotation.mode" :default="0" :allow-null="false" :options="RotationModeOptions" />
+						</EditorPanel>
+						<EditorPanel title="Adjustments" collapse-key="adjustments-editor"  v-model="imageParams.enableAdjustments" :show-toggle="true" :disabled="!imageParams.enableAdjustments">
 							<SliderParam title="Brightness" v-model="imageParams.adjustments.brightness" :min="0" :max="200" :step="1" :default="100" suffix="%" />
 							<SliderParam title="Saturation" v-model="imageParams.adjustments.saturation" :min="0" :max="200" :step="1" :default="100" suffix="%" />
 							<SliderParam title="Vibrance" v-model="imageParams.adjustments.vibrance" :min="0" :max="100" :step="1" :default="0" default-label="None" />
@@ -418,19 +430,19 @@ const redactFaceOptions = computed(() => {
 							<SliderParam title="Hue" v-model="imageParams.adjustments.hue" :min="-360" :max="360" :step="1" :default="0" suffix="°" />
 							<ToggleParam title="Invert" v-model="imageParams.adjustments.invert" />
 						</EditorPanel>
-						<EditorPanel title="Stylize"  v-model="imageParams.enableStylize" :show-toggle="true" :disabled="!imageParams.enableStylize">
+						<EditorPanel title="Stylize" collapse-key="stylize-editor"  v-model="imageParams.enableStylize" :show-toggle="true" :disabled="!imageParams.enableStylize">
 							<TagsParam title="Stylize Order" :options="StylizeOrderOptions" v-model="imageParams.stylize.order" placeholder="Order to process stylize operations" />
 							<SliderParam title="Blur" v-model="imageParams.stylize.blur" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
 							<SliderParam title="Pixelate" v-model="imageParams.stylize.pixelate" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
 						</EditorPanel>
-						<EditorPanel title="Gradient Map"  v-model="imageParams.enableGradientMap" :show-toggle="true" :disabled="!imageParams.enableGradientMap">
+						<EditorPanel title="Gradient Map" collapse-key="gradient-map-editor"  v-model="imageParams.enableGradientMap" :show-toggle="true" :disabled="!imageParams.enableGradientMap">
 							<GradientMapParam title="Gradient Map" :default="DefaultImageParams.gradientMap.stops" v-model="imageParams.gradientMap.stops" :enabled="imageParams.gradientMap.opacity > 0" />
 							<SliderParam title="Gradient Map Opacity" v-model="imageParams.gradientMap.opacity" :min="0" :max="100" :step="1" :default="0" default-label="Disabled" suffix="%" />
 							<ObjectSelectParam title="Gradient Map Mode" v-model="imageParams.gradientMap.blendMode" :default="BlendModes.BlendModeOver" :allow-null="false" :options="BlendModeOptions" />
 							<SliderParam title="Blur" v-model="imageParams.gradientMap.blur" :min="0" :max="320" :step="1" :default="0" default-label="None" suffix="px" />
 							<ToggleParam title="Map Monochrome Image" v-model="imageParams.gradientMap.monochrome" />
 						</EditorPanel>
-						<EditorPanel title="Padding"  v-model="imageParams.enablePadding" :show-toggle="true" :disabled="!imageParams.enablePadding">
+						<EditorPanel title="Padding" collapse-key="padding-editor"  v-model="imageParams.enablePadding" :show-toggle="true" :disabled="!imageParams.enablePadding">
 							<ColorParam title="Padding Color" v-model="imageParams.padding.color" :default="null" />
 							<div class="flex items-center gap-1">
 								<div class="flex-1 flex flex-col gap-3">
@@ -448,7 +460,7 @@ const redactFaceOptions = computed(() => {
 								</div>
 							</div>
 						</EditorPanel>
-						<EditorPanel title="Border" v-model="imageParams.enableBorder" :show-toggle="true" :disabled="!imageParams.enableBorder">
+						<EditorPanel title="Border" collapse-key="border-editor" v-model="imageParams.enableBorder" :show-toggle="true" :disabled="!imageParams.enableBorder">
 							<ColorParam title="Border Color" v-model="imageParams.border.color" :default="null" />
 							<div class="flex items-center gap-1">
 								<div class="flex-1 flex flex-col gap-3">
@@ -466,7 +478,29 @@ const redactFaceOptions = computed(() => {
 								</div>
 							</div>
 						</EditorPanel>
-						<EditorPanel title="Redact" v-model="imageParams.enableRedact" :show-toggle="true" :disabled="!imageParams.enableRedact">
+						<EditorPanel title="Watermark" collapse-key="watermark-editor" v-model="imageParams.enabledWatermark" :show-toggle="true" :disabled="!imageParams.enabledWatermark">
+							<TextParam title="Watermark Text" default="" v-model="imageParams.watermark.text" />
+							<TextParam title="Watermark Font" default="" v-model="imageParams.watermark.font" />
+							<div class="grid grid-cols-2 gap-3">
+								<SelectParam title="Horizontal Align" v-model="imageParams.watermark.hAlign" default="right" :allow-null="false" :options="HGravityOptions" />
+								<SelectParam title="Vertical Align" v-model="imageParams.watermark.vAlign" default="bottom" :allow-null="false" :options="VGravityOptions" />
+							</div>
+							<SliderParam title="Width" v-model="imageParams.watermark.width" :min="1" :max="100" :step="1" :default="80" suffix="%" />
+							<SliderParam title="Height" v-model="imageParams.watermark.height" :min="1" :max="100" :step="1" :default="6" suffix="%" />
+							<ObjectSelectParam title="Rotation" v-model="imageParams.watermark.rotate" :default="0" :allow-null="false" :options="WatermarkRotationOptions" />
+							<SliderParam title="Opacity" v-model="imageParams.watermark.opacity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
+							<ColorParam title="Color" v-model="imageParams.watermark.color" default="#FFFFFF" />
+							<EditorPanel title="Watermark Drop Shadow" collapse-key="watermark-drop-shadow-editor" v-model="imageParams.watermark.dropShadow.enabled" :show-toggle="true" :disabled="!imageParams.watermark.dropShadow.enabled">
+								<SliderParam title="Opacity" v-model="imageParams.watermark.dropShadow.opacity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
+								<SliderParam title="Blur" v-model="imageParams.watermark.dropShadow.blur" :min="0" :max="100" :step="1" :default="3" suffix="px" />
+								<ColorParam title="Color" v-model="imageParams.watermark.dropShadow.color" default="#000000" />
+								<div class="grid grid-cols-2 gap-3">
+									<SliderParam title="Offset X" v-model="imageParams.watermark.dropShadow.offsetX" :min="0" :max="100" :step="1" :default="1" suffix="px" />
+									<SliderParam title="Offset Y" v-model="imageParams.watermark.dropShadow.offsetX" :min="0" :max="100" :step="1" :default="1" suffix="px" />
+								</div>
+							</EditorPanel>
+						</EditorPanel>
+						<EditorPanel title="Redact" collapse-key="redact-editor" v-model="imageParams.enableRedact" :show-toggle="true" :disabled="!imageParams.enableRedact">
 							<TagsParam title="Faces" :options="redactFaceOptions" v-model="imageParams.redact.faces" placeholder="Faces to redact" />
 							<TagsParam title="People" :options="redactPersonOptions" v-model="imageParams.redact.people" placeholder="People to redact" />
 							<RedactRegionParam v-model="imageParams.redact.regions" />
@@ -478,14 +512,14 @@ const redactFaceOptions = computed(() => {
 							<SliderParam title="Expand Mask" v-model="imageParams.redact.expandMask" :min="0" :max="200" :step="1" :default="0" default-label="None" suffix="%" />
 							<SliderParam title="Pixelate Mask" v-model="imageParams.redact.pixelateMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
 						</EditorPanel>
-						<EditorPanel title="Format">
+						<EditorPanel title="Format" collapse-key="format-editor">
 							<ObjectSelectParam title="File Format" v-model="imageParams.export.format" default="webp" :allow-null="false" :options="ExportFormatOptions" />
 							<SliderParam title="Quality" v-model="imageParams.export.quality" :min="0" :max="100" :step="1" :default="85" />
 							<SliderParam v-if="imageParams.export.format === 'webp'" title="Reduction Effort" v-model="imageParams.export.reductionEffort" :min="0" :max="6" :step="1" :default="4" />
 							<ToggleParam title="Lossless" v-model="imageParams.export.lossless" />
 							<ToggleParam title="Near Lossless" v-model="imageParams.export.nearLossless" />
 						</EditorPanel>
-						<EditorPanel>
+						<EditorPanel collapse-key="debug-editor">
 							<div class="flex items-center justify-center">
 								<div @click="resetParams" class="cursor-pointer text-xs hover:text-blue-600">Reset All</div>
 							</div>

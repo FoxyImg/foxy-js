@@ -184,6 +184,14 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 
 	//endregion
 
+	//region Rotation
+	if (imageParams.enabledRotation) {
+		newUrl += `/rot:${imageParams.rotation.rotation}`;
+		if (imageParams.rotation.mode !== 'none') {
+			newUrl += `:${imageParams.rotation.mode}`;
+		}
+	}
+
 	//region Adjustments
 	if (imageParams.enableAdjustments) {
 		if (imageParams.adjustments.brightness !== 100) {
@@ -302,7 +310,40 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		}
 	}
 
+	//endregion
 
+	//region Watermark
+	if (imageParams.enabledWatermark && imageParams.watermark.text.length > 0 && imageParams.watermark.font.length > 0) {
+		newUrl += `/wm:text:${btoa(imageParams.watermark.text).replaceAll('=', '')}`;
+		newUrl += `/wm:font:${btoa(imageParams.watermark.font).replaceAll('=', '')}`;
+		if (`${imageParams.watermark.hAlign}:${imageParams.watermark.vAlign}` !== 'right:bottom') {
+			console.log(imageParams.watermark.hAlign, imageParams.watermark.vAlign);
+			newUrl += `/wm:align:${imageParams.watermark.hAlign}:${imageParams.watermark.vAlign}`;
+		}
+		newUrl += `/wm:size:${imageParams.watermark.width}:${imageParams.watermark.height}`;
+		newUrl += `/wm:color:${imageParams.watermark.color.replaceAll('#', '')}`;
+		if (imageParams.watermark.rotate !== 0) {
+			newUrl += `/wm:rot:${imageParams.watermark.rotate}`;
+		}
+		if (imageParams.watermark.vPadding > 0 || imageParams.watermark.hPadding > 0) {
+			newUrl += `/wm:pad:${imageParams.watermark.hPadding}:${imageParams.watermark.vPadding}`;
+		}
+		if (imageParams.watermark.opacity !== 100) {
+			newUrl += `/wm:opacity:${imageParams.watermark.opacity}`;
+		}
+		if (imageParams.watermark.dropShadow.enabled) {
+			if (imageParams.watermark.dropShadow.opacity !== 100) {
+				newUrl += `/wm:shadow:opacity:${imageParams.watermark.dropShadow.opacity}`;
+			}
+			if (imageParams.watermark.dropShadow.blur > 0) {
+				newUrl += `/wm:shadow:blur:${imageParams.watermark.dropShadow.blur}`;
+			}
+			newUrl += `/wm:shadow:color:${imageParams.watermark.dropShadow.color.replaceAll('#', '')}`;
+			if (imageParams.watermark.dropShadow.offsetX > 0 || imageParams.watermark.dropShadow.offsetY > 0) {
+				newUrl += `/wm:shadow:offs:${imageParams.watermark.dropShadow.offsetX}:${imageParams.watermark.dropShadow.offsetY}`;
+			}
+		}
+	}
 	//endregion
 
 	//region Export

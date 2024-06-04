@@ -3,12 +3,14 @@ import SmallLabel from "@/components/UI/SmallLabel.vue";
 import Icon from "@/components/UI/Icon.vue";
 import {computed, ref} from "vue";
 import Toggle from "@/components/UI/Toggle.vue";
+import {useStorage} from "@vueuse/core";
 
 const props = withDefaults(defineProps< {
 	title?: string
 	modelValue?: boolean
 	showToggle?: boolean
 	disabled?: boolean
+	collapseKey: string
 }>(), {
 	showToggle: false,
 	disabled: false,
@@ -21,7 +23,7 @@ const currentValue = computed({
 	set: (value) => emit('update:modelValue', value),
 });
 
-const expanded = ref(true);
+const expanded = useStorage('editor-panel-collapsed-'+props.collapseKey, true);
 </script>
 <template>
 	<div v-auto-animate class="p-3 rounded-lg shadow bg-white flex flex-col gap-3 border border-neutral-200" :key="`Section ${title}`" :class="{'opacity-50': disabled}">
