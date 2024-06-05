@@ -48,6 +48,7 @@ import {
 } from "@/types/params";
 import GradientMapParam from "@/components/editors/GradientMapParam.vue";
 import TextParam from "@/components/editors/TextParam.vue";
+import FontParam from "@/components/editors/FontParam.vue";
 
 const {
 	apps,
@@ -132,6 +133,7 @@ const currentTab = ref<"preview"|"metadata"|"preset">("preview");
 const constrainDimensions = useStorage('foxy_constrain_dimensions', false);
 const constrainPadding = useStorage('foxy_constrain_padding', true);
 const constrainBorder = useStorage('foxy_constrain_border', true);
+const constrainWatermarkPadding = useStorage('foxy_constrain_watermark_padding', true);
 
 watch(() => [imageParams.value.width, imageParams.value.height], (newVal, oldVal) => {
 	if (!constrainDimensions.value) {
@@ -145,6 +147,22 @@ watch(() => [imageParams.value.width, imageParams.value.height], (newVal, oldVal
 	} else if (oldVal[1] !== newVal[1]) {
 		if (imageParams.value.width !== newVal[1]) {
 			imageParams.value.width = newVal[1];
+		}
+	}
+});
+
+watch(() => [imageParams.value.watermark.hPadding, imageParams.value.watermark.vPadding], (newVal, oldVal) => {
+	if (!constrainWatermarkPadding.value) {
+		return;
+	}
+
+	if (oldVal[0] !== newVal[0]) {
+		if (imageParams.value.watermark.vPadding !== newVal[0]) {
+			imageParams.value.watermark.vPadding = newVal[0];
+		}
+	} else if (oldVal[1] !== newVal[1]) {
+		if (imageParams.value.watermark.hPadding !== newVal[1]) {
+			imageParams.value.watermark.hPadding = newVal[1];
 		}
 	}
 });
@@ -480,16 +498,29 @@ const redactFaceOptions = computed(() => {
 						</EditorPanel>
 						<EditorPanel title="Watermark" collapse-key="watermark-editor" v-model="imageParams.enabledWatermark" :show-toggle="true" :disabled="!imageParams.enabledWatermark">
 							<TextParam title="Watermark Text" default="" v-model="imageParams.watermark.text" />
-							<TextParam title="Watermark Font" default="" v-model="imageParams.watermark.font" />
+							<FontParam title="Watermark Font" default="" v-model="imageParams.watermark.font" />
+							<ColorParam title="Color" v-model="imageParams.watermark.color" default="#FFFFFF" />
 							<div class="grid grid-cols-2 gap-3">
 								<SelectParam title="Horizontal Align" v-model="imageParams.watermark.hAlign" default="right" :allow-null="false" :options="HGravityOptions" />
 								<SelectParam title="Vertical Align" v-model="imageParams.watermark.vAlign" default="bottom" :allow-null="false" :options="VGravityOptions" />
 							</div>
 							<SliderParam title="Width" v-model="imageParams.watermark.width" :min="1" :max="100" :step="1" :default="80" suffix="%" />
 							<SliderParam title="Height" v-model="imageParams.watermark.height" :min="1" :max="100" :step="1" :default="6" suffix="%" />
-							<ObjectSelectParam title="Rotation" v-model="imageParams.watermark.rotate" :default="0" :allow-null="false" :options="WatermarkRotationOptions" />
 							<SliderParam title="Opacity" v-model="imageParams.watermark.opacity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
-							<ColorParam title="Color" v-model="imageParams.watermark.color" default="#FFFFFF" />
+							<ObjectSelectParam title="Rotation" v-model="imageParams.watermark.rotate" :default="0" :allow-null="false" :options="WatermarkRotationOptions" />
+							<div class="flex items-center gap-1">
+								<div class="flex-1 flex flex-col gap-3">
+									<SliderParam title="Horizontal Padding" v-model="imageParams.watermark.hPadding" :min="0" :max="256" :step="1" :default="18" suffix="px" />
+									<SliderParam title="Vertical Padding" v-model="imageParams.watermark.vPadding" :min="0" :max="256" :step="1" :default="18" suffix="px" />
+								</div>
+								<div class="flex flex-col items-center justify-center gap-1">
+									<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500" />
+									<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainWatermarkPadding}" @click="constrainWatermarkPadding = !constrainWatermarkPadding">
+										<Icon name="constrain" class="fill-black w-3 h-auto" />
+									</div>
+									<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500 rotate-180 -scale-x-100" />
+								</div>
+							</div>
 							<EditorPanel title="Watermark Drop Shadow" collapse-key="watermark-drop-shadow-editor" v-model="imageParams.watermark.dropShadow.enabled" :show-toggle="true" :disabled="!imageParams.watermark.dropShadow.enabled">
 								<SliderParam title="Opacity" v-model="imageParams.watermark.dropShadow.opacity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
 								<SliderParam title="Blur" v-model="imageParams.watermark.dropShadow.blur" :min="0" :max="100" :step="1" :default="3" suffix="px" />

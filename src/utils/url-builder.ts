@@ -1,8 +1,10 @@
 import {BlendModes, type BoxCropParams, type DebugParams, type ImageParams} from "@/types/params";
 import signHMAC256 from "@/utils/sign";
+//@ts-ignore
+import base64 from "@hexagon/base64";
 
 export default function buildUrl(host:string, accessKey:string|null, secret:string, imageKey:string, imageParams:ImageParams, debugParams:DebugParams|null = null, preset:boolean = false) {
-	let encodedKey = btoa('/'+imageKey).replaceAll('=', '');
+	let encodedKey = base64.fromString('/'+imageKey).replaceAll('=', '');
 	let newUrl = accessKey ? `/${accessKey}/${encodedKey}` : `/${encodedKey}`;
 
 	const processBoxParams = (noun:string, params:BoxCropParams) => {
@@ -185,7 +187,7 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 	//endregion
 
 	//region Rotation
-	if (imageParams.enabledRotation) {
+	if (imageParams.enabledRotation && imageParams.rotation.rotation !== 0) {
 		newUrl += `/rot:${imageParams.rotation.rotation}`;
 		if (imageParams.rotation.mode !== 'none') {
 			newUrl += `:${imageParams.rotation.mode}`;
@@ -314,14 +316,14 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 
 	//region Watermark
 	if (imageParams.enabledWatermark && imageParams.watermark.text.length > 0 && imageParams.watermark.font.length > 0) {
-		newUrl += `/wm:text:${btoa(imageParams.watermark.text).replaceAll('=', '')}`;
-		newUrl += `/wm:font:${btoa(imageParams.watermark.font).replaceAll('=', '')}`;
+		newUrl += `/wm:text:${base64.fromString(imageParams.watermark.text).replaceAll('=', '')}`;
+		newUrl += `/wm:font:${base64.fromString(imageParams.watermark.font).replaceAll('=', '')}`;
 		if (`${imageParams.watermark.hAlign}:${imageParams.watermark.vAlign}` !== 'right:bottom') {
 			console.log(imageParams.watermark.hAlign, imageParams.watermark.vAlign);
-			newUrl += `/wm:align:${imageParams.watermark.hAlign}:${imageParams.watermark.vAlign}`;
+			newUrl += `/wm:al:${imageParams.watermark.hAlign}:${imageParams.watermark.vAlign}`;
 		}
-		newUrl += `/wm:size:${imageParams.watermark.width}:${imageParams.watermark.height}`;
-		newUrl += `/wm:color:${imageParams.watermark.color.replaceAll('#', '')}`;
+		newUrl += `/wm:dim:${imageParams.watermark.width}:${imageParams.watermark.height}`;
+		newUrl += `/wm:c:${imageParams.watermark.color.replaceAll('#', '')}`;
 		if (imageParams.watermark.rotate !== 0) {
 			newUrl += `/wm:rot:${imageParams.watermark.rotate}`;
 		}
@@ -329,18 +331,18 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 			newUrl += `/wm:pad:${imageParams.watermark.hPadding}:${imageParams.watermark.vPadding}`;
 		}
 		if (imageParams.watermark.opacity !== 100) {
-			newUrl += `/wm:opacity:${imageParams.watermark.opacity}`;
+			newUrl += `/wm:o:${imageParams.watermark.opacity}`;
 		}
 		if (imageParams.watermark.dropShadow.enabled) {
 			if (imageParams.watermark.dropShadow.opacity !== 100) {
-				newUrl += `/wm:shadow:opacity:${imageParams.watermark.dropShadow.opacity}`;
+				newUrl += `/wm:ds:o:${imageParams.watermark.dropShadow.opacity}`;
 			}
 			if (imageParams.watermark.dropShadow.blur > 0) {
-				newUrl += `/wm:shadow:blur:${imageParams.watermark.dropShadow.blur}`;
+				newUrl += `/wm:ds:bl:${imageParams.watermark.dropShadow.blur}`;
 			}
-			newUrl += `/wm:shadow:color:${imageParams.watermark.dropShadow.color.replaceAll('#', '')}`;
+			newUrl += `/wm:ds:color:${imageParams.watermark.dropShadow.color.replaceAll('#', '')}`;
 			if (imageParams.watermark.dropShadow.offsetX > 0 || imageParams.watermark.dropShadow.offsetY > 0) {
-				newUrl += `/wm:shadow:offs:${imageParams.watermark.dropShadow.offsetX}:${imageParams.watermark.dropShadow.offsetY}`;
+				newUrl += `/wm:ds:xy:${imageParams.watermark.dropShadow.offsetX}:${imageParams.watermark.dropShadow.offsetY}`;
 			}
 		}
 	}
