@@ -173,9 +173,16 @@ export type WatermarkDropShadowParams = {
 	offsetY: number,
 }
 
+export const WatermarkTypeOptions = [
+	{ label: 'Image', value: 'image' },
+	{ label: 'Text', value: 'text' },
+]
+
 export type WatermarkParams = {
+	type: 'image'|'text',
 	text: string,
 	font: string,
+	imageKey: string,
 	vAlign: 'top'|'center'|'bottom',
 	hAlign: 'left'|'center'|'right',
 	width: number,
@@ -354,7 +361,9 @@ export const DefaultImageParams: ImageParams = {
 
 	enabledWatermark: true,
 	watermark: {
+		type: 'text',
 		text: '',
+		imageKey: '',
 		font: 'sans',
 		vAlign: 'bottom',
 		hAlign: 'right',

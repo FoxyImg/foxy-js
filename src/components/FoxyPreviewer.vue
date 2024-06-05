@@ -44,11 +44,12 @@ import {
 	DefaultImageParams,
 	ExportFormatOptions,
 	RotationModeOptions,
-	StylizeOrderOptions, WatermarkRotationOptions
+	StylizeOrderOptions, WatermarkRotationOptions, WatermarkTypeOptions
 } from "@/types/params";
 import GradientMapParam from "@/components/editors/GradientMapParam.vue";
 import TextParam from "@/components/editors/TextParam.vue";
 import FontParam from "@/components/editors/FontParam.vue";
+import WatermarkImageParam from "@/components/editors/WatermarkImageParam.vue";
 
 const {
 	apps,
@@ -346,7 +347,7 @@ const redactFaceOptions = computed(() => {
 										<template #popper>
 											<div class="p-3 rounded-lg bg-neutral-100 flex flex-col gap-3">
 											<SmallLabel>Debug Options</SmallLabel>
-											<EditorPanel title="Image Recognition" class="w-[400px]">
+											<EditorPanel title="Image Recognition" class="w-[400px]" collapse-key="debug-recognition">
 												<div class="grid grid-cols-2 gap-3">
 													<ToggleParam title="Outline Faces" v-model="debugParams.faces" />
 													<ToggleParam title="Outline All Faces" v-model="debugParams.allFaces" />
@@ -355,7 +356,7 @@ const redactFaceOptions = computed(() => {
 													<ToggleParam title="Outline Other Labels" v-model="debugParams.otherLabels" />
 												</div>
 											</EditorPanel>
-											<EditorPanel title="Caching" class="w-[400px]">
+											<EditorPanel title="Caching" class="w-[400px]" collapse-key="debug-caching">
 												<div class="grid grid-cols-2 gap-3">
 													<ToggleParam title="Disable Source Cache" v-model="debugParams.disableSourceCache" />
 													<ToggleParam title="Disable Meta Cache" v-model="debugParams.disableMetaCache" />
@@ -381,7 +382,7 @@ const redactFaceOptions = computed(() => {
 			</div>
 			<div class="relative min-w-[400px]">
 				<div class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100">
-					<div class="p-3 flex flex-col gap-5">
+					<div class="p-3 flex flex-col gap-3">
 						<EditorPanel title="Cropping / Resizing" collapse-key="crop-editor" v-model="imageParams.enableCrop" :show-toggle="true" :disabled="!imageParams.enableCrop">
 							<TagsParam title="Crop Mode" :options="CropOptions" v-model="imageParams.crop" placeholder="Select 1 or more crop modes" />
 							<SelectParam v-if="imageParams.crop.includes('smart')" title="Smart Crop Mode" v-model="imageParams.smartMode" :default="null" :options="InterestingOptions" />
@@ -497,9 +498,11 @@ const redactFaceOptions = computed(() => {
 							</div>
 						</EditorPanel>
 						<EditorPanel title="Watermark" collapse-key="watermark-editor" v-model="imageParams.enabledWatermark" :show-toggle="true" :disabled="!imageParams.enabledWatermark">
-							<TextParam title="Watermark Text" default="" v-model="imageParams.watermark.text" />
-							<FontParam title="Watermark Font" default="" v-model="imageParams.watermark.font" />
-							<ColorParam title="Color" v-model="imageParams.watermark.color" default="#FFFFFF" />
+							<ObjectSelectParam title="Watermark Type" v-model="imageParams.watermark.type" default="text" :allow-null="false" :options="WatermarkTypeOptions" />
+							<TextParam v-if="imageParams.watermark.type === 'text'" title="Watermark Text" default="" v-model="imageParams.watermark.text" />
+							<FontParam v-if="imageParams.watermark.type === 'text'" title="Watermark Font" default="" v-model="imageParams.watermark.font" />
+							<ColorParam v-if="imageParams.watermark.type === 'text'" title="Color" v-model="imageParams.watermark.color" default="#FFFFFF" />
+							<WatermarkImageParam v-if="imageParams.watermark.type === 'image'" title="Watermark Image Key" default="" v-model="imageParams.watermark.imageKey" />
 							<div class="grid grid-cols-2 gap-3">
 								<SelectParam title="Horizontal Align" v-model="imageParams.watermark.hAlign" default="right" :allow-null="false" :options="HGravityOptions" />
 								<SelectParam title="Vertical Align" v-model="imageParams.watermark.vAlign" default="bottom" :allow-null="false" :options="VGravityOptions" />
@@ -521,7 +524,7 @@ const redactFaceOptions = computed(() => {
 									<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500 rotate-180 -scale-x-100" />
 								</div>
 							</div>
-							<EditorPanel title="Watermark Drop Shadow" collapse-key="watermark-drop-shadow-editor" v-model="imageParams.watermark.dropShadow.enabled" :show-toggle="true" :disabled="!imageParams.watermark.dropShadow.enabled">
+							<EditorPanel v-if="imageParams.watermark.type === 'text'" title="Watermark Drop Shadow" collapse-key="watermark-drop-shadow-editor" v-model="imageParams.watermark.dropShadow.enabled" :show-toggle="true" :disabled="!imageParams.watermark.dropShadow.enabled">
 								<SliderParam title="Opacity" v-model="imageParams.watermark.dropShadow.opacity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
 								<SliderParam title="Blur" v-model="imageParams.watermark.dropShadow.blur" :min="0" :max="100" :step="1" :default="3" suffix="px" />
 								<ColorParam title="Color" v-model="imageParams.watermark.dropShadow.color" default="#000000" />

@@ -46,6 +46,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 
 	const gradientMapPresets = ref<GradientMap[]>([]);
 	const fontPresets = ref<string[]>([]);
+	const watermarkImageSamples = ref<string[]>([]);
 
 	const imageMeta = ref<ImageMeta|null>(null);
 	const currentPresetJSONObject = ref<any|null>(null);
@@ -275,6 +276,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		currentPresetImageUrl,
 		gradientMapPresets,
 		fontPresets,
+		watermarkImageSamples,
 
 		buildImageUrl,
 		debouncedBuildImageUrl,

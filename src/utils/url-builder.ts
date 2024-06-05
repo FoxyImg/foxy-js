@@ -315,9 +315,17 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 	//endregion
 
 	//region Watermark
-	if (imageParams.enabledWatermark && imageParams.watermark.text.length > 0 && imageParams.watermark.font.length > 0) {
-		newUrl += `/wm:text:${base64.fromString(imageParams.watermark.text).replaceAll('=', '')}`;
-		newUrl += `/wm:font:${base64.fromString(imageParams.watermark.font).replaceAll('=', '')}`;
+	const canWatermark =
+		(imageParams.watermark.type !== 'text' && imageParams.watermark.text.trim().length > 0 && imageParams.watermark.font.trim().length > 0)
+		|| (imageParams.watermark.type === 'image' && imageParams.watermark.imageKey.trim().length > 0);
+	if (canWatermark && imageParams.enabledWatermark) {
+		if (imageParams.watermark.type === 'text') {
+			newUrl += `/wm:text:${base64.fromString(imageParams.watermark.text).replaceAll('=', '')}`;
+			newUrl += `/wm:font:${base64.fromString(imageParams.watermark.font).replaceAll('=', '')}`;
+		} else {
+			newUrl += `/wm:img:${base64.fromString(imageParams.watermark.imageKey).replaceAll('=', '')}`;
+		}
+
 		if (`${imageParams.watermark.hAlign}:${imageParams.watermark.vAlign}` !== 'right:bottom') {
 			console.log(imageParams.watermark.hAlign, imageParams.watermark.vAlign);
 			newUrl += `/wm:al:${imageParams.watermark.hAlign}:${imageParams.watermark.vAlign}`;
@@ -333,7 +341,7 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		if (imageParams.watermark.opacity !== 100) {
 			newUrl += `/wm:o:${imageParams.watermark.opacity}`;
 		}
-		if (imageParams.watermark.dropShadow.enabled) {
+		if (imageParams.watermark.type === 'text' && imageParams.watermark.dropShadow.enabled) {
 			if (imageParams.watermark.dropShadow.opacity !== 100) {
 				newUrl += `/wm:ds:o:${imageParams.watermark.dropShadow.opacity}`;
 			}
