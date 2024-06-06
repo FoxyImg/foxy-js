@@ -11,6 +11,7 @@ import SecureLS from "secure-ls";
 import {type FoxyBoundsPreset, type FoxyPreset} from "@/types/foxy-preset";
 import calcAspectRatio from "@/utils/aspect-ratio";
 import exists from "@/utils/exists";
+import base64 from "@/utils/base-64";
 
 export const useImageParamsStore = defineStore("foxy-image-params-store", () => {
 	const {
@@ -27,7 +28,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		if (!currentApp.value || !currentSource.value || !currentPresetId.value) {
 			return null;
 		}
-		const encodedKey = btoa('/'+imageKey.value);
+		let encodedKey = base64('/'+imageKey.value, true);
 		return `${currentApp.value.url}/${currentSource.value.key}/${encodedKey}/@${currentPresetId.value}`;
 	});
 

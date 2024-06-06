@@ -1,10 +1,9 @@
 import {BlendModes, type BoxCropParams, type DebugParams, type ImageParams} from "@/types/params";
 import signHMAC256 from "@/utils/sign";
-//@ts-ignore
-import base64 from "@hexagon/base64";
+import base64 from "@/utils/base-64";
 
 export default function buildUrl(host:string, accessKey:string|null, secret:string, imageKey:string, imageParams:ImageParams, debugParams:DebugParams|null = null, preset:boolean = false) {
-	let encodedKey = base64.fromString('/'+imageKey).replaceAll('=', '');
+	let encodedKey = base64('/'+imageKey, true);
 	let newUrl = accessKey ? `/${accessKey}/${encodedKey}` : `/${encodedKey}`;
 
 	const processBoxParams = (noun:string, params:BoxCropParams) => {
@@ -320,10 +319,10 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		|| (imageParams.watermark.type === 'image' && imageParams.watermark.imageKey.trim().length > 0);
 	if (canWatermark && imageParams.enabledWatermark) {
 		if (imageParams.watermark.type === 'text') {
-			newUrl += `/wm:text:${base64.fromString(imageParams.watermark.text).replaceAll('=', '')}`;
-			newUrl += `/wm:font:${base64.fromString(imageParams.watermark.font).replaceAll('=', '')}`;
+			newUrl += `/wm:text:${base64(imageParams.watermark.text, true)}`;
+			newUrl += `/wm:font:${base64(imageParams.watermark.font, true)}`;
 		} else {
-			newUrl += `/wm:img:${base64.fromString(imageParams.watermark.imageKey).replaceAll('=', '')}`;
+			newUrl += `/wm:img:${base64(imageParams.watermark.imageKey, true)}`;
 		}
 
 		if (`${imageParams.watermark.hAlign}:${imageParams.watermark.vAlign}` !== 'right:bottom') {

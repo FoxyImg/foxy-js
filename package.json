@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.8.2",
-    "@hexagon/base64": "^1.1.28",
     "@noction/vue-bezier": "^1.11.2",
     "@vueform/multiselect": "^2.6.7",
     "@vueuse/core": "^10.9.0",
