@@ -37,9 +37,9 @@ const currentValue = computed({
 <template>
 	<div class="flex flex-col gap-1">
 		<SmallLabel>{{ label }}</SmallLabel>
-		<div class="w-full relative">
+		<div class="w-full relative flex items-center gap-2">
 			<input :type="type" class="w-full border border-neutral-200 rounded-md px-2 py-1 text-sm" v-model="currentValue" />
-			<div v-if="host && accessKey && secret" class="absolute right-1 top-1/2 -translate-y-1/2 cursor-pointer">
+			<div v-if="host && accessKey && secret" class="aspect-square cursor-pointer">
 				<VDropdown>
 						<div class="w-4 aspect-square"><Icon name="image-search" class="w-auto h-4" /></div>
 						<template #popper>

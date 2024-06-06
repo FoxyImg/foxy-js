@@ -79,6 +79,7 @@ const {
 	faceCount,
 	peopleCount,
 	currentPresetJSONObject,
+	paramsEditorMode,
 } = storeToRefs(useImageParamsStore());
 
 const {
@@ -298,7 +299,7 @@ const redactFaceOptions = computed(() => {
 </script>
 <template>
 	<div class="fixed inset-0 flex flex-col">
-		<div class="p-3 flex items-center gap-3">
+		<div class="px-5 py-3 flex items-center gap-5">
 			<FoxyAppSelector :apps="apps" v-model="currentAppId" @add-app="newFoxyApp" @edit-app="editFoxyApp" @delete-app="deleteFoxyApp" />
 			<FoxySourceSelector :sources="currentSources" v-model="currentSourceId" @new-source="newFoxySource" @edit-source="editFoxySource" @save-source="saveFoxySource" @delete-source="deleteFoxySource" />
 			<HeaderImageKeyInput class="flex-1" label="Image Key" v-model="imageKey" :host="currentApp?.url" :access-key="currentSource?.key" :secret="currentApp?.secret" :sample-images="sampleImages" @remove-sample-image="removeSampleImage" />
@@ -312,7 +313,7 @@ const redactFaceOptions = computed(() => {
 					<Tab v-if="currentPresetJSONObject" v-model="currentTab" value="preset">Preset</Tab>
 				</Tabs>
 				<div class="bg-neutral-100 p-0.5"></div>
-				<div class="flex-1 relative flex flex-col">
+				<div class="flex-1 relative flex flex-col border-4 border-t-0 border-neutral-100">
 					<template v-if="currentTab === 'preview' || !imageMeta">
 						<div class="group absolute left-0 top-0 right-0 bottom-0 flex items-center justify-center preview-area">
 							<div v-if="error" class="absolute left-1/2 top-1/2 -translate-x-1/2 flex flex-col items-center justify-center bg-white/15 p-2 rounded-lg backdrop-blur overflow-hidden transform-gpu">
@@ -380,184 +381,192 @@ const redactFaceOptions = computed(() => {
 					</template>
 				</div>
 			</div>
-			<div class="relative min-w-[400px]">
-				<div class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100">
-					<div class="p-3 flex flex-col gap-3">
-						<EditorPanel title="Cropping / Resizing" collapse-key="crop-editor" v-model="imageParams.enableCrop" :show-toggle="true" :disabled="!imageParams.enableCrop">
-							<TagsParam title="Crop Mode" :options="CropOptions" v-model="imageParams.crop" placeholder="Select 1 or more crop modes" />
-							<SelectParam v-if="imageParams.crop.includes('smart')" title="Smart Crop Mode" v-model="imageParams.smartMode" :default="null" :options="InterestingOptions" />
-							<div class="flex items-center gap-1">
-								<div class="flex-1 flex flex-col gap-3">
-									<SliderParam title="Width" v-model="imageParams.width" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
-									<SliderParam title="Height" v-model="imageParams.height" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
-								</div>
-								<div class="flex flex-col items-center justify-center gap-1">
-									<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500" />
-									<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainDimensions}" @click="constrainDimensions = !constrainDimensions">
-										<Icon name="constrain" class="fill-black w-3 h-auto" />
+			<div class="min-w-[400px] flex flex-col border-l-8 border-neutral-200">
+				<Tabs>
+					<Tab v-model="paramsEditorMode" value="params">Parameters</Tab>
+					<Tab v-if="error && size === 666" v-model="paramsEditorMode" value="presets">Presets</Tab>
+				</Tabs>
+				<div class="flex-1 relative">
+					<div v-show="paramsEditorMode === 'params'" class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100">
+						<div class="p-3 flex flex-col gap-3">
+							<EditorPanel title="Cropping / Resizing" collapse-key="crop-editor" v-model="imageParams.enableCrop" :show-toggle="true" :disabled="!imageParams.enableCrop">
+								<TagsParam title="Crop Mode" :options="CropOptions" v-model="imageParams.crop" placeholder="Select 1 or more crop modes" />
+								<SelectParam v-if="imageParams.crop.includes('smart')" title="Smart Crop Mode" v-model="imageParams.smartMode" :default="null" :options="InterestingOptions" />
+								<div class="flex items-center gap-1">
+									<div class="flex-1 flex flex-col gap-3">
+										<SliderParam title="Width" v-model="imageParams.width" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
+										<SliderParam title="Height" v-model="imageParams.height" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
 									</div>
-									<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500 rotate-180 -scale-x-100" />
-								</div>
-							</div>
-							<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Width" v-model="imageParams.aspectRatioWidth" :min="0" :max="128" :step="1" :default="0" default-label="None" />
-							<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Height" v-model="imageParams.aspectRatioHeight" :min="0" :max="128" :step="1" :default="0" default-label="None" />
-							<SliderParam v-if="imageParams.crop.length > 0" title="Zoom" v-model="imageParams.zoom" :min="1" :max="10" :step="0.01" :default="1" default-label="None" suffix="x" />
-							<div v-if="imageParams.crop.includes('crop')" class="grid grid-cols-2 gap-3">
-								<SelectParam title="Horizontal Gravity" v-model="imageParams.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
-								<SelectParam title="Vertical Gravity" v-model="imageParams.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
-							</div>
-						</EditorPanel>
-						<EditorPanel v-if="imageParams.crop.includes('focus') && imageKey" collapse-key="focal-point-editor" title="Focal Point"  :disabled="!imageParams.enableCrop">
-							<FocalPointParam v-model="imageParams.focalPoint"/>
-							<SliderParam title="Focal Point Zoom" v-model="imageParams.focalPointZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
-						</EditorPanel>
-						<EditorPanel v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Crop Options" collapse-key="face-crop-options"  :disabled="!imageParams.enableCrop">
-							<ObjectSelectParam title="Face Index" v-model="imageParams.face.index" :default="-1" :allow-null="false" :options="faceOptions" />
-							<SliderParam title="Face Padding" v-model="imageParams.face.padding" :min="0" :max="256" :step="1" :default="8" suffix="px" />
-							<SliderParam title="Face Zoom" v-model="imageParams.face.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
-							<div class="grid grid-cols-2 gap-3">
-								<SelectParam title="Face Horizontal Gravity" v-model="imageParams.face.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
-								<SelectParam title="Face Vertical Gravity" v-model="imageParams.face.vGravity" default="top" :allow-null="false" :options="VGravityOptions" />
-							</div>
-							<ToggleParam title="Focus Face" v-model="imageParams.face.focus" />
-						</EditorPanel>
-						<EditorPanel v-if="imageParams.crop.includes('person') && peopleCount > 0" title="Person Crop Options" collapse-key="person-crop-options"  :disabled="!imageParams.enableCrop">
-							<ObjectSelectParam title="Person Index" v-model="imageParams.person.index" :default="-1" :allow-null="false" :options="personOptions" />
-							<SliderParam title="Person Padding" v-model="imageParams.person.padding" :min="0" :max="256" :step="1" :default="0" suffix="px" />
-							<SliderParam title="Person Zoom" v-model="imageParams.person.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
-							<div class="grid grid-cols-2 gap-3">
-								<SelectParam title="Person Horiz. Gravity" v-model="imageParams.person.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
-								<SelectParam title="Person Vertical Gravity" v-model="imageParams.person.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
-							</div>
-						</EditorPanel>
-						<EditorPanel title="Image Attributes" collapse-key="image-attributes">
-							<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
-						</EditorPanel>
-						<EditorPanel title="Rotation" collapse-key="rotation-editor" v-model="imageParams.enabledRotation" :show-toggle="true" :disabled="!imageParams.enabledRotation">
-							<SliderParam title="Rotation" v-model="imageParams.rotation.rotation" :min="0" :max="360" :step="1" :default="0" suffix="°" />
-							<ObjectSelectParam title="Rotation Mode" v-model="imageParams.rotation.mode" :default="0" :allow-null="false" :options="RotationModeOptions" />
-						</EditorPanel>
-						<EditorPanel title="Adjustments" collapse-key="adjustments-editor"  v-model="imageParams.enableAdjustments" :show-toggle="true" :disabled="!imageParams.enableAdjustments">
-							<SliderParam title="Brightness" v-model="imageParams.adjustments.brightness" :min="0" :max="200" :step="1" :default="100" suffix="%" />
-							<SliderParam title="Saturation" v-model="imageParams.adjustments.saturation" :min="0" :max="200" :step="1" :default="100" suffix="%" />
-							<SliderParam title="Vibrance" v-model="imageParams.adjustments.vibrance" :min="0" :max="100" :step="1" :default="0" default-label="None" />
-							<SliderParam title="Contrast" v-model="imageParams.adjustments.contrast" :min="0" :max="3" :step="0.01" :default="1" />
-							<SliderParam title="Exposure" v-model="imageParams.adjustments.exposure" :min="-3" :max="3" :step="0.01" :default="0" />
-							<SliderParam title="Gamma" v-model="imageParams.adjustments.gamma" :min="0.01" :max="10" :step="0.01" :default="1" />
-							<SliderParam title="Texture" v-model="imageParams.adjustments.texture" :min="0" :max="50" :step="0.1" :default="0" default-label="None" />
-							<SliderParam title="Texture Density" v-model="imageParams.adjustments.textureDensity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
-							<SliderParam title="Hue" v-model="imageParams.adjustments.hue" :min="-360" :max="360" :step="1" :default="0" suffix="°" />
-							<ToggleParam title="Invert" v-model="imageParams.adjustments.invert" />
-						</EditorPanel>
-						<EditorPanel title="Stylize" collapse-key="stylize-editor"  v-model="imageParams.enableStylize" :show-toggle="true" :disabled="!imageParams.enableStylize">
-							<TagsParam title="Stylize Order" :options="StylizeOrderOptions" v-model="imageParams.stylize.order" placeholder="Order to process stylize operations" />
-							<SliderParam title="Blur" v-model="imageParams.stylize.blur" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-							<SliderParam title="Pixelate" v-model="imageParams.stylize.pixelate" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-						</EditorPanel>
-						<EditorPanel title="Gradient Map" collapse-key="gradient-map-editor"  v-model="imageParams.enableGradientMap" :show-toggle="true" :disabled="!imageParams.enableGradientMap">
-							<GradientMapParam title="Gradient Map" :default="DefaultImageParams.gradientMap.stops" v-model="imageParams.gradientMap.stops" :enabled="imageParams.gradientMap.opacity > 0" />
-							<SliderParam title="Gradient Map Opacity" v-model="imageParams.gradientMap.opacity" :min="0" :max="100" :step="1" :default="0" default-label="Disabled" suffix="%" />
-							<ObjectSelectParam title="Gradient Map Mode" v-model="imageParams.gradientMap.blendMode" :default="BlendModes.BlendModeOver" :allow-null="false" :options="BlendModeOptions" />
-							<SliderParam title="Blur" v-model="imageParams.gradientMap.blur" :min="0" :max="320" :step="1" :default="0" default-label="None" suffix="px" />
-							<ToggleParam title="Map Monochrome Image" v-model="imageParams.gradientMap.monochrome" />
-						</EditorPanel>
-						<EditorPanel title="Padding" collapse-key="padding-editor"  v-model="imageParams.enablePadding" :show-toggle="true" :disabled="!imageParams.enablePadding">
-							<ColorParam title="Padding Color" v-model="imageParams.padding.color" :default="null" />
-							<div class="flex items-center gap-1">
-								<div class="flex-1 flex flex-col gap-3">
-									<SliderParam title="Top Padding" v-model="imageParams.padding.top" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-									<SliderParam title="Right Padding" v-model="imageParams.padding.right" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-									<SliderParam title="Bottom Padding" v-model="imageParams.padding.bottom" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-									<SliderParam title="Left Padding" v-model="imageParams.padding.left" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-								</div>
-								<div class="flex flex-col items-center justify-center gap-[8px]">
-									<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300" />
-									<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainPadding}" @click="constrainPadding = !constrainPadding">
-										<Icon name="constrain" class="fill-black w-3 h-auto" />
+									<div class="flex flex-col items-center justify-center gap-1">
+										<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500" />
+										<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainDimensions}" @click="constrainDimensions = !constrainDimensions">
+											<Icon name="constrain" class="fill-black w-3 h-auto" />
+										</div>
+										<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500 rotate-180 -scale-x-100" />
 									</div>
-									<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300 rotate-180 -scale-x-100" />
 								</div>
-							</div>
-						</EditorPanel>
-						<EditorPanel title="Border" collapse-key="border-editor" v-model="imageParams.enableBorder" :show-toggle="true" :disabled="!imageParams.enableBorder">
-							<ColorParam title="Border Color" v-model="imageParams.border.color" :default="null" />
-							<div class="flex items-center gap-1">
-								<div class="flex-1 flex flex-col gap-3">
-									<SliderParam title="Top Border" v-model="imageParams.border.top" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-									<SliderParam title="Right Border" v-model="imageParams.border.right" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-									<SliderParam title="Bottom Border" v-model="imageParams.border.bottom" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-									<SliderParam title="Left Border" v-model="imageParams.border.left" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-								</div>
-								<div class="flex flex-col items-center justify-center gap-[8px]">
-									<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300" />
-									<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainBorder}" @click="constrainBorder = !constrainBorder">
-										<Icon name="constrain" class="fill-black w-3 h-auto" />
-									</div>
-									<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300 rotate-180 -scale-x-100" />
-								</div>
-							</div>
-						</EditorPanel>
-						<EditorPanel title="Watermark" collapse-key="watermark-editor" v-model="imageParams.enabledWatermark" :show-toggle="true" :disabled="!imageParams.enabledWatermark">
-							<ObjectSelectParam title="Watermark Type" v-model="imageParams.watermark.type" default="text" :allow-null="false" :options="WatermarkTypeOptions" />
-							<TextParam v-if="imageParams.watermark.type === 'text'" title="Watermark Text" default="" v-model="imageParams.watermark.text" />
-							<FontParam v-if="imageParams.watermark.type === 'text'" title="Watermark Font" default="" v-model="imageParams.watermark.font" />
-							<ColorParam v-if="imageParams.watermark.type === 'text'" title="Color" v-model="imageParams.watermark.color" default="#FFFFFF" />
-							<WatermarkImageParam v-if="imageParams.watermark.type === 'image'" title="Watermark Image Key" default="" v-model="imageParams.watermark.imageKey" />
-							<div class="grid grid-cols-2 gap-3">
-								<SelectParam title="Horizontal Align" v-model="imageParams.watermark.hAlign" default="right" :allow-null="false" :options="HGravityOptions" />
-								<SelectParam title="Vertical Align" v-model="imageParams.watermark.vAlign" default="bottom" :allow-null="false" :options="VGravityOptions" />
-							</div>
-							<SliderParam title="Width" v-model="imageParams.watermark.width" :min="1" :max="100" :step="1" :default="80" suffix="%" />
-							<SliderParam title="Height" v-model="imageParams.watermark.height" :min="1" :max="100" :step="1" :default="6" suffix="%" />
-							<SliderParam title="Opacity" v-model="imageParams.watermark.opacity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
-							<ObjectSelectParam title="Rotation" v-model="imageParams.watermark.rotate" :default="0" :allow-null="false" :options="WatermarkRotationOptions" />
-							<div class="flex items-center gap-1">
-								<div class="flex-1 flex flex-col gap-3">
-									<SliderParam title="Horizontal Padding" v-model="imageParams.watermark.hPadding" :min="0" :max="256" :step="1" :default="18" suffix="px" />
-									<SliderParam title="Vertical Padding" v-model="imageParams.watermark.vPadding" :min="0" :max="256" :step="1" :default="18" suffix="px" />
-								</div>
-								<div class="flex flex-col items-center justify-center gap-1">
-									<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500" />
-									<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainWatermarkPadding}" @click="constrainWatermarkPadding = !constrainWatermarkPadding">
-										<Icon name="constrain" class="fill-black w-3 h-auto" />
-									</div>
-									<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500 rotate-180 -scale-x-100" />
-								</div>
-							</div>
-							<EditorPanel v-if="imageParams.watermark.type === 'text'" title="Watermark Drop Shadow" collapse-key="watermark-drop-shadow-editor" v-model="imageParams.watermark.dropShadow.enabled" :show-toggle="true" :disabled="!imageParams.watermark.dropShadow.enabled">
-								<SliderParam title="Opacity" v-model="imageParams.watermark.dropShadow.opacity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
-								<SliderParam title="Blur" v-model="imageParams.watermark.dropShadow.blur" :min="0" :max="100" :step="1" :default="3" suffix="px" />
-								<ColorParam title="Color" v-model="imageParams.watermark.dropShadow.color" default="#000000" />
-								<div class="grid grid-cols-2 gap-3">
-									<SliderParam title="Offset X" v-model="imageParams.watermark.dropShadow.offsetX" :min="0" :max="100" :step="1" :default="1" suffix="px" />
-									<SliderParam title="Offset Y" v-model="imageParams.watermark.dropShadow.offsetX" :min="0" :max="100" :step="1" :default="1" suffix="px" />
+								<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Width" v-model="imageParams.aspectRatioWidth" :min="0" :max="128" :step="1" :default="0" default-label="None" />
+								<SliderParam v-if="imageParams.crop.length > 0" title="Aspect Ratio Height" v-model="imageParams.aspectRatioHeight" :min="0" :max="128" :step="1" :default="0" default-label="None" />
+								<SliderParam v-if="imageParams.crop.length > 0" title="Zoom" v-model="imageParams.zoom" :min="1" :max="10" :step="0.01" :default="1" default-label="None" suffix="x" />
+								<div v-if="imageParams.crop.includes('crop')" class="grid grid-cols-2 gap-3">
+									<SelectParam title="Horizontal Gravity" v-model="imageParams.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
+									<SelectParam title="Vertical Gravity" v-model="imageParams.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
 								</div>
 							</EditorPanel>
-						</EditorPanel>
-						<EditorPanel title="Redact" collapse-key="redact-editor" v-model="imageParams.enableRedact" :show-toggle="true" :disabled="!imageParams.enableRedact">
-							<TagsParam title="Faces" :options="redactFaceOptions" v-model="imageParams.redact.faces" placeholder="Faces to redact" />
-							<TagsParam title="People" :options="redactPersonOptions" v-model="imageParams.redact.people" placeholder="People to redact" />
-							<RedactRegionParam v-model="imageParams.redact.regions" />
-							<SliderParam title="Blur" v-model="imageParams.redact.blur" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="" />
-							<SliderParam title="Pixelate" v-model="imageParams.redact.pixelate" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-							<ToggleParam title="Use Fill Color" v-model="imageParams.redact.useColor" />
-							<ColorParam v-if="imageParams.redact.useColor" title="Fill Color" v-model="imageParams.redact.color" :default="null" />
-							<SliderParam title="Blur Mask" v-model="imageParams.redact.blurMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="" />
-							<SliderParam title="Expand Mask" v-model="imageParams.redact.expandMask" :min="0" :max="200" :step="1" :default="0" default-label="None" suffix="%" />
-							<SliderParam title="Pixelate Mask" v-model="imageParams.redact.pixelateMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-						</EditorPanel>
-						<EditorPanel title="Format" collapse-key="format-editor">
-							<ObjectSelectParam title="File Format" v-model="imageParams.export.format" default="webp" :allow-null="false" :options="ExportFormatOptions" />
-							<SliderParam title="Quality" v-model="imageParams.export.quality" :min="0" :max="100" :step="1" :default="85" />
-							<SliderParam v-if="imageParams.export.format === 'webp'" title="Reduction Effort" v-model="imageParams.export.reductionEffort" :min="0" :max="6" :step="1" :default="4" />
-							<ToggleParam title="Lossless" v-model="imageParams.export.lossless" />
-							<ToggleParam title="Near Lossless" v-model="imageParams.export.nearLossless" />
-						</EditorPanel>
-						<EditorPanel collapse-key="debug-editor">
-							<div class="flex items-center justify-center">
-								<div @click="resetParams" class="cursor-pointer text-xs hover:text-blue-600">Reset All</div>
-							</div>
-						</EditorPanel>
+							<EditorPanel v-if="imageParams.crop.includes('focus') && imageKey" collapse-key="focal-point-editor" title="Focal Point"  :disabled="!imageParams.enableCrop">
+								<FocalPointParam v-model="imageParams.focalPoint"/>
+								<SliderParam title="Focal Point Zoom" v-model="imageParams.focalPointZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+							</EditorPanel>
+							<EditorPanel v-if="imageParams.crop.includes('face') && faceCount > 0" title="Face Crop Options" collapse-key="face-crop-options"  :disabled="!imageParams.enableCrop">
+								<ObjectSelectParam title="Face Index" v-model="imageParams.face.index" :default="-1" :allow-null="false" :options="faceOptions" />
+								<SliderParam title="Face Padding" v-model="imageParams.face.padding" :min="0" :max="256" :step="1" :default="8" suffix="px" />
+								<SliderParam title="Face Zoom" v-model="imageParams.face.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+								<div class="grid grid-cols-2 gap-3">
+									<SelectParam title="Face Horizontal Gravity" v-model="imageParams.face.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
+									<SelectParam title="Face Vertical Gravity" v-model="imageParams.face.vGravity" default="top" :allow-null="false" :options="VGravityOptions" />
+								</div>
+								<ToggleParam title="Focus Face" v-model="imageParams.face.focus" />
+							</EditorPanel>
+							<EditorPanel v-if="imageParams.crop.includes('person') && peopleCount > 0" title="Person Crop Options" collapse-key="person-crop-options"  :disabled="!imageParams.enableCrop">
+								<ObjectSelectParam title="Person Index" v-model="imageParams.person.index" :default="-1" :allow-null="false" :options="personOptions" />
+								<SliderParam title="Person Padding" v-model="imageParams.person.padding" :min="0" :max="256" :step="1" :default="0" suffix="px" />
+								<SliderParam title="Person Zoom" v-model="imageParams.person.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+								<div class="grid grid-cols-2 gap-3">
+									<SelectParam title="Person Horiz. Gravity" v-model="imageParams.person.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
+									<SelectParam title="Person Vertical Gravity" v-model="imageParams.person.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
+								</div>
+							</EditorPanel>
+							<EditorPanel title="Image Attributes" collapse-key="image-attributes">
+								<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
+							</EditorPanel>
+							<EditorPanel title="Rotation" collapse-key="rotation-editor" v-model="imageParams.enabledRotation" :show-toggle="true" :disabled="!imageParams.enabledRotation">
+								<SliderParam title="Rotation" v-model="imageParams.rotation.rotation" :min="0" :max="360" :step="1" :default="0" suffix="°" />
+								<ObjectSelectParam title="Rotation Mode" v-model="imageParams.rotation.mode" :default="0" :allow-null="false" :options="RotationModeOptions" />
+							</EditorPanel>
+							<EditorPanel title="Adjustments" collapse-key="adjustments-editor"  v-model="imageParams.enableAdjustments" :show-toggle="true" :disabled="!imageParams.enableAdjustments">
+								<SliderParam title="Brightness" v-model="imageParams.adjustments.brightness" :min="0" :max="200" :step="1" :default="100" suffix="%" />
+								<SliderParam title="Saturation" v-model="imageParams.adjustments.saturation" :min="0" :max="200" :step="1" :default="100" suffix="%" />
+								<SliderParam title="Vibrance" v-model="imageParams.adjustments.vibrance" :min="0" :max="100" :step="1" :default="0" default-label="None" />
+								<SliderParam title="Contrast" v-model="imageParams.adjustments.contrast" :min="0" :max="3" :step="0.01" :default="1" />
+								<SliderParam title="Exposure" v-model="imageParams.adjustments.exposure" :min="-3" :max="3" :step="0.01" :default="0" />
+								<SliderParam title="Gamma" v-model="imageParams.adjustments.gamma" :min="0.01" :max="10" :step="0.01" :default="1" />
+								<SliderParam title="Texture" v-model="imageParams.adjustments.texture" :min="0" :max="50" :step="0.1" :default="0" default-label="None" />
+								<SliderParam title="Texture Density" v-model="imageParams.adjustments.textureDensity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
+								<SliderParam title="Hue" v-model="imageParams.adjustments.hue" :min="-360" :max="360" :step="1" :default="0" suffix="°" />
+								<ToggleParam title="Invert" v-model="imageParams.adjustments.invert" />
+							</EditorPanel>
+							<EditorPanel title="Stylize" collapse-key="stylize-editor"  v-model="imageParams.enableStylize" :show-toggle="true" :disabled="!imageParams.enableStylize">
+								<TagsParam title="Stylize Order" :options="StylizeOrderOptions" v-model="imageParams.stylize.order" placeholder="Order to process stylize operations" />
+								<SliderParam title="Blur" v-model="imageParams.stylize.blur" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+								<SliderParam title="Pixelate" v-model="imageParams.stylize.pixelate" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+							</EditorPanel>
+							<EditorPanel title="Gradient Map" collapse-key="gradient-map-editor"  v-model="imageParams.enableGradientMap" :show-toggle="true" :disabled="!imageParams.enableGradientMap">
+								<GradientMapParam title="Gradient Map" :default="DefaultImageParams.gradientMap.stops" v-model="imageParams.gradientMap.stops" :enabled="imageParams.gradientMap.opacity > 0" />
+								<SliderParam title="Gradient Map Opacity" v-model="imageParams.gradientMap.opacity" :min="0" :max="100" :step="1" :default="0" default-label="Disabled" suffix="%" />
+								<ObjectSelectParam title="Gradient Map Mode" v-model="imageParams.gradientMap.blendMode" :default="BlendModes.BlendModeOver" :allow-null="false" :options="BlendModeOptions" />
+								<SliderParam title="Blur" v-model="imageParams.gradientMap.blur" :min="0" :max="320" :step="1" :default="0" default-label="None" suffix="px" />
+								<ToggleParam title="Map Monochrome Image" v-model="imageParams.gradientMap.monochrome" />
+							</EditorPanel>
+							<EditorPanel title="Padding" collapse-key="padding-editor"  v-model="imageParams.enablePadding" :show-toggle="true" :disabled="!imageParams.enablePadding">
+								<ColorParam title="Padding Color" v-model="imageParams.padding.color" :default="null" />
+								<div class="flex items-center gap-1">
+									<div class="flex-1 flex flex-col gap-3">
+										<SliderParam title="Top Padding" v-model="imageParams.padding.top" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+										<SliderParam title="Right Padding" v-model="imageParams.padding.right" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+										<SliderParam title="Bottom Padding" v-model="imageParams.padding.bottom" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+										<SliderParam title="Left Padding" v-model="imageParams.padding.left" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+									</div>
+									<div class="flex flex-col items-center justify-center gap-[8px]">
+										<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300" />
+										<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainPadding}" @click="constrainPadding = !constrainPadding">
+											<Icon name="constrain" class="fill-black w-3 h-auto" />
+										</div>
+										<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300 rotate-180 -scale-x-100" />
+									</div>
+								</div>
+							</EditorPanel>
+							<EditorPanel title="Border" collapse-key="border-editor" v-model="imageParams.enableBorder" :show-toggle="true" :disabled="!imageParams.enableBorder">
+								<ColorParam title="Border Color" v-model="imageParams.border.color" :default="null" />
+								<div class="flex items-center gap-1">
+									<div class="flex-1 flex flex-col gap-3">
+										<SliderParam title="Top Border" v-model="imageParams.border.top" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+										<SliderParam title="Right Border" v-model="imageParams.border.right" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+										<SliderParam title="Bottom Border" v-model="imageParams.border.bottom" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+										<SliderParam title="Left Border" v-model="imageParams.border.left" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+									</div>
+									<div class="flex flex-col items-center justify-center gap-[8px]">
+										<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300" />
+										<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainBorder}" @click="constrainBorder = !constrainBorder">
+											<Icon name="constrain" class="fill-black w-3 h-auto" />
+										</div>
+										<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300 rotate-180 -scale-x-100" />
+									</div>
+								</div>
+							</EditorPanel>
+							<EditorPanel title="Watermark" collapse-key="watermark-editor" v-model="imageParams.enabledWatermark" :show-toggle="true" :disabled="!imageParams.enabledWatermark">
+								<ObjectSelectParam title="Watermark Type" v-model="imageParams.watermark.type" default="text" :allow-null="false" :options="WatermarkTypeOptions" />
+								<TextParam v-if="imageParams.watermark.type === 'text'" title="Watermark Text" default="" v-model="imageParams.watermark.text" />
+								<FontParam v-if="imageParams.watermark.type === 'text'" title="Watermark Font" default="" v-model="imageParams.watermark.font" />
+								<ColorParam v-if="imageParams.watermark.type === 'text'" title="Color" v-model="imageParams.watermark.color" default="#FFFFFF" />
+								<WatermarkImageParam v-if="imageParams.watermark.type === 'image'" title="Watermark Image Key" default="" v-model="imageParams.watermark.imageKey" />
+								<div class="grid grid-cols-2 gap-3">
+									<SelectParam title="Horizontal Align" v-model="imageParams.watermark.hAlign" default="right" :allow-null="false" :options="HGravityOptions" />
+									<SelectParam title="Vertical Align" v-model="imageParams.watermark.vAlign" default="bottom" :allow-null="false" :options="VGravityOptions" />
+								</div>
+								<SliderParam title="Width" v-model="imageParams.watermark.width" :min="1" :max="100" :step="1" :default="80" suffix="%" />
+								<SliderParam title="Height" v-model="imageParams.watermark.height" :min="1" :max="100" :step="1" :default="6" suffix="%" />
+								<SliderParam title="Opacity" v-model="imageParams.watermark.opacity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
+								<ObjectSelectParam title="Rotation" v-model="imageParams.watermark.rotate" :default="0" :allow-null="false" :options="WatermarkRotationOptions" />
+								<div class="flex items-center gap-1">
+									<div class="flex-1 flex flex-col gap-3">
+										<SliderParam title="Horizontal Padding" v-model="imageParams.watermark.hPadding" :min="0" :max="256" :step="1" :default="18" suffix="px" />
+										<SliderParam title="Vertical Padding" v-model="imageParams.watermark.vPadding" :min="0" :max="256" :step="1" :default="18" suffix="px" />
+									</div>
+									<div class="flex flex-col items-center justify-center gap-1">
+										<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500" />
+										<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainWatermarkPadding}" @click="constrainWatermarkPadding = !constrainWatermarkPadding">
+											<Icon name="constrain" class="fill-black w-3 h-auto" />
+										</div>
+										<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500 rotate-180 -scale-x-100" />
+									</div>
+								</div>
+								<EditorPanel v-if="imageParams.watermark.type === 'text'" title="Watermark Drop Shadow" collapse-key="watermark-drop-shadow-editor" v-model="imageParams.watermark.dropShadow.enabled" :show-toggle="true" :disabled="!imageParams.watermark.dropShadow.enabled">
+									<SliderParam title="Opacity" v-model="imageParams.watermark.dropShadow.opacity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
+									<SliderParam title="Blur" v-model="imageParams.watermark.dropShadow.blur" :min="0" :max="100" :step="1" :default="3" suffix="px" />
+									<ColorParam title="Color" v-model="imageParams.watermark.dropShadow.color" default="#000000" />
+									<div class="grid grid-cols-2 gap-3">
+										<SliderParam title="Offset X" v-model="imageParams.watermark.dropShadow.offsetX" :min="0" :max="100" :step="1" :default="1" suffix="px" />
+										<SliderParam title="Offset Y" v-model="imageParams.watermark.dropShadow.offsetX" :min="0" :max="100" :step="1" :default="1" suffix="px" />
+									</div>
+								</EditorPanel>
+							</EditorPanel>
+							<EditorPanel title="Redact" collapse-key="redact-editor" v-model="imageParams.enableRedact" :show-toggle="true" :disabled="!imageParams.enableRedact">
+								<TagsParam title="Faces" :options="redactFaceOptions" v-model="imageParams.redact.faces" placeholder="Faces to redact" />
+								<TagsParam title="People" :options="redactPersonOptions" v-model="imageParams.redact.people" placeholder="People to redact" />
+								<RedactRegionParam v-model="imageParams.redact.regions" />
+								<SliderParam title="Blur" v-model="imageParams.redact.blur" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="" />
+								<SliderParam title="Pixelate" v-model="imageParams.redact.pixelate" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+								<ToggleParam title="Use Fill Color" v-model="imageParams.redact.useColor" />
+								<ColorParam v-if="imageParams.redact.useColor" title="Fill Color" v-model="imageParams.redact.color" :default="null" />
+								<SliderParam title="Blur Mask" v-model="imageParams.redact.blurMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="" />
+								<SliderParam title="Expand Mask" v-model="imageParams.redact.expandMask" :min="0" :max="200" :step="1" :default="0" default-label="None" suffix="%" />
+								<SliderParam title="Pixelate Mask" v-model="imageParams.redact.pixelateMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+							</EditorPanel>
+							<EditorPanel title="Format" collapse-key="format-editor">
+								<ObjectSelectParam title="File Format" v-model="imageParams.export.format" default="webp" :allow-null="false" :options="ExportFormatOptions" />
+								<SliderParam title="Quality" v-model="imageParams.export.quality" :min="0" :max="100" :step="1" :default="85" />
+								<SliderParam v-if="imageParams.export.format === 'webp'" title="Reduction Effort" v-model="imageParams.export.reductionEffort" :min="0" :max="6" :step="1" :default="4" />
+								<ToggleParam title="Lossless" v-model="imageParams.export.lossless" />
+								<ToggleParam title="Near Lossless" v-model="imageParams.export.nearLossless" />
+							</EditorPanel>
+							<EditorPanel collapse-key="debug-editor">
+								<div class="flex items-center justify-center">
+									<div @click="resetParams" class="cursor-pointer text-xs hover:text-blue-600">Reset All</div>
+								</div>
+							</EditorPanel>
+						</div>
+					</div>
+					<div v-show="paramsEditorMode === 'presets'" class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100">
 					</div>
 				</div>
 			</div>
