@@ -195,8 +195,17 @@ export type WatermarkParams = {
 	dropShadow: WatermarkDropShadowParams,
 }
 
+export type SourceCropParams = {
+	x: number,
+	y: number,
+	width: number,
+	height: number,
+}
 
 export type ImageParams = {
+	enableSourceCrop: boolean,
+	sourceCrop: SourceCropParams,
+
 	enableCrop: boolean,
 	crop: string[],
 	width: number,
@@ -255,6 +264,14 @@ export type DebugParams = {
 }
 
 export const DefaultImageParams: ImageParams = {
+	enableSourceCrop: true,
+	sourceCrop: {
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0,
+	},
+
 	enableCrop: true,
 	crop: [],
 	width: 0,

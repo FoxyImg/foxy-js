@@ -23,6 +23,8 @@ export type Label = {
 }
 
 export type ImageMeta = {
+	width: number,
+	height: number,
 	faces: Face[],
 	labels: Label[],
 	people: Label[],

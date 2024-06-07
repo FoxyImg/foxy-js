@@ -34,6 +34,12 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		}
 	}
 
+	//region Source Crop Params
+	console.log(imageParams.sourceCrop);
+	if (imageParams.enableSourceCrop && imageParams.sourceCrop.width > 0 && imageParams.sourceCrop.height > 0) {
+		newUrl += `/src:${imageParams.sourceCrop.x},${imageParams.sourceCrop.y},${imageParams.sourceCrop.width},${imageParams.sourceCrop.height}`;
+	}
+
 	//region Crop Params
 	if (imageParams.width > 0) {
 		newUrl += `/w:${imageParams.width}`;

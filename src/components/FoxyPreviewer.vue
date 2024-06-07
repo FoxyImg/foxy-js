@@ -50,6 +50,7 @@ import GradientMapParam from "@/components/editors/GradientMapParam.vue";
 import TextParam from "@/components/editors/TextParam.vue";
 import FontParam from "@/components/editors/FontParam.vue";
 import WatermarkImageParam from "@/components/editors/WatermarkImageParam.vue";
+import SourceCropParam from "@/components/editors/SourceCropParam.vue";
 
 const {
 	apps,
@@ -389,6 +390,9 @@ const redactFaceOptions = computed(() => {
 				<div class="flex-1 relative">
 					<div v-show="paramsEditorMode === 'params'" class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100">
 						<div class="p-3 flex flex-col gap-3">
+							<EditorPanel title="Source Crop" collapse-key="source-crop-editor" v-model="imageParams.enableSourceCrop" :show-toggle="true" :disabled="!imageParams.enableSourceCrop">
+								<SourceCropParam title="Crop" :default="DefaultImageParams.sourceCrop" v-model="imageParams.sourceCrop" />
+							</EditorPanel>
 							<EditorPanel title="Cropping / Resizing" collapse-key="crop-editor" v-model="imageParams.enableCrop" :show-toggle="true" :disabled="!imageParams.enableCrop">
 								<TagsParam title="Crop Mode" :options="CropOptions" v-model="imageParams.crop" placeholder="Select 1 or more crop modes" />
 								<SelectParam v-if="imageParams.crop.includes('smart')" title="Smart Crop Mode" v-model="imageParams.smartMode" :default="null" :options="InterestingOptions" />
