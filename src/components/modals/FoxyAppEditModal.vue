@@ -29,14 +29,14 @@ const emit = defineEmits(['update:modelValue', 'save', 'close']);
 const currentApp = ref<FoxyApp>(JSON.parse(JSON.stringify(props.modelValue)));
 
 async function saveSource() {
-	if (currentApp.value.id === null || currentApp.value.url === null || currentApp.value.signingKey === null) {
+	if (currentApp.value.id === null || currentApp.value.url === null || currentApp.value.apiKey === null) {
 		alert("Missing required fields");
 		return;
 	}
 
 
 	try {
-		const res = await verifyAppId(currentApp.value.id, currentApp.value.url, currentApp.value.signingKey);
+		const res = await verifyAppId(currentApp.value.id, currentApp.value.url, currentApp.value.apiKey);
 		currentApp.value.sources = res.sources;
 		currentApp.value.presets = res.presets;
 		console.log(currentApp.value);
@@ -67,8 +67,12 @@ async function saveSource() {
 				<input type="text" v-model="currentApp.url" class="border border-neutral-200 rounded-md px-2 py-1 text-sm">
 			</div>
 			<div class="flex flex-col gap-1">
-				<SmallLabel>App Key</SmallLabel>
+				<SmallLabel>Signing Key</SmallLabel>
 				<input type="password" v-model="currentApp.signingKey" class="border border-neutral-200 rounded-md px-2 py-1 text-sm">
+			</div>
+			<div class="flex flex-col gap-1">
+				<SmallLabel>API Key</SmallLabel>
+				<input type="password" v-model="currentApp.apiKey" class="border border-neutral-200 rounded-md px-2 py-1 text-sm">
 			</div>
 			<div class="flex justify-end">
 				<button type="button" class="button"  @click="saveSource">Save App</button>

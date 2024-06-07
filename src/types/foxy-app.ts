@@ -6,6 +6,7 @@ export type FoxyApp = {
 	name: string,
 	url: string|null,
 	signingKey: string|null,
+	apiKey: string|null,
 	sources: FoxySource[],
 	presets: {
 		[key: string]: FoxyPreset,
@@ -17,6 +18,7 @@ export const DefaultFoxyApp: FoxyApp = {
 	name: "Default App",
 	url: null,
 	signingKey: null,
+	apiKey: null,
 	sources: [],
 	presets: {},
 }

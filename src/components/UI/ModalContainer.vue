@@ -6,7 +6,7 @@ withDefaults(defineProps<{
 	title: string,
 	showTitle: boolean
 	showClose: boolean
-	fullScreen: boolean
+	fullScreen?: boolean
 }>(), {
 	showTitle: true,
 	showClose: true,

@@ -46,7 +46,7 @@ export default function useFoxyPresetEditor() {
 		const deletePresetResponse = await fetch(`${currentApp.value.url}/presets/${currentApp.value.id}/${currentPresetId.value}`, {
 			method: "DELETE",
 			headers: {
-				'Authorization': `Bearer ${currentApp.value.signingKey}`,
+				'Authorization': `Bearer ${currentApp.value.apiKey}`,
 			},
 		});
 
@@ -60,7 +60,7 @@ export default function useFoxyPresetEditor() {
 		const newPresetResponse = await fetch(`${currentApp.value.url}/presets/${currentApp.value.id}/${newSlug}`, {
 			method: "POST",
 			headers: {
-				'Authorization': `Bearer ${currentApp.value.signingKey}`,
+				'Authorization': `Bearer ${currentApp.value.apiKey}`,
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify(existingPreset),
@@ -86,7 +86,7 @@ export default function useFoxyPresetEditor() {
 		const newPresetResponse = await fetch(`${currentApp.value.url}/presets/${currentApp.value.id}/${newSlug}`, {
 			method: "POST",
 			headers: {
-				'Authorization': `Bearer ${currentApp.value.signingKey}`,
+				'Authorization': `Bearer ${currentApp.value.apiKey}`,
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify(currentPresetJSONObject.value),
@@ -106,7 +106,7 @@ export default function useFoxyPresetEditor() {
 		const newPresetResponse = await fetch(`${currentApp.value.url}/presets/${currentApp.value.id}/${currentPresetId.value}`, {
 			method: "PUT",
 			headers: {
-				'Authorization': `Bearer ${currentApp.value.signingKey}`,
+				'Authorization': `Bearer ${currentApp.value.apiKey}`,
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify(currentPresetJSONObject.value),
@@ -125,7 +125,7 @@ export default function useFoxyPresetEditor() {
 		const deletePresetResponse = await fetch(`${currentApp.value.url}/presets/${currentApp.value.id}/${currentPresetId.value}`, {
 			method: "DELETE",
 			headers: {
-				'Authorization': `Bearer ${currentApp.value.signingKey}`,
+				'Authorization': `Bearer ${currentApp.value.apiKey}`,
 			},
 		});
 
@@ -142,7 +142,7 @@ export default function useFoxyPresetEditor() {
 
 		const presetsResponse = await fetch(`${currentApp.value.url}/presets/${currentApp.value.id}`, {
 			headers: {
-				'Authorization': `Bearer ${currentApp.value.signingKey}`,
+				'Authorization': `Bearer ${currentApp.value.apiKey}`,
 			}
 		});
 
