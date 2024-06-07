@@ -42,11 +42,11 @@ const focalPointStyle = computed(() => {
 });
 
 const imageUrl = computed(() => {
-	if (!currentSource.value || !currentApp.value || !currentApp.value.url || !currentSource.value.key || !currentApp.value.secret || !imageKey.value) {
+	if (!currentSource.value || !currentApp.value || !currentApp.value.url || !currentSource.value.key || !currentApp.value.signingKey || !imageKey.value) {
 		return null;
 	}
 
-	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.secret, imageKey.value, buildImageParams({ width: 300 }));
+	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, buildImageParams({ width: 300 }));
 });
 
 let boundingRect:DOMRect|null = null;

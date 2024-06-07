@@ -49,7 +49,7 @@ export default function useFoxyAppEditor() {
 	}
 
 	const saveFoxyApp = () => {
-		if (editingFoxyApp.value.id === null || editingFoxyApp.value.url === null || editingFoxyApp.value.secret === null) {
+		if (editingFoxyApp.value.id === null || editingFoxyApp.value.url === null || editingFoxyApp.value.signingKey === null) {
 			return;
 		}
 

@@ -71,17 +71,17 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 
 	function buildImageUrl() {
 		console.log(currentSource.value, currentApp.value);
-		if (!currentSource.value || !currentApp.value || !currentSource.value.key || !currentApp.value.secret || !currentApp.value.url || !imageKey.value) {
+		if (!currentSource.value || !currentApp.value || !currentSource.value.key || !currentApp.value.signingKey || !currentApp.value.url || !imageKey.value) {
 			currentImageUrl.value = null;
 			return;
 		}
 
-		currentImageUrl.value = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.secret, imageKey.value, imageParams.value, debugParams.value);
+		currentImageUrl.value = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, imageParams.value, debugParams.value);
 	}
 	const debouncedBuildImageUrl = pDebounce(buildImageUrl, 500);
 
 	async function fetchImageMeta() {
-		if (!currentSource.value || !currentApp.value || !currentSource.value.key || !currentApp.value.secret || !currentApp.value.url || !imageKey.value) {
+		if (!currentSource.value || !currentApp.value || !currentSource.value.key || !currentApp.value.signingKey || !currentApp.value.url || !imageKey.value) {
 			imageMeta.value = null;
 			return;
 		}
@@ -89,7 +89,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		let encodedKey = btoa('/'+imageKey.value);
 		let metaUrl = `/${currentSource.value.key}/${encodedKey}/meta`;
 
-		const sig = signHMAC256(currentApp.value.secret, metaUrl);
+		const sig = signHMAC256(currentApp.value.signingKey, metaUrl);
 
 		const response = await fetch(currentApp.value.url + metaUrl + "?s="+sig);
 		if (!response.ok) {
@@ -102,12 +102,12 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 	const debouncedFetchImageMeta = pDebounce(fetchImageMeta, 500);
 
 	async function fetchCurrentPresetJSONObject() {
-		if (!currentSource.value || !currentApp.value || !currentSource.value.key || !currentApp.value.secret || !currentApp.value.url || !imageKey.value) {
+		if (!currentSource.value || !currentApp.value || !currentSource.value.key || !currentApp.value.signingKey || !currentApp.value.url || !imageKey.value) {
 			currentPresetJSONObject.value = null;
 			return;
 		}
 
-		const presetUrl = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.secret, imageKey.value, imageParams.value, null, true);
+		const presetUrl = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, imageParams.value, null, true);
 		console.log(presetUrl);
 		const response = await fetch(presetUrl);
 		if (!response.ok) {

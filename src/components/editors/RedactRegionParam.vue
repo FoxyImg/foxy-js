@@ -25,11 +25,11 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue']);
 
 const imageUrl = computed(() => {
-	if (!currentSource.value || !currentApp.value || !currentApp.value.url || !currentSource.value.key || !currentApp.value.secret || !imageKey.value) {
+	if (!currentSource.value || !currentApp.value || !currentApp.value.url || !currentSource.value.key || !currentApp.value.signingKey || !imageKey.value) {
 		return null;
 	}
 
-	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.secret, imageKey.value, buildImageParams({ width: 300 }));
+	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, buildImageParams({ width: 300 }));
 });
 
 function regionStyle(region:Rect) {
