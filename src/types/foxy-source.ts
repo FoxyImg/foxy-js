@@ -3,6 +3,7 @@ export type FoxySource = {
 	name: string,
 	key: string|null,
 	sampleImages: string[]
+	overlayImages: string[]
 }
 
 export const DefaultFoxySource: FoxySource = {
@@ -10,4 +11,5 @@ export const DefaultFoxySource: FoxySource = {
 	name: "Default",
 	key: null,
 	sampleImages: [],
+	overlayImages: [],
 }

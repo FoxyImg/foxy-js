@@ -23,7 +23,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		currentPreset,
 	} = storeToRefs(useFoxyAppStore());
 
-	const paramsEditorMode = ref<"params"|"presets">("params");
+	const paramsEditorMode = ref<"params"|"overlays"|"presets">("params");
 	const currentImageUrl = ref<string|null>(null);
 	const currentPresetImageUrl = computed(() => {
 		if (!currentApp.value || !currentSource.value || !currentPresetId.value) {

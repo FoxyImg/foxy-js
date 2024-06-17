@@ -1,10 +1,37 @@
-import {BlendModes, type BoxCropParams, type DebugParams, type ImageParams} from "@/types/params";
+import {BlendModes, type BoxCropParams, type DebugParams, DefaultOverlayParams, type ImageParams} from "@/types/params";
 import signHMAC256 from "@/utils/sign";
 import base64 from "@/utils/base-64";
 
 export default function buildUrl(host:string, accessKey:string|null, secret:string, imageKey:string, imageParams:ImageParams, debugParams:DebugParams|null = null, preset:boolean = false) {
 	let encodedKey = base64('/'+imageKey, true);
 	let newUrl = accessKey ? `/${accessKey}/${encodedKey}` : `/${encodedKey}`;
+
+	const compressParams = (params: { [key:string]: any }, defaultParams:{ [key:string]: any }, toSkip:string[] = []) => {
+		if (params === null) {
+			return null;
+		}
+
+		const newParams:{ [key:string]: any } = {};
+		for(const key of Object.keys(params)) {
+			if (toSkip.includes(key)) {
+				continue;
+			}
+
+			if (typeof params[key] === 'object' && params[key] && defaultParams[key] !== undefined) {
+				const obj = compressParams(params[key], defaultParams[key]);
+				if (obj && Object.keys(obj).length > 0) {
+					newParams[key] = obj;
+				}
+			} else if (params[key] !== undefined && params[key] !== defaultParams[key]) {
+				console.log('compressParams', key, params[key], defaultParams[key]);
+				newParams[key] = params[key];
+			}
+		}
+
+		console.log('compressParams', params);
+		console.log('compressParams', newParams);
+		return newParams;
+	}
 
 	const processBoxParams = (noun:string, params:BoxCropParams) => {
 		if (params.padding != 8) {
@@ -131,7 +158,7 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 			if (imageParams.redact.regions.length > 0) {
 				for(const region of imageParams.redact.regions) {
 					if (region.width > 0 && region.height > 0) {
-						newUrl += `/redact:region:${region.left},${region.top},${region.width},${region.height}`;
+						newUrl += `/redact:region:${imageParams.redact.cornerRadius}:${region.left},${region.top},${region.width},${region.height}`;
 					}
 				}
 			}
@@ -319,46 +346,167 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 
 	//endregion
 
-	//region Watermark
-	const canWatermark =
-		(imageParams.watermark.type !== 'text' && imageParams.watermark.text.trim().length > 0 && imageParams.watermark.font.trim().length > 0)
-		|| (imageParams.watermark.type === 'image' && imageParams.watermark.imageKey.trim().length > 0);
-	if (canWatermark && imageParams.enabledWatermark) {
-		if (imageParams.watermark.type === 'text') {
-			newUrl += `/wm:text:${base64(imageParams.watermark.text, true)}`;
-			newUrl += `/wm:font:${base64(imageParams.watermark.font, true)}`;
-		} else {
-			newUrl += `/wm:img:${base64(imageParams.watermark.imageKey, true)}`;
-		}
+	//region Overlays
+	if (imageParams.overlays.length > 0) {
+		if (imageParams.encodeOverlays) {
+			const overlays:any[] = [];
+			for(const overlay of imageParams.overlays) {
+				if (!overlay.enabled) {
+					continue;
+				}
 
-		if (`${imageParams.watermark.hAlign}:${imageParams.watermark.vAlign}` !== 'right:bottom') {
-			console.log(imageParams.watermark.hAlign, imageParams.watermark.vAlign);
-			newUrl += `/wm:al:${imageParams.watermark.hAlign}:${imageParams.watermark.vAlign}`;
-		}
-		newUrl += `/wm:dim:${imageParams.watermark.width}:${imageParams.watermark.height}`;
-		newUrl += `/wm:c:${imageParams.watermark.color.replaceAll('#', '')}`;
-		if (imageParams.watermark.rotate !== 0) {
-			newUrl += `/wm:rot:${imageParams.watermark.rotate}`;
-		}
-		if (imageParams.watermark.vPadding > 0 || imageParams.watermark.hPadding > 0) {
-			newUrl += `/wm:pad:${imageParams.watermark.hPadding}:${imageParams.watermark.vPadding}`;
-		}
-		if (imageParams.watermark.opacity !== 100) {
-			newUrl += `/wm:o:${imageParams.watermark.opacity}`;
-		}
-		if (imageParams.watermark.type === 'text' && imageParams.watermark.dropShadow.enabled) {
-			if (imageParams.watermark.dropShadow.opacity !== 100) {
-				newUrl += `/wm:ds:o:${imageParams.watermark.dropShadow.opacity}`;
+				overlays.push(compressParams(overlay, DefaultOverlayParams, ['id']));
 			}
-			if (imageParams.watermark.dropShadow.blur > 0) {
-				newUrl += `/wm:ds:bl:${imageParams.watermark.dropShadow.blur}`;
+
+			if (overlays.length > 0) {
+				newUrl += `/ovs:${base64(JSON.stringify(overlays), true)}`;
 			}
-			newUrl += `/wm:ds:color:${imageParams.watermark.dropShadow.color.replaceAll('#', '')}`;
-			if (imageParams.watermark.dropShadow.offsetX > 0 || imageParams.watermark.dropShadow.offsetY > 0) {
-				newUrl += `/wm:ds:xy:${imageParams.watermark.dropShadow.offsetX}:${imageParams.watermark.dropShadow.offsetY}`;
+		} else {
+			let actualIndex = 0;
+			for(const overlay of imageParams.overlays) {
+				if (!overlay.enabled) {
+					continue;
+				}
+
+				if (overlay.url && overlay.url.trim().length > 0) {
+					newUrl += `/ov:${actualIndex}:url:${base64(overlay.url, true)}`;
+				}
+
+				if (overlay.text && overlay.text.trim().length > 0) {
+					newUrl += `/ov:${actualIndex}:text:${base64(overlay.text, true)}`;
+				}
+
+				if (overlay.type === 'image') {
+					if (overlay.trim) {
+						newUrl += `/ov:${actualIndex}:trim`;
+					}
+
+					if (overlay.substitutions.length > 0) {
+						for(const substitution of overlay.substitutions) {
+							newUrl += `/ov:${actualIndex}:sub:${base64(substitution.key, true)}:${base64(substitution.value, true)}`;
+						}
+					}
+				}
+
+				if (overlay.font && overlay.font.trim().length > 0) {
+					newUrl += `/ov:${actualIndex}:font:${base64(overlay.font, true)}`;
+				}
+
+				const coordType = overlay.relativeCoords ? 'rel' : 'px';
+
+				if (overlay.hPadding > 0 || overlay.vPadding > 0) {
+					newUrl += `/ov:${actualIndex}:pad:${overlay.hPadding}:${overlay.vPadding}`;
+				}
+
+				if (overlay.x > 0 || overlay.y > 0) {
+					newUrl += `/ov:${actualIndex}:xy:${coordType}:${overlay.x}:${overlay.y}`;
+				}
+
+				if (overlay.hAnchor !== 'right' || overlay.vAnchor !== 'bottom') {
+					newUrl += `/ov:${actualIndex}:a:${overlay.hAnchor}:${overlay.vAnchor}`;
+				}
+
+				const sizeType = overlay.relativeSize ? 'rel' : 'px';
+
+				if (overlay.width > 0 || overlay.height > 0) {
+					newUrl += `/ov:${actualIndex}:sz:${sizeType}:${overlay.width}:${overlay.height}`;
+				}
+
+				if (overlay.minWidth > 0 || overlay.minHeight > 0) {
+					newUrl += `/ov:${actualIndex}:minsz:${overlay.minWidth}:${overlay.minHeight}`;
+				}
+
+				if (overlay.maxWidth > 0 || overlay.maxHeight > 0) {
+					newUrl += `/ov:${actualIndex}:maxsz:${overlay.maxWidth}:${overlay.maxHeight}`;
+				}
+
+				if (overlay.opacity !== 100) {
+					newUrl += `/ov:${actualIndex}:o:${overlay.opacity}`;
+				}
+
+				if (overlay.rotate !== 0) {
+					newUrl += `/ov:${actualIndex}:rot:${overlay.rotate}`;
+				}
+
+				if (overlay.type === 'image' && overlay.fit !== 'fit') {
+					newUrl += `/ov:${actualIndex}:fit:${overlay.fit}`;
+				}
+
+				if (overlay.type === 'text' && overlay.textColor !== '#000000') {
+					newUrl += `/ov:${actualIndex}:tc:${overlay.textColor}`;
+				}
+
+				if (overlay.dropShadow.enabled) {
+					if (overlay.dropShadow.opacity !== 100) {
+						newUrl += `/ov:${actualIndex}:ds:o:${overlay.dropShadow.opacity}`;
+					}
+					if (overlay.dropShadow.blur > 0) {
+						newUrl += `/ov:${actualIndex}:ds:bl:${overlay.dropShadow.blur}`;
+					}
+					newUrl += `/ov:${actualIndex}:ds:c:${overlay.dropShadow.color.replaceAll('#', '')}`;
+					if (overlay.dropShadow.offsetX > 0 || overlay.dropShadow.offsetY > 0) {
+						newUrl += `/ov:${actualIndex}:ds:xy:${overlay.dropShadow.offsetX}:${overlay.dropShadow.offsetY}`;
+					}
+				}
+
+				if (overlay.background.enabled) {
+					if (overlay.background.backgroundColorType !== 'color' || (overlay.background.backgroundColorType === 'color' && overlay.background.backgroundColor !== '#00000000')) {
+						if (overlay.background.backgroundColorType === 'color') {
+							newUrl += `/ov:${actualIndex}:bg:c:${overlay.background.backgroundColor.replaceAll('#', '')}`;
+						} else {
+							newUrl += `/ov:${actualIndex}:bg:c:${overlay.background.backgroundColorType}:${overlay.background.dominantColorOpacity}:${overlay.background.backgroundColor.replaceAll('#', '')}`;
+						}
+					}
+
+					if (overlay.background.blur > 0) {
+						newUrl += `/ov:${actualIndex}:bg:bl:${overlay.background.blur}`;
+					}
+
+					if (overlay.background.saturation !== 100) {
+						newUrl += `/ov:${actualIndex}:bg:sat:${overlay.background.saturation}`;
+					}
+
+					if (overlay.background.contrast !== 100) {
+						newUrl += `/ov:${actualIndex}:bg:con:${overlay.background.contrast}`;
+					}
+
+					if (overlay.background.brightness !== 100) {
+						newUrl += `/ov:${actualIndex}:bg:bri:${overlay.background.brightness}`;
+					}
+
+					if (overlay.background.cornerRadius > 0) {
+						newUrl += `/ov:${actualIndex}:bg:br:${overlay.background.cornerRadius}`;
+					}
+
+					const sizeType = overlay.background.relativeSize ? 'rel' : 'px';
+
+					if (overlay.background.width > 0 || overlay.background.height > 0) {
+						newUrl += `/ov:${actualIndex}:bg:sz:${sizeType}:${overlay.background.width}:${overlay.background.height}`;
+					}
+
+					if (overlay.background.minWidth > 0 || overlay.background.minHeight > 0) {
+						newUrl += `/ov:${actualIndex}:bg:minsz:${overlay.background.minWidth}:${overlay.background.minHeight}`;
+					}
+
+					if (overlay.background.maxWidth > 0 || overlay.background.maxHeight > 0) {
+						newUrl += `/ov:${actualIndex}:bg:maxsz:${overlay.background.maxWidth}:${overlay.background.maxHeight}`;
+					}
+
+					if (overlay.background.hAlign !== 'center' || overlay.background.vAlign !== 'center') {
+						newUrl += `/ov:${actualIndex}:bg:align:${overlay.background.hAlign}:${overlay.background.vAlign}`;
+					}
+
+					const paddingType = overlay.background.relativePadding ? 'rel' : 'px';
+					if (overlay.background.hPadding > 0 || overlay.background.vPadding > 0) {
+						newUrl += `/ov:${actualIndex}:bg:pad:${paddingType}:${overlay.background.hPadding}:${overlay.background.vPadding}`;
+					}
+				}
+
+				actualIndex++;
 			}
 		}
 	}
+
 	//endregion
 
 	//region Export

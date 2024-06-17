@@ -22,6 +22,20 @@ export type Label = {
 	confidence: number,
 }
 
+export type UsedColor = {
+	used: number,
+	r: number,
+	g: number,
+	b: number,
+	l: number,
+}
+
+export type DominantColors = {
+	lightest: UsedColor|null,
+	darkest: UsedColor|null,
+	colors: UsedColor[],
+}
+
 export type ImageMeta = {
 	width: number,
 	height: number,
@@ -29,4 +43,5 @@ export type ImageMeta = {
 	labels: Label[],
 	people: Label[],
 	moderationLabels: Label[],
+	dominantColors: DominantColors,
 }

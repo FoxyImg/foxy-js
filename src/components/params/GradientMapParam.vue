@@ -2,7 +2,7 @@
 import type {GradientStops} from "@/types/params";
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import GradientEditor from "@/components/UI/GradientEditor.vue";
-import GradienMapPresetsSelector from "@/components/editors/GradienMapPresetsSelector.vue";
+import GradienMapPresetsSelector from "@/components/params/GradienMapPresetsSelector.vue";
 import Icon from "@/components/UI/Icon.vue";
 
 const props = defineProps<{

@@ -20,6 +20,7 @@ const {
 
 const props = defineProps<{
 	modelValue: Rect[],
+	cornerRadius: number,
 }>();
 
 const emit = defineEmits(['update:modelValue']);
@@ -38,6 +39,7 @@ function regionStyle(region:Rect) {
 		top: `${region.top * 100}%`,
 		width: `${region.width * 100}%`,
 		height: `${region.height * 100}%`,
+		borderRadius: `${props.cornerRadius}%`,
 	};
 }
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {useImageParamsStore} from "@/stores/image-params-store";
 import {storeToRefs} from "pinia";
-import GradientMapPreset from "@/components/editors/GradientMapPreset.vue";
+import GradientMapPreset from "@/components/params/GradientMapPreset.vue";
 import Icon from "@/components/UI/Icon.vue";
 import {DefaultImageParams} from "@/types/params";
 import { hideAllPoppers } from "floating-vue";

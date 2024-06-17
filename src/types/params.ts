@@ -34,6 +34,7 @@ export type RedactParams = {
 	useColor: boolean,
 	color: string|null,
 	pixelate: number,
+	cornerRadius: number,
 }
 
 export const StylizeOrderOptions = [
@@ -157,14 +158,26 @@ export type RotationParams = {
 	mode: string
 }
 
-export const WatermarkRotationOptions = [
+export const RotationOptions = [
 	{ label: 'None', value: 0 },
 	{ label: '90', value: 90 },
 	{ label: '180', value: 180 },
 	{ label: '270', value: 270 },
 ]
 
-export type WatermarkDropShadowParams = {
+export type SourceCropParams = {
+	x: number,
+	y: number,
+	width: number,
+	height: number,
+}
+
+export const OverlayTypeOptions = [
+	{ label: 'Image', value: 'image' },
+	{ label: 'Text', value: 'text' },
+]
+
+export type DropShadowParams = {
 	enabled: boolean,
 	opacity: number,
 	blur: number,
@@ -173,33 +186,139 @@ export type WatermarkDropShadowParams = {
 	offsetY: number,
 }
 
-export const WatermarkTypeOptions = [
-	{ label: 'Image', value: 'image' },
-	{ label: 'Text', value: 'text' },
+export const FitOptions = [
+	{ label: 'Fit', value: 'fit' },
+	{ label: 'Fill', value: 'fill' },
+	{ label: 'Crop', value: 'crop' },
 ]
 
-export type WatermarkParams = {
-	type: 'image'|'text',
-	text: string,
-	font: string,
-	imageKey: string,
-	vAlign: 'top'|'center'|'bottom',
-	hAlign: 'left'|'center'|'right',
+export type OverlaySizeParams = {
+	relativeSize: boolean,
 	width: number,
 	height: number,
-	opacity: number,
-	color: string,
-	hPadding: number,
-	vPadding: number,
-	rotate: number,
-	dropShadow: WatermarkDropShadowParams,
+	minWidth: number,
+	minHeight: number,
+	maxWidth: number,
+	maxHeight: number,
 }
 
-export type SourceCropParams = {
+export const OverlayBackgroundColorTypeOptions = [
+	{ label: 'Color', value: 'color' },
+	{ label: 'Dominant', value: 'dom' },
+	{ label: 'Lightest', value: 'light' },
+	{ label: 'Darkest', value: 'dark' },
+]
+
+export type OverlayBackgroundParams = OverlaySizeParams & {
+	enabled: boolean,
+	backgroundColor: string,
+	backgroundColorType: 'color' | 'dominant' | 'lightest' | 'darkest',
+	dominantColorOpacity: number,
+	blur: number,
+	saturation: number,
+	contrast: number,
+	brightness: number,
+	cornerRadius: number,
+	relativePadding: boolean,
+	hPadding: number,
+	vPadding: number,
+	hAlign: 'left'|'center'|'right',
+	vAlign: 'top'|'center'|'bottom',
+}
+
+export type OverlaySubstitutionParam = {
+	key: string,
+	value: string,
+}
+
+export type OverlayParams =  OverlaySizeParams & {
+	id: string,
+	enabled: boolean,
+	type: 'image'|'text'
+	text: string|null,
+	font: string|null,
+	url: string|null,
+	opacity: number,
+	rotate: number,
+	relativeCoords: boolean,
+	hPadding: number,
+	vPadding: number,
 	x: number,
 	y: number,
-	width: number,
-	height: number,
+	fit: 'fit' | 'fill' | 'crop',
+	hAnchor: 'left'|'center'|'right',
+	vAnchor: 'top'|'center'|'bottom',
+	textColor: string|null,
+	fillColor: string|null,
+	strokeColor: string|null,
+	strokeWidth: number,
+	dropShadow: DropShadowParams,
+	background: OverlayBackgroundParams,
+	trim: boolean,
+	substitutions: OverlaySubstitutionParam[],
+}
+
+export const DefaultOverlayParams: OverlayParams = {
+	id: '',
+	type: 'image',
+	enabled: true,
+	relativeCoords: false,
+	hPadding: 0,
+	vPadding: 0,
+	x: 0,
+	y: 0,
+	relativeSize: false,
+	width: 0,
+	height: 0,
+	minWidth: 0,
+	minHeight: 0,
+	maxWidth: 0,
+	maxHeight: 0,
+	fit: 'fit',
+	hAnchor: 'right',
+	vAnchor: 'bottom',
+	textColor: '#000000',
+	fillColor: null,
+	strokeColor: null,
+	strokeWidth: 0,
+	text: null,
+	font: null,
+	url: null,
+	opacity: 100,
+	rotate: 0,
+	trim: true,
+	substitutions: [],
+	dropShadow: {
+		enabled: false,
+		opacity: 100,
+		blur: 3,
+		color: '#000000',
+		offsetX: 1,
+		offsetY: 1,
+	},
+	background: {
+		enabled: false,
+		backgroundColor: "#00000000",
+		backgroundColorType: 'color',
+		dominantColorOpacity: 100,
+		blur: 0,
+		saturation: 100,
+		contrast: 1,
+		brightness: 100,
+		cornerRadius: 0,
+		relativePadding: false,
+		hPadding: 0,
+		vPadding: 0,
+		hAlign: 'left',
+		vAlign: 'top',
+		relativeSize: false,
+		width: 0,
+		height: 0,
+		minWidth: 0,
+		minHeight: 0,
+		maxWidth: 0,
+		maxHeight: 0,
+	}
 }
 
 export type ImageParams = {
@@ -245,8 +364,9 @@ export type ImageParams = {
 	enableRedact: boolean,
 	redact: RedactParams,
 
-	enabledWatermark: boolean,
-	watermark: WatermarkParams,
+	encodeOverlays: boolean,
+	enabledOverlays: boolean,
+	overlays: OverlayParams[],
 
 	export: ExportParams,
 }
@@ -374,32 +494,12 @@ export const DefaultImageParams: ImageParams = {
 		useColor: false,
 		color: null,
 		pixelate: 0,
+		cornerRadius: 0,
 	},
 
-	enabledWatermark: true,
-	watermark: {
-		type: 'text',
-		text: '',
-		imageKey: '',
-		font: 'sans',
-		vAlign: 'bottom',
-		hAlign: 'right',
-		width: 80,
-		height: 6,
-		opacity: 100,
-		color: '#FFFFFF',
-		hPadding: 18,
-		vPadding: 18,
-		rotate: 0,
-		dropShadow: {
-			enabled: false,
-			opacity: 100,
-			blur: 3,
-			color: '#000000',
-			offsetX: 1,
-			offsetY: 1,
-		},
-	},
+	encodeOverlays: true,
+	enabledOverlays: true,
+	overlays: [],
 
 	export: {
 		format: 'webp',
