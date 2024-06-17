@@ -78,7 +78,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 
 		currentImageUrl.value = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, imageParams.value, debugParams.value);
 	}
-	const debouncedBuildImageUrl = pDebounce(buildImageUrl, 500);
+	const debouncedBuildImageUrl = pDebounce(buildImageUrl, 1000);
 
 	async function fetchImageMeta() {
 		if (!currentSource.value || !currentApp.value || !currentSource.value.key || !currentApp.value.signingKey || !currentApp.value.url || !imageKey.value) {
@@ -99,7 +99,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 
 		imageMeta.value = await response.json();
 	}
-	const debouncedFetchImageMeta = pDebounce(fetchImageMeta, 500);
+	const debouncedFetchImageMeta = pDebounce(fetchImageMeta, 1000);
 
 	async function fetchCurrentPresetJSONObject() {
 		if (!currentSource.value || !currentApp.value || !currentSource.value.key || !currentApp.value.signingKey || !currentApp.value.url || !imageKey.value) {
@@ -124,7 +124,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		}
 		currentPresetJSONObject.value = presetObj;
 	}
-	const debouncedFetchCurrentPresetJSONObject = pDebounce(fetchCurrentPresetJSONObject, 500);
+	const debouncedFetchCurrentPresetJSONObject = pDebounce(fetchCurrentPresetJSONObject, 1000);
 
 	async function reload() {
 		buildImageUrl();
