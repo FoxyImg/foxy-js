@@ -127,22 +127,6 @@ watch(() => [imageParams.value.width, imageParams.value.height], (newVal, oldVal
 	}
 });
 
-watch(() => [imageParams.value.watermark.hPadding, imageParams.value.watermark.vPadding], (newVal, oldVal) => {
-	if (!constrainWatermarkPadding.value) {
-		return;
-	}
-
-	if (oldVal[0] !== newVal[0]) {
-		if (imageParams.value.watermark.vPadding !== newVal[0]) {
-			imageParams.value.watermark.vPadding = newVal[0];
-		}
-	} else if (oldVal[1] !== newVal[1]) {
-		if (imageParams.value.watermark.hPadding !== newVal[1]) {
-			imageParams.value.watermark.hPadding = newVal[1];
-		}
-	}
-});
-
 watch(() => [imageParams.value.padding.top, imageParams.value.padding.left, imageParams.value.padding.right, imageParams.value.padding.bottom], (newVal, oldVal) => {
 	if (!constrainPadding.value) {
 		return;
@@ -188,42 +172,6 @@ watch(() => [imageParams.value.border.top, imageParams.value.border.left, imageP
 		imageParams.value.border.top = newVal[3];
 		imageParams.value.border.left = newVal[3];
 		imageParams.value.border.right = newVal[3];
-	}
-});
-
-watch(() => [imageParams.value.watermark.width, imageParams.value.watermark.height], (newVal, oldVal) => {
-	if (oldVal[0] !== newVal[0] && newVal[0] > 0) {
-		imageParams.value.watermark.height = 0;
-		imageParams.value.watermark.minHeight = 0;
-		imageParams.value.watermark.maxHeight = 0;
-	} else if (oldVal[1] !== newVal[1] && newVal[1] > 0) {
-		imageParams.value.watermark.width = 0;
-		imageParams.value.watermark.minWidth = 0;
-		imageParams.value.watermark.maxWidth = 0;
-	}
-});
-
-watch(() => [imageParams.value.watermark.minWidth, imageParams.value.watermark.minHeight], (newVal, oldVal) => {
-	if (oldVal[0] !== newVal[0] && newVal[0] > 0) {
-		imageParams.value.watermark.height = 0;
-		imageParams.value.watermark.minHeight = 0;
-		imageParams.value.watermark.maxHeight = 0;
-	} else if (oldVal[1] !== newVal[1] && newVal[1] > 0) {
-		imageParams.value.watermark.width = 0;
-		imageParams.value.watermark.minWidth = 0;
-		imageParams.value.watermark.maxWidth = 0;
-	}
-});
-
-watch(() => [imageParams.value.watermark.maxWidth, imageParams.value.watermark.maxHeight], (newVal, oldVal) => {
-	if (oldVal[0] !== newVal[0] && newVal[0] > 0) {
-		imageParams.value.watermark.height = 0;
-		imageParams.value.watermark.maxHeight = 0;
-		imageParams.value.watermark.minHeight = 0;
-	} else if (oldVal[1] !== newVal[1] && newVal[1] > 0) {
-		imageParams.value.watermark.width = 0;
-		imageParams.value.watermark.minWidth = 0;
-		imageParams.value.watermark.maxWidth = 0;
 	}
 });
 </script>
