@@ -158,7 +158,7 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 			if (imageParams.redact.regions.length > 0) {
 				for(const region of imageParams.redact.regions) {
 					if (region.width > 0 && region.height > 0) {
-						newUrl += `/redact:region:${imageParams.redact.cornerRadius}:${region.left},${region.top},${region.width},${region.height}`;
+						newUrl += `/redact:region:${region.cornerRadius ?? 0}:${region.rotation ?? 0}:${region.left},${region.top},${region.width},${region.height}`;
 					}
 				}
 			}

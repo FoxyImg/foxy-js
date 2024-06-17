@@ -299,7 +299,6 @@ watch(() => [imageParams.value.border.top, imageParams.value.border.left, imageP
 			<TagsParam title="Faces" :options="redactFaceOptions" v-model="imageParams.redact.faces" placeholder="Faces to redact" />
 			<TagsParam title="People" :options="redactPersonOptions" v-model="imageParams.redact.people" placeholder="People to redact" />
 			<RedactRegionParam v-model="imageParams.redact.regions" :corner-radius="imageParams.redact.cornerRadius" />
-			<SliderParam title="Region Corner Radius" v-model="imageParams.redact.cornerRadius" :min="0" :max="100" :step="1" :default="0" default-label="None" suffix="%" />
 			<SliderParam title="Blur" v-model="imageParams.redact.blur" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="" />
 			<SliderParam title="Pixelate" v-model="imageParams.redact.pixelate" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
 			<ToggleParam title="Use Fill Color" v-model="imageParams.redact.useColor" />

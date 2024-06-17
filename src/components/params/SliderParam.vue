@@ -12,8 +12,10 @@ const props = withDefaults(defineProps<{
 	suffix?: string;
 	allowDirectEditing?: boolean;
 	valueFormatter?: (value: number|null) => string;
+	disabled?: boolean;
 }>(), {
 	allowDirectEditing: true,
+	disabled: false,
 });
 
 const emit = defineEmits<{
@@ -68,7 +70,7 @@ function onWheel(e: WheelEvent) {
 
 </script>
 <template>
-	<div class="flex flex-col gap-1.5">
+	<div class="flex flex-col gap-1.5" :class="{'opacity-50 pointer-events-none': props.disabled}">
 		<div class="flex items-center justify-between text-xs text-neutral-600">
 			<label :class="{'font-bold text-neutral-700': currentValue !== props.default}">{{  title  }}</label>
 			<input

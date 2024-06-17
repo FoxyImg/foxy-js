@@ -23,10 +23,15 @@ export type Rect = {
 	height: number,
 }
 
+export type RedactRect = Rect & {
+	cornerRadius: number,
+	rotation: number,
+}
+
 export type RedactParams = {
 	faces: string[],
 	people: string[],
-	regions: Rect[],
+	regions: RedactRect[],
 	blur: number,
 	expandMask: number,
 	blurMask: number,
