@@ -2,7 +2,7 @@
 import {
 	BlendModeOptions,
 	BlendModes,
-	DefaultImageParams, ExportFormatOptions,
+	DefaultImageParams, ExportFormatOptions, MaskFitOptions, MaskTypeOptions,
 	RotationModeOptions,
 	StylizeOrderOptions,
 } from "@/types/params";
@@ -24,6 +24,7 @@ import {useImageParamsStore} from "@/stores/image-params-store";
 import {useStorage} from "@vueuse/core";
 import {computed, watch} from "vue";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
+import OverlayImageParam from "@/components/params/OverlayImageParam.vue";
 
 const {
 	imageKey,
@@ -294,6 +295,12 @@ watch(() => [imageParams.value.border.top, imageParams.value.border.left, imageP
 					<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300 rotate-180 -scale-x-100" />
 				</div>
 			</div>
+		</EditorPanel>
+		<EditorPanel title="Mask" collapse-key="mask-editor" v-model="imageParams.enableMask" :show-toggle="true" :disabled="!imageParams.enableMask">
+			<ObjectSelectParam title="Mask Type" v-model="imageParams.mask.type" default="circle" :allow-null="false" :options="MaskTypeOptions" />
+			<OverlayImageParam v-if="imageParams.mask.type === 'image'" title="Mask Image Key" default="" v-model="imageParams.mask.imageKey" />
+			<ObjectSelectParam v-if="imageParams.mask.type === 'image'" title="Mask Fit" v-model="imageParams.mask.fit" default="fit" :allow-null="false" :options="MaskFitOptions" />
+			<SliderParam v-if="imageParams.mask.type === 'rect' || imageParams.mask.type === 'square'" title="Corner Radius" v-model="imageParams.mask.cornerRadius" :min="0" :max="1920" :step="1" :default="0" default-label="None" suffix="px" />
 		</EditorPanel>
 		<EditorPanel title="Redact" collapse-key="redact-editor" v-model="imageParams.enableRedact" :show-toggle="true" :disabled="!imageParams.enableRedact">
 			<TagsParam title="Faces" :options="redactFaceOptions" v-model="imageParams.redact.faces" placeholder="Faces to redact" />

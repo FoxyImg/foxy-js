@@ -190,6 +190,21 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 	}
 	//endregion
 
+	//region Mask Params
+	if (imageParams.enableMask) {
+		if (imageParams.mask.type === 'image' && imageParams.mask.imageKey) {
+			newUrl += `/mask:image:${base64(imageParams.mask.imageKey, true)}:${imageParams.mask.fit}`;
+		} else if (imageParams.mask.type === 'rect') {
+			newUrl += `/mask:rect:${imageParams.mask.cornerRadius}`;
+		} else if (imageParams.mask.type === 'square') {
+			newUrl += `/mask:square:${imageParams.mask.cornerRadius}`;
+		} else if (imageParams.mask.type === 'ellipse') {
+			newUrl += `/mask:ellipse`;
+		} else if (imageParams.mask.type === 'circle') {
+			newUrl += `/mask:circle`;
+		}
+	}
+
 
 	//region Image Attributes
 	if (imageParams.backgroundColor) {

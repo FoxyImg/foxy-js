@@ -197,6 +197,27 @@ export const FitOptions = [
 	{ label: 'Crop', value: 'crop' },
 ]
 
+export const MaskTypeOptions = [
+	{ label: 'Image', value: 'image' },
+	{ label: 'Rect', value: 'rect' },
+	{ label: 'Square', value: 'square' },
+	{ label: 'Ellipse', value: 'ellipse' },
+	{ label: 'Circle', value: 'circle' },
+]
+
+export const MaskFitOptions = [
+	{ label: 'Fit', value: 'fit' },
+	{ label: 'Fill', value: 'fill' },
+	{ label: 'Stretch', value: 'stretch' },
+]
+
+export type MaskParams = {
+	type: 'image' | 'rect' | 'square' | 'ellipse' | 'circle',
+	imageKey: string|null,
+	cornerRadius: number,
+	fit: 'fit' | 'fill' | 'stretch',
+}
+
 export type OverlaySizeParams = {
 	relativeSize: boolean,
 	width: number,
@@ -369,6 +390,9 @@ export type ImageParams = {
 	enableRedact: boolean,
 	redact: RedactParams,
 
+	enableMask: boolean,
+	mask: MaskParams,
+
 	encodeOverlays: boolean,
 	enabledOverlays: boolean,
 	overlays: OverlayParams[],
@@ -500,6 +524,14 @@ export const DefaultImageParams: ImageParams = {
 		color: null,
 		pixelate: 0,
 		cornerRadius: 0,
+	},
+
+	enableMask: false,
+	mask: {
+		type: 'circle',
+		imageKey: null,
+		cornerRadius: 0,
+		fit: 'fit',
 	},
 
 	encodeOverlays: true,
