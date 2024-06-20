@@ -73,7 +73,7 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 	//region Source Crop Params
 	console.log(imageParams.sourceCrop);
 	if (imageParams.enableSourceCrop && imageParams.sourceCrop.width > 0 && imageParams.sourceCrop.height > 0) {
-		newUrl += `/src:${imageParams.sourceCrop.x},${imageParams.sourceCrop.y},${imageParams.sourceCrop.width},${imageParams.sourceCrop.height}`;
+		newUrl += `/src:${imageParams.sourceCrop.x}:${imageParams.sourceCrop.y}:${imageParams.sourceCrop.width}:${imageParams.sourceCrop.height}`;
 	}
 
 	//region Crop Params
@@ -83,7 +83,7 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 
 	if (imageParams.enableCrop) {
 		if (imageParams.crop.length > 0) {
-			newUrl += `/crop:${imageParams.crop.join(',')}`;
+			newUrl += `/crop:${imageParams.crop.join(':')}`;
 		}
 
 		if (imageParams.height > 0) {
@@ -344,7 +344,7 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		}
 
 		if (debug.length > 0) {
-			newUrl += `/debug:${debug.join(',')}`;
+			newUrl += `/debug:${debug.join(':')}`;
 		}
 
 		const nocache:string[] = [];
@@ -362,7 +362,7 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		}
 
 		if (nocache.length > 0) {
-			newUrl += `/nocache:${nocache.join(',')}`;
+			newUrl += `/nocache:${nocache.join(':')}`;
 		}
 	}
 
