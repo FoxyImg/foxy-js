@@ -61,6 +61,15 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 		}
 	}
 
+	//region Background Removal
+	if (imageParams.enabledBackgroundRemoval) {
+		if (imageParams.backgroundRemoval.imageKey) {
+			newUrl += `/bgr:img:${imageParams.backgroundRemoval.mode}:${base64(imageParams.backgroundRemoval.imageKey, true)}`;
+		} else if (imageParams.backgroundRemoval.backgroundColor) {
+			newUrl += `/bgr:c:${imageParams.backgroundRemoval.mode}:${imageParams.backgroundRemoval.backgroundColor}`;
+		}
+	}
+
 	//region Source Crop Params
 	console.log(imageParams.sourceCrop);
 	if (imageParams.enableSourceCrop && imageParams.sourceCrop.width > 0 && imageParams.sourceCrop.height > 0) {
@@ -198,10 +207,8 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 			newUrl += `/mask:rect:${imageParams.mask.cornerRadius}`;
 		} else if (imageParams.mask.type === 'square') {
 			newUrl += `/mask:square:${imageParams.mask.cornerRadius}`;
-		} else if (imageParams.mask.type === 'ellipse') {
-			newUrl += `/mask:ellipse`;
-		} else if (imageParams.mask.type === 'circle') {
-			newUrl += `/mask:circle`;
+		} else {
+			newUrl += `/mask:${imageParams.mask.type}`;
 		}
 	}
 

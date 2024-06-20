@@ -284,6 +284,19 @@ export type OverlayParams =  OverlaySizeParams & {
 	substitutions: OverlaySubstitutionParam[],
 }
 
+export const BackgroundRemovalModeOptions = [
+	{ label: 'Photoroom', value: 'photoroom' },
+	{ label: 'ClipDrop', value: 'clipdrop' },
+	{ label: 'Foreground', value: 'fg' },
+	{ label: 'Person', value: 'person' },
+]
+
+export type BackgroundRemovalParams = {
+	mode: 'photoroom' | 'clipdrop' | 'fg' | 'person',
+	imageKey: string|null,
+	backgroundColor: string|null,
+}
+
 export const DefaultOverlayParams: OverlayParams = {
 	id: '',
 	type: 'image',
@@ -396,6 +409,9 @@ export type ImageParams = {
 	encodeOverlays: boolean,
 	enabledOverlays: boolean,
 	overlays: OverlayParams[],
+
+	enabledBackgroundRemoval: boolean,
+	backgroundRemoval: BackgroundRemovalParams,
 
 	export: ExportParams,
 }
@@ -537,6 +553,13 @@ export const DefaultImageParams: ImageParams = {
 	encodeOverlays: true,
 	enabledOverlays: true,
 	overlays: [],
+
+	enabledBackgroundRemoval: false,
+	backgroundRemoval: {
+		mode: 'fg',
+		imageKey: null,
+		backgroundColor: null,
+	},
 
 	export: {
 		format: 'webp',

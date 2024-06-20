@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	BackgroundRemovalModeOptions,
 	BlendModeOptions,
 	BlendModes,
 	DefaultImageParams, ExportFormatOptions, MaskFitOptions, MaskTypeOptions,
@@ -25,6 +26,7 @@ import {useStorage} from "@vueuse/core";
 import {computed, watch} from "vue";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import OverlayImageParam from "@/components/params/OverlayImageParam.vue";
+import ImageKeyParam from "@/components/params/ImageKeyParam.vue";
 
 const {
 	imageKey,
@@ -231,6 +233,11 @@ watch(() => [imageParams.value.border.top, imageParams.value.border.left, imageP
 		</EditorPanel>
 		<EditorPanel title="Image Attributes" collapse-key="image-attributes">
 			<ColorParam title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
+		</EditorPanel>
+		<EditorPanel title="Background Removal" collapse-key="background-removal" v-model="imageParams.enabledBackgroundRemoval" :show-toggle="true" :disabled="!imageParams.enabledBackgroundRemoval">
+			<ObjectSelectParam title="Mode" v-model="imageParams.backgroundRemoval.mode" default="photoroom" :allow-null="false" :options="BackgroundRemovalModeOptions" />
+			<ColorParam title="Background Color" v-model="imageParams.backgroundRemoval.backgroundColor" :default="null" />
+			<ImageKeyParam title="Background Image" :default="null" v-model="imageParams.backgroundRemoval.imageKey" />
 		</EditorPanel>
 		<EditorPanel title="Rotation" collapse-key="rotation-editor" v-model="imageParams.enabledRotation" :show-toggle="true" :disabled="!imageParams.enabledRotation">
 			<SliderParam title="Rotation" v-model="imageParams.rotation.rotation" :min="0" :max="360" :step="1" :default="0" suffix="°" />
