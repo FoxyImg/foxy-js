@@ -3,7 +3,7 @@ import {computed, reactive, ref, watch} from "vue";
 import type {BoxCropParams, DebugParams, GradientMap, ImageParams} from "@/types/params";
 import {DefaultImageParams} from "@/types/params";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
-import buildUrl from "@/utils/url-builder";
+import buildUrl from "@/utils/build-url";
 import pDebounce from "p-debounce";
 import type {ImageMeta} from "@/types/image-meta";
 import signHMAC256 from "@/utils/sign";

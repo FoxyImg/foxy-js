@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type {Face, ImageMeta} from "@/types/image-meta";
-import buildUrl from "@/utils/url-builder";
+import buildUrl from "@/utils/build-url";
 import {buildImageParams} from "@/types/params";
 import Icon from "@/components/UI/Icon.vue";
 import {storeToRefs} from "pinia";

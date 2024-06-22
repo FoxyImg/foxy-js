@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import buildUrl from "@/utils/url-builder";
+import buildUrl from "@/utils/build-url";
 import {DefaultImageParams} from "@/types/params";
 import { hideAllPoppers } from "floating-vue";
 import Icon from "@/components/UI/Icon.vue";
@@ -40,19 +40,19 @@ function removeImage(image: string) {
 		return;
 	}
 
-	currentSource.value.overlayImages = currentSource.value.overlayImages.filter((i) => i !== image);
+	currentSource.value.sampleImages = currentSource.value.sampleImages.filter((i) => i !== image);
 }
 
 </script>
 <template>
 	<div>
-		<div v-if="!currentSource || !currentSource.overlayImages || currentSource.overlayImages.length === 0" class="px-10 py-5 text-center text-xs">
+		<div v-if="!currentSource || !currentSource.sampleImages || currentSource.sampleImages.length === 0" class="px-10 py-5 text-center text-xs">
 			No sample images.
 		</div>
 		<div v-else-if="currentApp && currentSource && currentApp.url && currentSource.key && currentApp.signingKey" class="w-[384px] aspect-square relative">
 			<div class="absolute inset-0 bg-neutral-100 overflow-y-auto p-1.5">
 				<div class="grid grid-cols-3 gap-1">
-					<div v-for="(image, index) in currentSource.overlayImages" :key="index" class="cursor-pointer relative">
+					<div v-for="(image, index) in currentSource.sampleImages" :key="index" class="cursor-pointer relative">
 						<img :src="buildUrl(currentApp.url, currentSource.key, currentApp.signingKey, image, imageParams)" @click="selectImage(image)">
 						<div class="absolute right-1 top-1 rounded-full bg-white/50 backdrop-blur p-1 cursor-pointer" @click="removeImage(image)">
 							<Icon name="close" class="fill-current w-1.5 h-auto" />

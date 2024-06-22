@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import {computed, onMounted} from 'vue';
 import Icon from "@/components/UI/Icon.vue";
-import WatermarkImageSamples from "@/components/params/WatermarkImageSamples.vue";
 import pDebounce from "p-debounce";
 import {storeToRefs} from "pinia";
-import {useImageParamsStore} from "@/stores/image-params-store";
+import {useFoxyAppStore} from "@/stores/foxy-app-store";
+import OverlayImageSamples from "@/components/values/OverlayImageSamples.vue";
+import HeaderSampleImages from "@/components/header/HeaderSampleImages.vue";
+import ImageKeyImageSamples from "@/components/values/ImageKeyImageSamples.vue";
+
+const {
+	currentSource
+} = storeToRefs(useFoxyAppStore());
 
 const props = withDefaults(defineProps<{
 	title: string,
@@ -12,10 +18,6 @@ const props = withDefaults(defineProps<{
 	default: string|null,
 }>(), {
 });
-
-const {
-	watermarkImageSamples,
-} = storeToRefs(useImageParamsStore());
 
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: string|null): void;
@@ -38,11 +40,16 @@ function addImage() {
 		return;
 	}
 
-	if (watermarkImageSamples.value.includes(currentValue.value)) {
+	if (currentSource.value === null) {
 		return;
 	}
 
-	watermarkImageSamples.value.push(currentValue.value);
+	if (currentSource.value.sampleImages.includes(currentValue.value)) {
+		return;
+	}
+
+	console.log('adding image');
+	currentSource.value.sampleImages.push(currentValue.value);
 }
 </script>
 <template>
@@ -56,7 +63,7 @@ function addImage() {
 						<Icon name="image-search" class="w-5 h-auto fill-black" />
 					</div>
 					<template #popper>
-						<WatermarkImageSamples v-model="currentValue" />
+						<ImageKeyImageSamples v-model="currentValue" />
 					</template>
 				</VDropdown>
 			</div>

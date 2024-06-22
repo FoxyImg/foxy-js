@@ -3,12 +3,12 @@ import {computed, onMounted, reactive, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 
 import HeaderImageKeyInput from "@/components/header/HeaderImageKeyInput.vue";
-import EditorPanel from "@/components/params/EditorPanel.vue";
+import EditorPanel from "@/components/values/EditorPanel.vue";
 import Tabs from "@/components/UI/Tabs.vue";
 import Tab from "@/components/UI/Tab.vue";
 import Icon from "@/components/UI/Icon.vue";
 import LoaderFeedback from "@/components/UI/LoaderFeedback.vue";
-import ToggleParam from "@/components/params/ToggleParam.vue";
+import ToggleParam from "@/components/values/ToggleValue.vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
 import SourceEditModal from "@/components/modals/SourceEditModal.vue";
 import FoxySourceSelector from "@/components/header/FoxySourceSelector.vue";

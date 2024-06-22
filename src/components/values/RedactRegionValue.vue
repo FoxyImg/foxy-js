@@ -4,11 +4,12 @@ import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import {useImageParamsStore} from "@/stores/image-params-store";
 import {buildImageParams, type RedactRect} from "@/types/params";
 import {computed, ref} from "vue";
-import buildUrl from "@/utils/url-builder";
+import buildUrl from "@/utils/build-url";
 import type {Face} from "@/types/image-meta";
 import Icon from "@/components/UI/Icon.vue";
-import RedactRegion from "@/components/params/RedactRegion.vue";
-import SliderParam from "@/components/params/SliderParam.vue";
+import RedactRegion from "@/components/values/RedactRegion.vue";
+import SliderParam from "@/components/values/SliderValue.vue";
+import {DefaultSizingParams} from "@/composables/params/sizing";
 
 const {
 	currentApp,
@@ -60,7 +61,7 @@ const imageUrl = computed(() => {
 		return null;
 	}
 
-	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, buildImageParams({ width: 300 }));
+	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, buildImageParams({ sizing: { ...DefaultSizingParams, width: 300 } }));
 });
 
 const currentValue = computed({

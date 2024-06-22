@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import buildUrl from "@/utils/url-builder";
+import buildUrl from "@/utils/build-url";
 import {DefaultImageParams} from "@/types/params";
 import { hideAllPoppers } from "floating-vue";
 import Icon from "@/components/UI/Icon.vue";

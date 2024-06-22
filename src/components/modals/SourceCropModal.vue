@@ -3,7 +3,7 @@ import ModalContainer from "@/components/UI/ModalContainer.vue";
 import {computed, reactive, ref, toRaw, watch} from "vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
 import {buildImageParams, type SourceCropParams} from "@/types/params";
-import buildUrl from "@/utils/url-builder";
+import buildUrl from "@/utils/build-url";
 import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import { Cropper } from 'vue-advanced-cropper';

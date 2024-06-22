@@ -4,7 +4,7 @@ import Icon from "@/components/UI/Icon.vue";
 import pDebounce from "p-debounce";
 import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
-import OverlayImageSamples from "@/components/params/OverlayImageSamples.vue";
+import OverlayImageSamples from "@/components/values/OverlayImageSamples.vue";
 
 const {
 	currentSource
