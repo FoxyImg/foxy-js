@@ -31,13 +31,15 @@ export const useFoxyAppStore = defineStore("foxy-app-store", () => {
 		return currentApp.value.sources;
 	});
 
-	const sampleImages = computed(() => {
-		if (currentSource.value === null) {
-			return [];
-		}
-
-		return currentSource.value!.sampleImages;
-	});
+	const sampleImages = computed({
+		get: () => currentSource.value?.sampleImages ?? [],
+		set: (value) => {
+			console.log('setting sample images', value);
+			if (currentSource.value) {
+				currentSource.value.sampleImages = value
+			}
+		},
+	})
 
 	const currentPresetChanged = ref(false);
 	const currentPresetId = ref<string|null>(null);

@@ -14,6 +14,7 @@ import BorderParam from "@/components/params/BorderParam.vue";
 import MaskParam from "@/components/params/MaskParam.vue";
 import RedactParam from "@/components/params/RedactParam.vue";
 import ExportParam from "@/components/params/ExportParam.vue";
+import LevelsParam from "@/components/params/LevelsParam.vue";
 
 const {
 	imageParams,
@@ -34,6 +35,7 @@ const {
 		</EditorPanel>
 		<BackgroundRemovalParam v-model="imageParams.backgroundRemoval" />
 		<RotationParam v-model="imageParams.rotation" />
+		<LevelsParam v-model="imageParams.levels" />
 		<AdjustmentsParam v-model="imageParams.adjustments" />
 		<StylizeParam v-model="imageParams.stylize" />
 		<GradientMapParam v-model="imageParams.gradientMap" />

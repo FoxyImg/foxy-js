@@ -2,8 +2,9 @@ export type FoxySource = {
 	type: "web" | "local" | "s3",
 	name: string,
 	key: string|null,
-	sampleImages: string[]
-	overlayImages: string[]
+	sampleImages: string[],
+	overlayImages: string[],
+	imgixMode: boolean,
 }
 
 export const DefaultFoxySource: FoxySource = {
@@ -12,4 +13,5 @@ export const DefaultFoxySource: FoxySource = {
 	key: null,
 	sampleImages: [],
 	overlayImages: [],
+	imgixMode: false,
 }

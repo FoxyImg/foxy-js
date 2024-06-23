@@ -158,9 +158,9 @@ onMounted(() => {
 	<div class="fixed inset-0 flex flex-col">
 		<div class="px-5 py-3 flex items-center gap-5">
 			<FoxyAppSelector :apps="apps" v-model="currentAppId" @add-app="newFoxyApp" @edit-app="editFoxyApp" @delete-app="deleteFoxyApp" />
-			<FoxySourceSelector :sources="currentSources" v-model="currentSourceId" @new-source="newFoxySource" @edit-source="editFoxySource" @save-source="saveFoxySource" @delete-source="deleteFoxySource" />
-			<HeaderImageKeyInput class="flex-1" label="Image Key" v-model="imageKey" :host="currentApp?.url" :access-key="currentSource?.key" :secret="currentApp?.signingKey" :sample-images="sampleImages" @remove-sample-image="removeSampleImage" />
-			<FoxyPresetSelector :presets="currentPresets" v-model="currentPresetId" :preset-changed="currentPresetChanged" @new-preset="newFoxyPreset" @edit-preset="editFoxyPreset" @delete-preset="deleteFoxyPreset" @sync-presets="syncFoxyPresets" @update-preset="updateCurrentFoxyPreset" />
+			<FoxySourceSelector v-if="currentApp" :sources="currentSources" v-model="currentSourceId" @new-source="newFoxySource" @edit-source="editFoxySource" @save-source="saveFoxySource" @delete-source="deleteFoxySource" />
+			<HeaderImageKeyInput v-if="currentApp && currentSource" class="flex-1" label="Image Key" v-model="imageKey" :host="currentApp?.url" :access-key="currentSource?.key" :secret="currentApp?.signingKey" :imgix-mode="currentSource!.imgixMode" :sample-images="sampleImages" @remove-sample-image="removeSampleImage" @import-sample-images="sampleImages = $event" />
+			<FoxyPresetSelector v-if="currentApp && currentSource" :presets="currentPresets" v-model="currentPresetId" :preset-changed="currentPresetChanged" @new-preset="newFoxyPreset" @edit-preset="editFoxyPreset" @delete-preset="deleteFoxyPreset" @sync-presets="syncFoxyPresets" @update-preset="updateCurrentFoxyPreset" />
 		</div>
 		<div class="flex-1 flex">
 			<div class="flex-1 flex flex-col">
@@ -172,7 +172,7 @@ onMounted(() => {
 				<div class="bg-neutral-100 p-0.5"></div>
 				<div class="flex-1 relative flex flex-col border-4 border-t-0 border-neutral-100">
 					<template v-if="currentTab === 'preview' || !imageMeta">
-						<div class="group absolute left-0 top-0 right-0 bottom-0 flex items-center justify-center preview-area">
+						<div class="group absolute left-0 top-0 right-0 bottom-0 flex items-center justify-center bg-checkered">
 							<div v-if="error" class="absolute left-1/2 top-1/2 -translate-x-1/2 flex flex-col items-center justify-center bg-white/15 p-2 rounded-lg backdrop-blur overflow-hidden transform-gpu">
 								<Icon name="broken" class="fill-red-600 w-16 h-auto" />
 								<div class="font-bold">Oops.</div>
@@ -275,7 +275,4 @@ onMounted(() => {
 	</teleport>
 </template>
 <style>
-.preview-area {
-	background-image: url("data:image/svg+xml, %3Csvg%20width=%2216%22%20height=%2216%22%20viewBox=%220%200%2016%2016%22%20fill=%22none%22%20xmlns=%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width=%228%22%20height=%228%22%20fill=%22%23AEAEAE%22%2F%3E%0A%3Crect%20x=%228%22%20y=%228%22%20width=%228%22%20height=%228%22%20fill=%22%23AEAEAE%22%2F%3E%0A%3Crect%20x=%228%22%20width=%228%22%20height=%228%22%20fill=%22%23D9D9D9%22%2F%3E%0A%3Crect%20y=%228%22%20width=%228%22%20height=%228%22%20fill=%22%23D9D9D9%22%2F%3E%0A%3C%2Fsvg%3E%0A");
-}
 </style>

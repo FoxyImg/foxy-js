@@ -12,6 +12,7 @@ const props = withDefaults(defineProps<{
 	host:string|null|undefined,
 	accessKey:string|null|undefined,
 	secret:string|null|undefined,
+	imgixMode:boolean,
 	modelValue: string|null,
 	sampleImages: string[],
 }>(), {
@@ -21,6 +22,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: string|null): void;
 	(e: 'removeSampleImage', value: string): void;
+	(e: 'importSampleImages', value: string[]): void;
 }>();
 
 function updateModelValue(value: string|null) {
@@ -43,7 +45,7 @@ const currentValue = computed({
 				<VDropdown>
 						<div class="w-4 aspect-square"><Icon name="image-search" class="w-auto h-4" /></div>
 						<template #popper>
-							<HeaderSampleImages v-model="currentValue" :host="host" :access-key="accessKey" :secret="secret" :sample-images="sampleImages" @remove-sample-image="emit('removeSampleImage', $event)" />
+							<HeaderSampleImages v-model="currentValue" :host="host" :access-key="accessKey" :secret="secret" :sample-images="sampleImages" :imgix-mode="imgixMode" @remove-sample-image="emit('removeSampleImage', $event)" @import-sample-images="emit('importSampleImages', $event)" />
 						</template>
 				</VDropdown>
 			</div>

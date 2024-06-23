@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type {GradientStops} from "@/types/params";
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import {ColorPicker} from "vue3-colorpicker";
+import shortUUID from "short-uuid";
+import type {GradientStops} from "@/composables/params/gradient-map";
 
 const props = defineProps<{
 	modelValue: GradientStops[],
@@ -77,6 +78,9 @@ onUnmounted(() => {
 	document.removeEventListener('mousemove', dragStop);
 	document.removeEventListener('mouseup', dragStopEnd);
 });
+
+
+const gradId = ref('gradient-'+shortUUID.generate());
 </script>
 <template>
 	<div class="flex flex-col gap-1.5">
@@ -84,13 +88,13 @@ onUnmounted(() => {
 			<div class="relative w-full h-[32px] gradient-param-container border border-neutral-200" ref="gradientRef">
 				<svg class="absolute inset-0 w-full h-full cursor-pointer" @mouseup="addStop" >
 					<defs>
-						<linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+						<linearGradient :id="gradId" x1="0%" y1="0%" x2="100%" y2="0%">
 							<template v-for="(stop, index) in sortedStops" :key="index">
 								<stop v-if="stop.enabled" :offset="`${Math.floor(stop.stop)}%`" :stop-color="stop.color" />
 							</template>
 						</linearGradient>
 					</defs>
-					<rect width="100%" height="100%" fill="url(#gradient)" />
+					<rect width="100%" height="100%" :fill="`url(#${gradId})`" />
 				</svg>
 				<div v-for="(stop, index) in sortedStops" :key="index" class="absolute -translate-x-1/2 -top-2 -bottom-2 flex flex-col cursor-ew-resize" :style="stopStyle(stop)">
 					<div class="flex-1" @mousedown.prevent.stop="draggingStop=stop" >&nbsp;</div>

@@ -4,6 +4,7 @@ import {SourceTypeOptions} from "@/types/options";
 import {nextTick, onMounted, reactive, ref} from "vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
 import type {FoxySource} from "@/types/foxy-source";
+import Toggle from "@/components/UI/Toggle.vue";
 
 const props = defineProps<{
 	editing: boolean,
@@ -71,6 +72,12 @@ function jsonSelected() {
 			<div class="flex flex-col gap-1">
 				<SmallLabel>Access Key</SmallLabel>
 				<input type="text" v-model="currentSource.key" class="border border-neutral-200 rounded-md px-2 py-1 text-sm">
+			</div>
+			<div class="flex flex-col gap-2 text-sm py-1">
+				<label class="flex items-center gap-1.5 cursor-pointer">
+					<Toggle v-model="currentSource.imgixMode" size="md" />
+					Imgix Mode
+				</label>
 			</div>
 			<div class="flex flex-col gap-1">
 				<SmallLabel>Sample Image Keys</SmallLabel>

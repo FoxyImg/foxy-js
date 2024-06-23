@@ -53,7 +53,7 @@ function removeImage(image: string) {
 			<div class="absolute inset-0 bg-neutral-100 overflow-y-auto p-1.5">
 				<div class="grid grid-cols-3 gap-1">
 					<div v-for="(image, index) in currentSource.overlayImages" :key="index" class="cursor-pointer relative">
-						<img :src="buildUrl(currentApp.url, currentSource.key, currentApp.signingKey, image, imageParams)" @click="selectImage(image)">
+						<img :src="buildUrl(currentApp.url, currentSource.key, currentApp.signingKey, image, imageParams, null, false, currentSource.imgixMode)" @click="selectImage(image)">
 						<div class="absolute right-1 top-1 rounded-full bg-white/50 backdrop-blur p-1 cursor-pointer" @click="removeImage(image)">
 							<Icon name="close" class="fill-current w-1.5 h-auto" />
 						</div>

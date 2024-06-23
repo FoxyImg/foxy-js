@@ -13,3 +13,11 @@ export function leadingSlash(url:string) {
 
 	return '/' + url;
 }
+
+export function trimStartingSlash(url:string) {
+	if (url.startsWith('/')) {
+		return url.substring(1);
+	}
+
+	return url;
+}

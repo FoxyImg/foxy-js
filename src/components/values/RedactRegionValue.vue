@@ -61,7 +61,7 @@ const imageUrl = computed(() => {
 		return null;
 	}
 
-	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, buildImageParams({ sizing: { ...DefaultSizingParams, width: 300 } }));
+	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, { sizing: { ...DefaultSizingParams, width: 300 } }, null, false, currentSource.value.imgixMode);
 });
 
 const currentValue = computed({

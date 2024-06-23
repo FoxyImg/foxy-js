@@ -1,6 +1,6 @@
 import {
 	type BuiltParams,
-	type DebugParams,
+	type DebugParams, getImageParams,
 	type ImageParams
 } from "@/types/params";
 import signHMAC256 from "@/utils/sign";
@@ -18,7 +18,9 @@ import {useMaskParam} from "@/composables/params/mask";
 import {useRedactParam} from "@/composables/params/redact";
 import {useExportParam} from "@/composables/params/export";
 import {useOverlaysParam} from "@/composables/params/overlays";
-import {leadingSlash} from "@/utils/slash-it";
+import {leadingSlash, trimStartingSlash} from "@/utils/slash-it";
+import type {DeepPartial} from "@/types/deep-partial";
+import {useLevelsParam} from "@/composables/params/levels";
 
 const sourceCropParam = useSourceCropParam();
 const sizingParam = useSizingParam();
@@ -33,9 +35,12 @@ const maskParam = useMaskParam();
 const redactParam = useRedactParam();
 const exportParam = useExportParam()
 const overlaysParam = useOverlaysParam();
+const levelsParam = useLevelsParam();
 
-export default function buildUrl(host:string, accessKey:string|null, secret:string, imageKey:string, imageParams:ImageParams, debugParams:DebugParams|null = null, preset:boolean = false) {
+export default function buildUrl(host:string, accessKey:string|null, secret:string, imageKey:string, params:DeepPartial<ImageParams>, debugParams:DebugParams|null = null, preset:boolean = false, imgixMode:boolean = false) {
 	const builtParams:BuiltParams = {};
+
+	const imageParams = getImageParams(params);
 
 	backgroundRemovalParam.buildParams(builtParams, imageParams.backgroundRemoval);
 	sourceCropParam.buildParams(builtParams, imageParams.sourceCrop);
@@ -46,6 +51,7 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 	stylizeParam.buildParams(builtParams, imageParams.stylize);
 	rotationParam.buildParams(builtParams, imageParams.rotation);
 	adjustmentsParam.buildParams(builtParams, imageParams.adjustments);
+	levelsParam.buildParams(builtParams, imageParams.levels);
 	gradientMapParam.buildParams(builtParams, imageParams.gradientMap);
 	maskParam.buildParams(builtParams, imageParams.mask);
 	exportParam.buildParams(builtParams, imageParams.export);
@@ -53,6 +59,10 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 
 	if (imageParams.backgroundColor) {
 		builtParams['bg'] = imageParams.backgroundColor;
+	}
+
+	if (imageParams.metaOnly) {
+		builtParams['meta'] = null;
 	}
 
 	//region Debug Params
@@ -105,19 +115,39 @@ export default function buildUrl(host:string, accessKey:string|null, secret:stri
 	//endregion
 
 
-	const url = new URL(host + '/' + accessKey + leadingSlash(imageKey));
-	for(const key of Object.keys(builtParams)) {
-		url.searchParams.set(key.replaceAll(':', '-'), builtParams[key] ?? "");
+	if (imgixMode) {
+		const url = new URL(host + '/' + accessKey + leadingSlash(imageKey));
+		const sigParams:string[] = [];
+
+		for(const key of Object.keys(builtParams)) {
+			sigParams.push(`${key.replaceAll(':', '-')}=${builtParams[key]??''}`);
+			url.searchParams.set(key.replaceAll(':', '-'), builtParams[key] ?? "");
+		}
+
+		sigParams.sort((a, b) => a.localeCompare(b));
+		const sigParamsStr = trimStartingSlash(decodeURI(imageKey).replaceAll('%2C', ',')) + '?' + sigParams.join('&');
+		console.log('sigParamsStr', sigParamsStr);
+		const sig = signHMAC256(secret, sigParamsStr);
+
+		if (preset) {
+			url.searchParams.set('showpreset', '');
+		}
+
+		url.searchParams.set('s', sig);
+		url.searchParams.set('_', new Date().getTime().toString());
+		return url.toString();
+	} else {
+		let encodedKey = base64('/'+imageKey, true);
+		let newUrl = accessKey ? `/${accessKey}/${encodedKey}` : `/${encodedKey}`;
+
+		for(const key of Object.keys(builtParams)) {
+			if (builtParams[key] === null || builtParams[key] === '') {
+				newUrl += `/${key}`;
+			} else {
+				newUrl += `/${key}:${builtParams[key]}`;
+			}
+		}
+
+		return host + newUrl + `?_=${new Date().getTime()}&s=`+signHMAC256(secret, newUrl)+(preset ? '&showpreset': '');
 	}
-
-	console.log('builtParams', url.toString(), imageParams, builtParams);
-
-	let encodedKey = base64('/'+imageKey, true);
-	let newUrl = accessKey ? `/${accessKey}/${encodedKey}` : `/${encodedKey}`;
-
-	for(const key of Object.keys(builtParams)) {
-		newUrl += `/${key}:${builtParams[key]}`;
-	}
-
-	return host + newUrl + `?_=${new Date().getTime()}&s=`+signHMAC256(secret, newUrl)+(preset ? '&preset': '');
 }

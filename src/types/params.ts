@@ -10,6 +10,13 @@ import {DefaultMaskParams, type MaskParams} from "@/composables/params/mask";
 import {DefaultRedactParams, type RedactParams} from "@/composables/params/redact";
 import {DefaultExportParams, type ExportParams} from "@/composables/params/export";
 import {DefaultOverlaysParam, type OverlaysParams} from "@/composables/params/overlays";
+import type {DeepPartial} from "@/types/deep-partial";
+import {
+	type ChannelLevelsParams,
+	DefaultChannelLevelsParams,
+	DefaultLevelsParams,
+	type LevelsParams
+} from "@/composables/params/levels";
 
 export type BuiltParams = { [key:string] : string|null}
 export type ParamBuilder<T> = (urlParams:BuiltParams, params:T) => BuiltParams;
@@ -21,6 +28,8 @@ export type BaseParam = {
 }
 
 export type ImageParams = {
+	metaOnly: boolean,
+
 	backgroundRemoval: BackgroundRemovalParams,
 	sourceCrop: SourceCropParams,
 	sizing: SizingParams,
@@ -34,6 +43,7 @@ export type ImageParams = {
 	redact: RedactParams,
 	export: ExportParams,
 	overlays: OverlaysParams,
+	levels: LevelsParams,
 
 	backgroundColor: string|null,
 }
@@ -51,6 +61,8 @@ export type DebugParams = {
 }
 
 export const DefaultImageParams: ImageParams = {
+	metaOnly: false,
+
 	backgroundColor: null,
 
 	backgroundRemoval: {...DefaultBackgroundRemovalParams},
@@ -65,7 +77,37 @@ export const DefaultImageParams: ImageParams = {
 	mask: {...DefaultMaskParams},
 	redact: {...DefaultRedactParams},
 	export: {...DefaultExportParams},
+	levels: {...DefaultLevelsParams},
 	overlays: {...DefaultOverlaysParam},
+}
+
+export function getImageParams(partialParams:DeepPartial<ImageParams>):ImageParams {
+	return {
+		metaOnly: !!partialParams.metaOnly,
+
+		backgroundColor: partialParams.backgroundColor ?? null,
+
+		backgroundRemoval: {...DefaultBackgroundRemovalParams, ...(partialParams.backgroundRemoval ?? {})},
+		sourceCrop: {...DefaultSourceCropParams, ...(partialParams.sourceCrop ?? {})},
+		sizing: {...DefaultSizingParams, ...(<SizingParams>partialParams.sizing ?? {})},
+		rotation: {...DefaultRotationParams, ...(partialParams.rotation ?? {})},
+		adjustments: {...DefaultAdjustmentsParams, ...(partialParams.adjustments ?? {})},
+		stylize: {...DefaultStylizeParams, ...(<StylizeParams>partialParams.stylize ?? {})},
+		gradientMap: {...DefaultGradientMapParams, ...(<GradientMapParams>partialParams.gradientMap ?? {})},
+		padding: {...DefaultBorderParams, ...(partialParams.padding ?? {})},
+		border: {...DefaultBorderParams, ...(partialParams.border ?? {})},
+		mask: {...DefaultMaskParams, ...(partialParams.mask ?? {})},
+		redact: {...DefaultRedactParams, ...(<RedactParams>partialParams.redact ?? {})},
+		levels: {
+			enabled: !!partialParams.levels?.enabled,
+			all: { ...DefaultChannelLevelsParams, ...(<ChannelLevelsParams>partialParams.levels?.all ?? {}) },
+			red: { ...DefaultChannelLevelsParams, ...(<ChannelLevelsParams>partialParams.levels?.red ?? {}) },
+			green: { ...DefaultChannelLevelsParams, ...(<ChannelLevelsParams>partialParams.levels?.green ?? {}) },
+			blue: { ...DefaultChannelLevelsParams, ...(<ChannelLevelsParams>partialParams.levels?.blue ?? {}) },
+		},
+		export: {...DefaultExportParams, ...(partialParams.export ?? {})},
+		overlays: {...DefaultOverlaysParam, ...(<OverlaysParams>partialParams.overlays ?? {})},
+	}
 }
 
 export function buildImageParams(imageParams: Partial<ImageParams>) {

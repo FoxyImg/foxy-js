@@ -156,6 +156,10 @@ export const DefaultOverlayParams: OverlayParams = {
 
 export const useOverlayParam:ComposableParam<OverlayParams> = (prefix?:string) => {
 	function buildParams(urlParams: BuiltParams, params:OverlayParams) {
+		if ((!params.url || params.url.trim().length === 0) && (!params.text || params.text.trim().length === 0)) {
+			return urlParams;
+		}
+
 		prefix = prefix ?? 'overlay';
 
 		if (params.url && params.url.trim().length > 0) {

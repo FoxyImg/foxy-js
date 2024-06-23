@@ -1,6 +1,6 @@
 import {defineStore, storeToRefs} from "pinia";
 import {computed, reactive, ref, watch} from "vue";
-import type {BoxCropParams, DebugParams, GradientMap, ImageParams} from "@/types/params";
+import type {DebugParams, ImageParams} from "@/types/params";
 import {DefaultImageParams} from "@/types/params";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import buildUrl from "@/utils/build-url";
@@ -12,6 +12,8 @@ import {type FoxyBoundsPreset, type FoxyPreset} from "@/types/foxy-preset";
 import calcAspectRatio from "@/utils/aspect-ratio";
 import exists from "@/utils/exists";
 import base64 from "@/utils/base-64";
+import type {GradientMapParams} from "@/composables/params/gradient-map";
+import type {BoxCropParams} from "@/composables/params/sizing";
 
 export const useImageParamsStore = defineStore("foxy-image-params-store", () => {
 	const {
@@ -46,7 +48,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		disableRenderCache: false,
 	});
 
-	const gradientMapPresets = ref<GradientMap[]>([]);
+	const gradientMapPresets = ref<GradientMapParams[]>([]);
 	const fontPresets = ref<string[]>([]);
 	const watermarkImageSamples = ref<string[]>([]);
 
@@ -76,7 +78,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			return;
 		}
 
-		currentImageUrl.value = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, imageParams.value, debugParams.value);
+		currentImageUrl.value = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, imageParams.value, debugParams.value, false, currentSource.value.imgixMode);
 	}
 	const debouncedBuildImageUrl = pDebounce(buildImageUrl, 1000);
 
@@ -86,12 +88,8 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			return;
 		}
 
-		let encodedKey = btoa('/'+imageKey.value);
-		let metaUrl = `/${currentSource.value.key}/${encodedKey}/meta`;
-
-		const sig = signHMAC256(currentApp.value.signingKey, metaUrl);
-
-		const response = await fetch(currentApp.value.url + metaUrl + "?s="+sig);
+		const metaUrl = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, {metaOnly: true}, null, false, currentSource.value.imgixMode);
+		const response = await fetch(metaUrl);
 		if (!response.ok) {
 			imageMeta.value = null;
 			return;
@@ -107,7 +105,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			return;
 		}
 
-		const presetUrl = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, imageParams.value, null, true);
+		const presetUrl = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, imageParams.value, null, true, currentSource.value.imgixMode);
 		console.log(presetUrl);
 		const response = await fetch(presetUrl);
 		if (!response.ok) {
