@@ -29,7 +29,7 @@ export const useBackgroundRemovalParam:ComposableParam<BackgroundRemovalParams> 
 		}
 
 		if (params.imageKey) {
-			urlParams['bgr:img'] = base64(params.imageKey, true);
+			urlParams['bgr:img'] = `${params.mode}:${base64(params.imageKey, true)}`;
 		} else if (params.backgroundColor) {
 			urlParams['bgr:c'] = `${params.mode}:${params.backgroundColor}`;
 		}
