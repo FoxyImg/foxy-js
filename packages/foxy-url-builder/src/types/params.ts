@@ -17,6 +17,7 @@ import {
 	DefaultLevelsParams,
 	type LevelsParams
 } from "./params/levels";
+import {DebugParams, DefaultDebugParams} from "./params/debug";
 
 export type BuiltParams = { [key:string] : string|null}
 export type ParamBuilder<T> = (urlParams:BuiltParams, params:T) => BuiltParams;
@@ -29,6 +30,7 @@ export type BaseParam = {
 
 export type ImageParams = {
 	metaOnly: boolean,
+	showPreset: boolean,
 
 	backgroundRemoval: BackgroundRemovalParams,
 	sourceCrop: SourceCropParams,
@@ -44,26 +46,17 @@ export type ImageParams = {
 	export: ExportParams,
 	overlays: OverlaysParams,
 	levels: LevelsParams,
+	debug: DebugParams,
 
 	backgroundColor: string|null,
 }
 
 export type PartialImageParams = DeepPartial<ImageParams>;
 
-export type DebugParams = {
-	faces: boolean,
-	allFaces: boolean,
-	people: boolean,
-	allPeople: boolean,
-	otherLabels: boolean,
-
-	disableSourceCache: boolean,
-	disableMetaCache: boolean,
-	disableRenderCache: boolean,
-}
 
 export const DefaultImageParams: ImageParams = {
 	metaOnly: false,
+	showPreset: false,
 
 	backgroundColor: null,
 
@@ -81,11 +74,13 @@ export const DefaultImageParams: ImageParams = {
 	export: {...DefaultExportParams},
 	levels: {...DefaultLevelsParams},
 	overlays: {...DefaultOverlaysParam},
+	debug: {...DefaultDebugParams},
 }
 
 export function getImageParams(partialParams:PartialImageParams):ImageParams {
 	return {
 		metaOnly: !!partialParams.metaOnly,
+		showPreset: !!partialParams.showPreset,
 
 		backgroundColor: partialParams.backgroundColor ?? null,
 
@@ -109,5 +104,6 @@ export function getImageParams(partialParams:PartialImageParams):ImageParams {
 		},
 		export: {...DefaultExportParams, ...(partialParams.export ?? {})},
 		overlays: {...DefaultOverlaysParam, ...(<OverlaysParams>partialParams.overlays ?? {})},
+		debug: {...DefaultDebugParams, ...(partialParams.debug ?? {})},
 	}
 }

@@ -32,7 +32,7 @@ const exportParam = useExportParam()
 const overlaysParam = useOverlaysParam();
 const levelsParam = useLevelsParam();
 
-export function foxy(host:string, accessKey:string, secret:string|undefined = undefined, imgixMode:boolean = false) {
+export function foxy(host:string, accessKey:string, secret:string|undefined = undefined, imgixMode:boolean = false, cacheBuster:boolean = false) {
 	const buildUrl = (imageKey:string, params:PartialImageParams) => {
 		const builtParams:BuiltParams = {};
 
@@ -74,6 +74,14 @@ export function foxy(host:string, accessKey:string, secret:string|undefined = un
 				url.searchParams.set('s', sig);
 			}
 
+			if (params.showPreset) {
+				url.searchParams.set('showpreset', '');
+			}
+
+			if (cacheBuster) {
+				url.searchParams.set('_', Date.now().toString());
+			}
+
 			return url.toString();
 		} else {
 			const encodedKey = base64('/'+imageKey, true);
@@ -83,7 +91,26 @@ export function foxy(host:string, accessKey:string, secret:string|undefined = un
 				newUrl += builtParams[key] === null || builtParams[key] === '' ? `/${key}` : `/${key}:${builtParams[key]}`;
 			}
 
-			return secret ? host + newUrl + `?s=`+signHMAC256(secret, newUrl) : host + newUrl;
+			const queryString:string[] = [];
+
+			if (secret) {
+				queryString.push('s='+signHMAC256(secret, newUrl));
+			}
+
+			if (params.showPreset) {
+				queryString.push('showpreset');
+			}
+
+			if (cacheBuster) {
+				queryString.push('_='+Date.now().toString());
+			}
+
+			let url =  host + newUrl;
+			if (queryString.length > 0) {
+				url += '?' + queryString.join('&');
+			}
+
+			return url;
 		}
 	}
 

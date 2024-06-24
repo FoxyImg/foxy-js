@@ -1,6 +1,6 @@
 {
   "name": "@foxy/vue",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "repository": "unjs/packageName",
   "license": "MIT",
@@ -21,6 +21,8 @@
   ],
   "scripts": {
     "build": "unbuild",
+    "stub": "unbuild --stub",
+    "watch": "node --watch-path=src dist/index.mjs",
     "dev": "vitest dev",
     "lint": "eslint . && biome check .",
     "lint:fix": "automd && eslint . --fix && biome check --apply .",
