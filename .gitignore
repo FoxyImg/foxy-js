@@ -25,3 +25,6 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+apps/foxy-preset-builder/src/data/sample-local-images.json
+apps/foxy-preset-builder/src/data/sample-s3-images.json
+apps/foxy-preset-builder/src/data/sample-web-images.json
