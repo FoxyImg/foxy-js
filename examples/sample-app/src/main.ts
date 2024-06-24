@@ -11,6 +11,7 @@ app.use(FoxyPlugin, {
 	sourceId: "gweb2",
 	secret: "rapscallion",
 	imgixMode: true,
+	cacheBuster: false,
 });
 
 app.mount('#app')

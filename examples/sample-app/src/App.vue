@@ -18,10 +18,11 @@ import { FoxyDynamicImage } from "@foxy/vue";
 	  source-id="gweb2"
 	  secret="rapscallion"
 	  image-key="konrad-ziemlewski-5mfZce5zuHs-unsplash.jpg"
+	  :cache-buster="true"
 	  :params="{
 			sizing: {
-				width: 640,
-				height: 640,
+				width: 720,
+				height: 720,
 				crop: ['crop']
 			}
 	}" />
