@@ -1,25 +1,18 @@
 <script setup lang="ts">
 import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
-import {useImageParamsStore} from "@/stores/image-params-store";
-import {buildImageParams, type RedactRect} from "@/types/params";
 import {computed, ref} from "vue";
 import buildUrl from "@/utils/build-url";
-import type {Face} from "@/types/image-meta";
-import Icon from "@/components/UI/Icon.vue";
 import RedactRegion from "@/components/values/RedactRegion.vue";
 import SliderParam from "@/components/values/SliderValue.vue";
 import {DefaultSizingParams} from "@/composables/params/sizing";
+import type {RedactRect} from "@/composables/params/redact";
 
 const {
 	currentApp,
 	currentSource,
 	imageKey,
 } = storeToRefs(useFoxyAppStore());
-
-const {
-	imageMeta,
-} = storeToRefs(useImageParamsStore());
 
 const props = defineProps<{
 	modelValue: RedactRect[],

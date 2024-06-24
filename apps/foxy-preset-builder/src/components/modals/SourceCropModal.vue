@@ -2,7 +2,6 @@
 import ModalContainer from "@/components/UI/ModalContainer.vue";
 import {computed, reactive, ref, toRaw, watch} from "vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
-import {buildImageParams, type SourceCropParams} from "@/types/params";
 import buildUrl from "@/utils/build-url";
 import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
@@ -11,6 +10,7 @@ import 'vue-advanced-cropper/dist/style.css';
 import LoaderFeedback from "@/components/UI/LoaderFeedback.vue";
 import useImageLoader from "@/composables/image-loader";
 import Toggle from "@/components/UI/Toggle.vue";
+import type {SourceCropParams} from "@/composables/params/source-crop";
 
 const {
 	currentApp,
