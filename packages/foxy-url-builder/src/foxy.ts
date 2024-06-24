@@ -1,0 +1,91 @@
+import {useSourceCropParam} from "./types/params/source-crop";
+import {useSizingParam} from "./types/params/sizing";
+import {useBackgroundRemovalParam} from "./types/params/background-removal";
+import {useRotationParam} from "./types/params/rotation";
+import {useAdjustmentsParam} from "./types/params/adjustments";
+import {useStylizeParam} from "./types/params/stylize";
+import {useGradientMapParam} from "./types/params/gradient-map";
+import {usePaddingParam} from "./types/params/padding";
+import {useBorderParam} from "./types/params/border";
+import {useMaskParam} from "./types/params/mask";
+import {useRedactParam} from "./types/params/redact";
+import {useExportParam} from "./types/params/export";
+import {useOverlaysParam} from "./types/params/overlays";
+import {useLevelsParam} from "./types/params/levels";
+import {type BuiltParams, getImageParams, type PartialImageParams} from "./types/params";
+import {leadingSlash, trimStartingSlash} from "./utils/slash-it";
+import signHMAC256 from "./utils/sign";
+import base64 from "./utils/base-64";
+
+const sourceCropParam = useSourceCropParam();
+const sizingParam = useSizingParam();
+const backgroundRemovalParam = useBackgroundRemovalParam();
+const rotationParam = useRotationParam();
+const adjustmentsParam  = useAdjustmentsParam();
+const stylizeParam = useStylizeParam();
+const gradientMapParam = useGradientMapParam();
+const paddingParam = usePaddingParam()
+const borderParam = useBorderParam()
+const maskParam = useMaskParam();
+const redactParam = useRedactParam();
+const exportParam = useExportParam()
+const overlaysParam = useOverlaysParam();
+const levelsParam = useLevelsParam();
+
+export function foxy(host:string, accessKey:string, secret:string, imgixMode:boolean = false) {
+	const buildUrl = (imageKey:string, params:PartialImageParams) => {
+		const builtParams:BuiltParams = {};
+
+		const imageParams = getImageParams(params);
+
+		backgroundRemovalParam.buildParams(builtParams, imageParams.backgroundRemoval);
+		sourceCropParam.buildParams(builtParams, imageParams.sourceCrop);
+		redactParam.buildParams(builtParams, imageParams.redact);
+		sizingParam.buildParams(builtParams, imageParams.sizing);
+		paddingParam.buildParams(builtParams, imageParams.padding);
+		borderParam.buildParams(builtParams, imageParams.border);
+		stylizeParam.buildParams(builtParams, imageParams.stylize);
+		rotationParam.buildParams(builtParams, imageParams.rotation);
+		adjustmentsParam.buildParams(builtParams, imageParams.adjustments);
+		levelsParam.buildParams(builtParams, imageParams.levels);
+		gradientMapParam.buildParams(builtParams, imageParams.gradientMap);
+		maskParam.buildParams(builtParams, imageParams.mask);
+		exportParam.buildParams(builtParams, imageParams.export);
+		overlaysParam.buildParams(builtParams, imageParams.overlays);
+
+		if (imageParams.backgroundColor) {
+			builtParams['bg'] = imageParams.backgroundColor;
+		}
+
+		if (imgixMode) {
+			const url = new URL(host + '/' + accessKey + leadingSlash(imageKey));
+			const sigParams:string[] = [];
+
+			for(const key of Object.keys(builtParams)) {
+				sigParams.push(`${key.replaceAll(':', '-')}=${builtParams[key]??''}`);
+				url.searchParams.set(key.replaceAll(':', '-'), builtParams[key] ?? "");
+			}
+
+			sigParams.sort((a, b) => a.localeCompare(b));
+			const sigParamsStr = trimStartingSlash(decodeURI(imageKey).replaceAll('%2C', ',')) + '?' + sigParams.join('&');
+			console.log('sigParamsStr', sigParamsStr);
+			const sig = signHMAC256(secret, sigParamsStr);
+
+			url.searchParams.set('s', sig);
+			return url.toString();
+		} else {
+			const encodedKey = base64('/'+imageKey, true);
+			let newUrl = accessKey ? `/${accessKey}/${encodedKey}` : `/${encodedKey}`;
+
+			for(const key of Object.keys(builtParams)) {
+				newUrl += builtParams[key] === null || builtParams[key] === '' ? `/${key}` : `/${key}:${builtParams[key]}`;
+			}
+
+			return host + newUrl + `?s=`+signHMAC256(secret, newUrl);
+		}
+	}
+
+	return {
+		buildUrl,
+	}
+}
