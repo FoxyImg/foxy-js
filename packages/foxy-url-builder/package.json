@@ -1,6 +1,6 @@
 {
-  "name": "foxy-url-builder",
-  "version": "0.0.1",
+  "name": "@foxy/url-builder",
+  "version": "0.0.2",
   "description": "",
   "repository": "jawngee/foxy-js",
   "license": "MIT",

@@ -32,7 +32,7 @@ const exportParam = useExportParam()
 const overlaysParam = useOverlaysParam();
 const levelsParam = useLevelsParam();
 
-export function foxy(host:string, accessKey:string, secret:string, imgixMode:boolean = false) {
+export function foxy(host:string, accessKey:string, secret:string|undefined = undefined, imgixMode:boolean = false) {
 	const buildUrl = (imageKey:string, params:PartialImageParams) => {
 		const builtParams:BuiltParams = {};
 
@@ -66,12 +66,14 @@ export function foxy(host:string, accessKey:string, secret:string, imgixMode:boo
 				url.searchParams.set(key.replaceAll(':', '-'), builtParams[key] ?? "");
 			}
 
-			sigParams.sort((a, b) => a.localeCompare(b));
-			const sigParamsStr = trimStartingSlash(decodeURI(imageKey).replaceAll('%2C', ',')) + '?' + sigParams.join('&');
-			console.log('sigParamsStr', sigParamsStr);
-			const sig = signHMAC256(secret, sigParamsStr);
+			if (secret) {
+				sigParams.sort((a, b) => a.localeCompare(b));
+				const sigParamsStr = trimStartingSlash(decodeURI(imageKey).replaceAll('%2C', ',')) + '?' + sigParams.join('&');
+				const sig = signHMAC256(secret, sigParamsStr);
 
-			url.searchParams.set('s', sig);
+				url.searchParams.set('s', sig);
+			}
+
 			return url.toString();
 		} else {
 			const encodedKey = base64('/'+imageKey, true);
@@ -81,7 +83,7 @@ export function foxy(host:string, accessKey:string, secret:string, imgixMode:boo
 				newUrl += builtParams[key] === null || builtParams[key] === '' ? `/${key}` : `/${key}:${builtParams[key]}`;
 			}
 
-			return host + newUrl + `?s=`+signHMAC256(secret, newUrl);
+			return secret ? host + newUrl + `?s=`+signHMAC256(secret, newUrl) : host + newUrl;
 		}
 	}
 
