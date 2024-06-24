@@ -8,12 +8,18 @@ export type FoxyConfig = {
 	host: string;
 	sourceId: string;
 	secret?: string|undefined;
-	imgixMode: boolean;
+	imgixMode?: boolean;
+	cacheBuster?: boolean;
 }
 
 export const FoxyPlugin:Plugin= {
 	install: (app:App, options:FoxyConfig) => {
-		const { buildUrl } = foxy(options.host, options.sourceId, options.secret, options.imgixMode);
+		options = Object.assign({
+			imgixMode: true,
+			cacheBuster: false
+		}, options);
+
+		const { buildUrl } = foxy(options.host, options.sourceId, options.secret, options.imgixMode, options.cacheBuster);
 		app.provide("foxy", buildUrl);
 	}
 }

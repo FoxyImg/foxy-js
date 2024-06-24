@@ -7,12 +7,14 @@ import {foxy} from "@foxy/url-builder";
 const props = withDefaults(defineProps<{
 	host: string;
 	sourceId: string;
-	imgixMode: boolean;
-	imageKey: string;
 	secret?: string;
-	params: PartialImageParams
+	imageKey: string;
+	params: PartialImageParams;
+	imgixMode?: boolean;
+	cacheBuster?: boolean;
 }>(), {
-	imgixMode: true
+	imgixMode: true,
+	cacheBuster: false,
 });
 
 const imageUrl = computed(() => {
@@ -20,7 +22,7 @@ const imageUrl = computed(() => {
 		return null;
 	}
 
-	return foxy(props.host, props.sourceId, props.secret, props.imgixMode).buildUrl(props.imageKey, props.params);
+	return foxy(props.host, props.sourceId, props.secret, props.imgixMode, props.cacheBuster).buildUrl(props.imageKey, props.params);
 });
 </script>
 <template>
