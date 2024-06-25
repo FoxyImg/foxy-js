@@ -1,4 +1,4 @@
-import type {BaseParam, BuiltParams, ComposableParam, ImageParams} from "../params";
+import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 
 export type AdjustmentsParams = BaseParam & {
 	brightness: number,

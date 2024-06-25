@@ -51,7 +51,6 @@ const {
 const {
 	currentImageUrl,
 	currentPresetImageUrl,
-	debugParams,
 	imageMeta,
 	faceCount,
 	peopleCount,

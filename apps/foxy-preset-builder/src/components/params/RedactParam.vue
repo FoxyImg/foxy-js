@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import EditorPanel from "@/components/values/EditorPanel.vue";
-import type {RedactParams} from "@/composables/params/redact";
+import type {RedactParams} from "@foxy/url-builder";
 import TagsValue from "@/components/values/TagsValue.vue";
 import SliderValue from "@/components/values/SliderValue.vue";
 import ColorValue from "@/components/values/ColorValue.vue";

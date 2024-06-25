@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {RedactRect} from "@/types/params";
+import type {RedactRect} from "@foxy/url-builder";
 import {computed, ref} from "vue";
 import Icon from "@/components/UI/Icon.vue";
 

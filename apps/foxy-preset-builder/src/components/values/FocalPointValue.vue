@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type {Face, ImageMeta} from "@/types/image-meta";
-import buildUrl from "@/utils/build-url";
+import type {Face} from "@foxy/url-builder";
 import Icon from "@/components/UI/Icon.vue";
 import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import {useImageParamsStore} from "@/stores/image-params-store";
+import buildUrl from "@/composables/build-url";
 
 const {
 	currentApp,
@@ -45,7 +45,7 @@ const imageUrl = computed(() => {
 		return null;
 	}
 
-	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, { sizing: { width: 300 }}, null, false, currentSource.value.imgixMode);
+	return buildUrl(imageKey.value, { sizing: { width: 300 }});
 });
 
 let boundingRect:DOMRect|null = null;

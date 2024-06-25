@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import EditorPanel from "@/components/values/EditorPanel.vue";
-import {BackgroundRemovalModeOptions, type BackgroundRemovalParams} from "@/composables/params/background-removal";
+import {BackgroundRemovalModeOptions, type BackgroundRemovalParams} from "@foxy/url-builder";
 import ObjectSelectValue from "@/components/values/ObjectSelectValue.vue";
 import ColorValue from "@/components/values/ColorValue.vue";
 import ImageKeyValue from "@/components/values/ImageKeyValue.vue";

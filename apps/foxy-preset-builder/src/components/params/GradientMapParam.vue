@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import EditorPanel from "@/components/values/EditorPanel.vue";
-import {BlendModeOptions, BlendModes, DefaultGradientMapParams, type GradientMapParams} from "@/composables/params/gradient-map";
+import {BlendModeOptions, BlendModes, DefaultGradientMapParams, type GradientMapParams} from "@foxy/url-builder";
 import GradientMapValue from "@/components/values/GradientMapValue.vue";
 import SliderValue from "@/components/values/SliderValue.vue";
 import ObjectSelectValue from "@/components/values/ObjectSelectValue.vue";

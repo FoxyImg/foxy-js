@@ -2,11 +2,10 @@
 import {computed, ref} from 'vue';
 import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
-import buildUrl from "@/utils/build-url";
 import SourceCropModal from "@/components/modals/SourceCropModal.vue";
 import {useImageParamsStore} from "@/stores/image-params-store";
-import type {SourceCropParams} from "@/composables/params/source-crop";
-import {DefaultSizingParams} from "@/composables/params/sizing";
+import { type SourceCropParams, DefaultSizingParams} from "@foxy/url-builder";
+import buildUrl from "@/composables/build-url";
 
 const {
 	currentApp,
@@ -39,7 +38,7 @@ const imageUrl = computed(() => {
 		return null;
 	}
 
-	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, { sizing: { ...DefaultSizingParams, width: 300 } }, null, false, currentSource.value.imgixMode);
+	return buildUrl(imageKey.value, { sizing: { ...DefaultSizingParams, width: 300 } });
 });
 
 const showCropModal = ref(false);

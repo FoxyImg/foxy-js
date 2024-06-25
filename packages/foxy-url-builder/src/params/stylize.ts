@@ -24,7 +24,6 @@ export const useStylizeParam:ComposableParam<StylizeParams> = () => {
 			return urlParams;
 		}
 
-		let hasStyle = params.blur > 0 && params.pixelate > 0;
 		if (params.blur > 0) {
 			urlParams['blur'] = `${params.blur}`;
 		}
@@ -33,7 +32,7 @@ export const useStylizeParam:ComposableParam<StylizeParams> = () => {
 			urlParams['px'] = `${params.pixelate}`;
 		}
 
-		if (hasStyle) {
+		if (params.blur > 0 && params.pixelate > 0) {
 			urlParams['stylize:order'] = params.order.join(',');
 		}
 

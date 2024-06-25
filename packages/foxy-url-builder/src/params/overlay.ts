@@ -1,6 +1,5 @@
-import type {BaseParam, BuiltParams, ComposableParam} from "@/types/params";
-import type {OverlaysParams} from "@/composables/params/overlays";
-import base64 from "@/utils/base-64";
+import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import base64 from "../utils/base-64";
 
 export const OverlayTypeOptions = [
 	{ label: 'Image', value: 'image' },

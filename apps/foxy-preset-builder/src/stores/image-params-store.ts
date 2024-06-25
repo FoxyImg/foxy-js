@@ -1,19 +1,21 @@
 import {defineStore, storeToRefs} from "pinia";
-import {computed, reactive, ref, watch} from "vue";
-import type {DebugParams, ImageParams} from "@/types/params";
-import {DefaultImageParams} from "@/types/params";
+import {computed, ref, watch} from "vue";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
-import buildUrl from "@/utils/build-url";
 import pDebounce from "p-debounce";
-import type {ImageMeta} from "@/types/image-meta";
-import signHMAC256 from "@/utils/sign";
 import SecureLS from "secure-ls";
 import {type FoxyBoundsPreset, type FoxyPreset} from "@/types/foxy-preset";
 import calcAspectRatio from "@/utils/aspect-ratio";
 import exists from "@/utils/exists";
-import base64 from "@/utils/base-64";
-import type {GradientMapParams} from "@/composables/params/gradient-map";
-import type {BoxCropParams} from "@/composables/params/sizing";
+import {
+	type ImageParams,
+	type ImageMeta,
+	type GradientMapParams,
+	type BoxCropParams,
+	DefaultImageParams,
+	base64
+} from "@foxy/url-builder";
+
+import buildUrl from "@/composables/build-url";
 
 export const useImageParamsStore = defineStore("foxy-image-params-store", () => {
 	const {
@@ -36,17 +38,6 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 	});
 
 	const imageParams = ref<ImageParams>(JSON.parse(JSON.stringify(DefaultImageParams)));
-	const debugParams = ref<DebugParams>({
-		faces: false,
-		allFaces: false,
-		people: false,
-		allPeople: false,
-		otherLabels: false,
-
-		disableSourceCache: false,
-		disableMetaCache: false,
-		disableRenderCache: false,
-	});
 
 	const gradientMapPresets = ref<GradientMapParams[]>([]);
 	const fontPresets = ref<string[]>([]);
@@ -78,7 +69,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			return;
 		}
 
-		currentImageUrl.value = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, imageParams.value, debugParams.value, false, currentSource.value.imgixMode);
+		currentImageUrl.value = buildUrl(imageKey.value, imageParams.value);
 	}
 	const debouncedBuildImageUrl = pDebounce(buildImageUrl, 1000);
 
@@ -88,14 +79,16 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			return;
 		}
 
-		const metaUrl = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, {metaOnly: true}, null, false, currentSource.value.imgixMode);
-		const response = await fetch(metaUrl);
-		if (!response.ok) {
-			imageMeta.value = null;
-			return;
-		}
+		const metaUrl = buildUrl(imageKey.value, {metaOnly: true})
+		if (metaUrl) {
+			const response = await fetch(metaUrl);
+			if (!response.ok) {
+				imageMeta.value = null;
+				return;
+			}
 
-		imageMeta.value = await response.json();
+			imageMeta.value = await response.json();
+		}
 	}
 	const debouncedFetchImageMeta = pDebounce(fetchImageMeta, 1000);
 
@@ -105,22 +98,23 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			return;
 		}
 
-		const presetUrl = buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, imageParams.value, null, true, currentSource.value.imgixMode);
-		console.log(presetUrl);
-		const response = await fetch(presetUrl);
-		if (!response.ok) {
-			currentPresetJSONObject.value = null;
-			return;
-		}
-
-		const presetObj = await response.json();
-		console.log("presetObj", presetObj);
-		for(const key of Object.keys(presetObj)) {
-			if (typeof presetObj[key] === 'object' && Object.keys(presetObj[key]).length === 0) {
-				delete presetObj[key];
+		const presetUrl = buildUrl(imageKey.value, { ...imageParams.value, showPreset: true });
+		if (presetUrl) {
+			const response = await fetch(presetUrl);
+			if (!response.ok) {
+				currentPresetJSONObject.value = null;
+				return;
 			}
+
+			const presetObj = await response.json();
+			console.log("presetObj", presetObj);
+			for(const key of Object.keys(presetObj)) {
+				if (typeof presetObj[key] === 'object' && Object.keys(presetObj[key]).length === 0) {
+					delete presetObj[key];
+				}
+			}
+			currentPresetJSONObject.value = presetObj;
 		}
-		currentPresetJSONObject.value = presetObj;
 	}
 	const debouncedFetchCurrentPresetJSONObject = pDebounce(fetchCurrentPresetJSONObject, 1000);
 
@@ -248,11 +242,6 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		await debouncedFetchImageMeta();
 	}, { deep: true });
 
-	watch([imageParams, debugParams], async () => {
-		await debouncedBuildImageUrl();
-		await debouncedFetchCurrentPresetJSONObject();
-	}, { deep: true });
-
 	watch(imageParams, () => {
 		currentPresetChanged.value = true;
 	}, {deep: true});
@@ -267,7 +256,6 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 
 	return {
 		imageParams,
-		debugParams,
 		currentImageUrl,
 		imageMeta,
 		faceCount,

@@ -1,7 +1,6 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
-import {ExportParams} from "./export";
 
-export type DebugParams = {
+export type DebugParams = BaseParam & {
 	faces: boolean,
 	allFaces: boolean,
 	people: boolean,
@@ -14,6 +13,8 @@ export type DebugParams = {
 }
 
 export const DefaultDebugParams: DebugParams = {
+	enabled: true,
+
 	faces: false,
 	allFaces: false,
 	people: false,

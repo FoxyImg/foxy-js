@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type {SourceCropParams} from "@/composables/params/source-crop";
-import {DefaultSourceCropParams} from "@/composables/params/source-crop";
+import type {SourceCropParams} from "@foxy/url-builder";
+import {DefaultSourceCropParams} from "@foxy/url-builder";
 import {computed} from "vue";
 import EditorPanel from "@/components/values/EditorPanel.vue";
 import SourceCropValue from "@/components/values/SourceCropValue.vue";

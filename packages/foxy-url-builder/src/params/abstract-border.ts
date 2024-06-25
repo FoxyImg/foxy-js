@@ -1,6 +1,6 @@
-import type {BaseParam, BuiltParams, ComposableParam, ImageParams} from "@/types/params";
+import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 
-export type BorderParams = BaseParam &{
+export type BorderParams = BaseParam & {
 	color: string|null,
 	left: number,
 	top: number,
@@ -17,8 +17,12 @@ export const DefaultBorderParams:BorderParams = {
 	bottom: 0,
 }
 
-export const useAbstractBorderParam = (prefix:string) => {
+export const useAbstractBorderParam:ComposableParam<BorderParams> = (prefix?:string) => {
 	function buildParams(urlParams: BuiltParams, params:BorderParams) {
+		if (!prefix) {
+			return urlParams;
+		}
+
 		if (params.left > 0 || params.top > 0 || params.right > 0 || params.bottom > 0) {
 			if (params.left === params.top && params.top === params.right && params.right == params.bottom) {
 				urlParams[prefix] = `${params.color ?? '00000000'}:${params.left}`;

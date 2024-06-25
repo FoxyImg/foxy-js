@@ -5,7 +5,7 @@ import {ref, watch} from "vue";
 import { animations } from "@formkit/drag-and-drop";
 import {useDragAndDrop} from "@formkit/drag-and-drop/vue";
 import shortUUID from "short-uuid";
-import {DefaultOverlayParams} from "@/composables/params/overlay";
+import {DefaultOverlayParams} from "@foxy/url-builder";
 import OverlayParam from "@/components/params/OverlayParam.vue";
 
 const {

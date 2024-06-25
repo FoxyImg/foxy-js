@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import EditorPanel from "@/components/values/EditorPanel.vue";
-import {MaskFitOptions, type MaskParams, MaskTypeOptions} from "@/composables/params/mask";
+import {MaskFitOptions, type MaskParams, MaskTypeOptions} from "@foxy/url-builder";
 import ObjectSelectValue from "@/components/values/ObjectSelectValue.vue";
 import OverlayImageValue from "@/components/values/OverlayImageValue.vue";
 import SliderValue from "@/components/values/SliderValue.vue";

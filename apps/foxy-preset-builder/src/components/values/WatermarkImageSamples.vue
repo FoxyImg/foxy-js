@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import buildUrl from "@/utils/build-url";
-import {DefaultImageParams} from "@/types/params";
+import {DefaultImageParams} from "@foxy/url-builder";
 import { hideAllPoppers } from "floating-vue";
 import Icon from "@/components/UI/Icon.vue";
 import {storeToRefs} from "pinia";
 import {useImageParamsStore} from "@/stores/image-params-store";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
+import buildUrl from "@/composables/build-url";
 
 const {
 	currentApp,
@@ -54,7 +54,7 @@ function removeImage(image: string) {
 			<div class="absolute inset-0 bg-neutral-100 overflow-y-auto p-1.5">
 				<div class="grid grid-cols-3 gap-1">
 					<div v-for="(image, index) in watermarkImageSamples" :key="index" class="cursor-pointer relative">
-						<img :src="buildUrl(currentApp.url, currentSource.key, currentApp.signingKey, image, imageParams)" @click="selectImage(image)">
+						<img :src="buildUrl(image, imageParams) ?? ''" @click="selectImage(image)">
 						<div class="absolute right-1 top-1 rounded-full bg-white/50 backdrop-blur p-1 cursor-pointer" @click="removeImage(image)">
 							<Icon name="close" class="fill-current w-1.5 h-auto" />
 						</div>

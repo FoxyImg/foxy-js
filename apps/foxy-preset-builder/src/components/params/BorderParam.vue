@@ -4,7 +4,7 @@ import EditorPanel from "@/components/values/EditorPanel.vue";
 import Icon from "@/components/UI/Icon.vue";
 import SliderValue from "@/components/values/SliderValue.vue";
 import ColorValue from "@/components/values/ColorValue.vue";
-import type {BorderParams} from "@/composables/params/abstract-border";
+import type {BorderParams} from "@foxy/url-builder";
 import {useStorage} from "@vueuse/core";
 
 const props = defineProps<{

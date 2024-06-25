@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {GradientStops} from "@/types/params";
+import type {GradientStops} from "@foxy/url-builder";
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import GradientEditor from "@/components/UI/GradientEditor.vue";
 import GradienMapPresetsSelector from "@/components/values/GradienMapPresetsSelector.vue";

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {computed, watch} from "vue";
-import buildUrl from "@/utils/build-url";
-import {DefaultImageParams} from "@/types/params";
+import {DefaultImageParams} from "@foxy/url-builder";
 import { hideAllPoppers } from "floating-vue";
 import Icon from "@/components/UI/Icon.vue";
 import {useFileDialog} from "@vueuse/core";
+import buildUrl from "@/composables/build-url";
 
 const props = defineProps<{
 	host:string,
@@ -71,7 +71,6 @@ function exportSampleImages() {
 	downloadAnchorNode.click();
 	downloadAnchorNode.remove();
 }
-
 </script>
 <template>
 <div>
@@ -83,7 +82,7 @@ function exportSampleImages() {
 			<div class="absolute inset-0 bg-neutral-100 overflow-y-auto p-1.5">
 				<div class="grid grid-cols-3 gap-1">
 					<div v-for="(image, index) in sampleImages" :key="index" class="cursor-pointer relative bg-checkered">
-						<img :src="buildUrl(host, accessKey, secret, image, imageParams, null, false, imgixMode)" @click="selectImage(image)" class="cursor-pointer object-contain w-full h-full bg-black/25 aspect-square">
+						<img :src="buildUrl(image, imageParams) ?? ''" @click="selectImage(image)" class="cursor-pointer object-contain w-full h-full bg-black/25 aspect-square">
 						<div class="absolute right-1 top-1 rounded-full bg-white/50 backdrop-blur p-1 cursor-pointer" @click="removeImage(image)">
 							<Icon name="close" class="fill-current w-1.5 h-auto" />
 						</div>

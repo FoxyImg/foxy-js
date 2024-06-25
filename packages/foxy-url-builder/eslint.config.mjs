@@ -8,6 +8,7 @@ export default unjs({
     // rule overrides
 	  "unicorn/no-null": "off",
 	  "unicorn/no-useless-fallback-in-spread": "off",
+	  "unicorn/empty-brace-spaces": "off",
   },
   markdown: {
     rules: {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ModalContainer from "@/components/UI/ModalContainer.vue";
-import {SourceTypeOptions} from "@/types/options";
+import {SourceTypeOptions} from "@foxy/url-builder";
 import {nextTick, onMounted, reactive, ref} from "vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
 import type {FoxySource} from "@/types/foxy-source";

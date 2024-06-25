@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type {OverlaySubstitutionParam} from "@/types/params";
+import type {OverlaySubstitutionParam} from "@foxy/url-builder";
 import Icon from "@/components/UI/Icon.vue";
 
 const props = withDefaults(defineProps<{

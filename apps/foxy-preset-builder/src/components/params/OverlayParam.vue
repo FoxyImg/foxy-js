@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import EditorPanel from "@/components/values/EditorPanel.vue";
-import {HGravityOptions, VGravityOptions} from "@/types/options";
 import {
 	FitOptions,
 	OverlayBackgroundColorTypeOptions,
 	type OverlayParams,
-	OverlayTypeOptions
-} from "@/composables/params/overlay";
-import {RotationOptions} from "@/composables/params/rotation";
+	OverlayTypeOptions,
+	RotationOptions,
+	HGravityOptions,
+	VGravityOptions
+} from "@foxy/url-builder";
 import {storeToRefs} from "pinia";
 import {useImageParamsStore} from "@/stores/image-params-store";
 import ObjectSelectValue from "@/components/values/ObjectSelectValue.vue";

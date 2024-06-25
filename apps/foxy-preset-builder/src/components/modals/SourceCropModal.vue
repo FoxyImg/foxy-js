@@ -2,7 +2,6 @@
 import ModalContainer from "@/components/UI/ModalContainer.vue";
 import {computed, reactive, ref, toRaw, watch} from "vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
-import buildUrl from "@/utils/build-url";
 import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import { Cropper } from 'vue-advanced-cropper';
@@ -10,7 +9,8 @@ import 'vue-advanced-cropper/dist/style.css';
 import LoaderFeedback from "@/components/UI/LoaderFeedback.vue";
 import useImageLoader from "@/composables/image-loader";
 import Toggle from "@/components/UI/Toggle.vue";
-import type {SourceCropParams} from "@/composables/params/source-crop";
+import type {SourceCropParams} from "@foxy/url-builder";
+import buildUrl from "@/composables/build-url";
 
 const {
 	currentApp,
@@ -46,7 +46,7 @@ const imageUrl = computed(() => {
 		return null;
 	}
 
-	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, {}, null, false, currentSource.value.imgixMode);
+	return buildUrl(imageKey.value, {});
 });
 
 const {

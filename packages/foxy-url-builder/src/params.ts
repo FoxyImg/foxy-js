@@ -1,22 +1,23 @@
-import {DefaultSourceCropParams, type SourceCropParams} from "@/composables/params/source-crop";
-import {DefaultSizingParams, type SizingParams} from "@/composables/params/sizing";
-import {type BackgroundRemovalParams, DefaultBackgroundRemovalParams} from "@/composables/params/background-removal";
-import {DefaultRotationParams, type RotationParams} from "@/composables/params/rotation";
-import {type AdjustmentsParams, DefaultAdjustmentsParams} from "@/composables/params/adjustments";
-import {DefaultStylizeParams, type StylizeParams} from "@/composables/params/stylize";
-import {DefaultGradientMapParams, type GradientMapParams} from "@/composables/params/gradient-map";
-import {type BorderParams, DefaultBorderParams} from "@/composables/params/abstract-border";
-import {DefaultMaskParams, type MaskParams} from "@/composables/params/mask";
-import {DefaultRedactParams, type RedactParams} from "@/composables/params/redact";
-import {DefaultExportParams, type ExportParams} from "@/composables/params/export";
-import {DefaultOverlaysParam, type OverlaysParams} from "@/composables/params/overlays";
-import type {DeepPartial} from "@/types/deep-partial";
+import type {DeepPartial} from "./deep-partial";
+import {type SourceCropParams, DefaultSourceCropParams} from "./params/source-crop";
+import {type SizingParams,DefaultSizingParams} from "./params/sizing";
+import {type BackgroundRemovalParams, DefaultBackgroundRemovalParams} from "./params/background-removal";
+import {type RotationParams, DefaultRotationParams} from "./params/rotation";
+import {type AdjustmentsParams, DefaultAdjustmentsParams} from "./params/adjustments";
+import {type StylizeParams, DefaultStylizeParams} from "./params/stylize";
+import {type GradientMapParams, DefaultGradientMapParams} from "./params/gradient-map";
+import {type BorderParams, DefaultBorderParams} from "./params/abstract-border";
+import {type MaskParams, DefaultMaskParams} from "./params/mask";
+import {type RedactParams, DefaultRedactParams} from "./params/redact";
+import {type ExportParams, DefaultExportParams} from "./params/export";
+import {type OverlaysParams, DefaultOverlaysParam} from "./params/overlays";
 import {
 	type ChannelLevelsParams,
+	type LevelsParams,
 	DefaultChannelLevelsParams,
-	DefaultLevelsParams,
-	type LevelsParams
-} from "@/composables/params/levels";
+	DefaultLevelsParams
+} from "./params/levels";
+import {DebugParams, DefaultDebugParams} from "./params/debug";
 
 export type BuiltParams = { [key:string] : string|null}
 export type ParamBuilder<T> = (urlParams:BuiltParams, params:T) => BuiltParams;
@@ -29,6 +30,7 @@ export type BaseParam = {
 
 export type ImageParams = {
 	metaOnly: boolean,
+	showPreset: boolean,
 
 	backgroundRemoval: BackgroundRemovalParams,
 	sourceCrop: SourceCropParams,
@@ -44,24 +46,16 @@ export type ImageParams = {
 	export: ExportParams,
 	overlays: OverlaysParams,
 	levels: LevelsParams,
+	debug: DebugParams,
 
 	backgroundColor: string|null,
 }
 
-export type DebugParams = {
-	faces: boolean,
-	allFaces: boolean,
-	people: boolean,
-	allPeople: boolean,
-	otherLabels: boolean,
-
-	disableSourceCache: boolean,
-	disableMetaCache: boolean,
-	disableRenderCache: boolean,
-}
+export type PartialImageParams = DeepPartial<ImageParams>;
 
 export const DefaultImageParams: ImageParams = {
 	metaOnly: false,
+	showPreset: false,
 
 	backgroundColor: null,
 
@@ -79,11 +73,13 @@ export const DefaultImageParams: ImageParams = {
 	export: {...DefaultExportParams},
 	levels: {...DefaultLevelsParams},
 	overlays: {...DefaultOverlaysParam},
+	debug: {...DefaultDebugParams},
 }
 
-export function getImageParams(partialParams:DeepPartial<ImageParams>):ImageParams {
+export function getImageParams(partialParams:PartialImageParams):ImageParams {
 	return {
 		metaOnly: !!partialParams.metaOnly,
+		showPreset: !!partialParams.showPreset,
 
 		backgroundColor: partialParams.backgroundColor ?? null,
 
@@ -107,9 +103,6 @@ export function getImageParams(partialParams:DeepPartial<ImageParams>):ImagePara
 		},
 		export: {...DefaultExportParams, ...(partialParams.export ?? {})},
 		overlays: {...DefaultOverlaysParam, ...(<OverlaysParams>partialParams.overlays ?? {})},
+		debug: {...DefaultDebugParams, ...(partialParams.debug ?? {})},
 	}
-}
-
-export function buildImageParams(imageParams: Partial<ImageParams>) {
-	return Object.assign(JSON.parse(JSON.stringify(DefaultImageParams)), imageParams);
 }

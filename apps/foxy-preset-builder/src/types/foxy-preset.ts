@@ -1,4 +1,4 @@
-import type {DeepPartial} from "@/types/deep-partial";
+import type {DeepPartial} from "@foxy/url-builder";
 
 export type FoxyBoundsPreset = {
 	index: number|null,

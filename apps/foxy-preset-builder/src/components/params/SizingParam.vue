@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {computed, watch} from "vue";
 import EditorPanel from "@/components/values/EditorPanel.vue";
-import type {SizingParams} from "@/composables/params/sizing";
-import {CropOptions, HGravityOptions, InterestingOptions, VGravityOptions} from "@/types/options";
+import {type SizingParams, CropOptions, HGravityOptions, InterestingOptions, VGravityOptions} from "@foxy/url-builder";
 import TagsValue from "@/components/values/TagsValue.vue";
 import SelectValue from "@/components/values/SelectValue.vue";
 import SliderValue from "@/components/values/SliderValue.vue";

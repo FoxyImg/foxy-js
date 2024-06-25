@@ -3,7 +3,7 @@ import {useImageParamsStore} from "@/stores/image-params-store";
 import {storeToRefs} from "pinia";
 import GradientMapPreset from "@/components/values/GradientMapPreset.vue";
 import Icon from "@/components/UI/Icon.vue";
-import {DefaultImageParams} from "@/types/params";
+import {DefaultImageParams} from "@foxy/url-builder";
 import { hideAllPoppers } from "floating-vue";
 import {useFileDialog} from "@vueuse/core";
 //@ts-ignore

@@ -2,11 +2,10 @@
 import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import {computed, ref} from "vue";
-import buildUrl from "@/utils/build-url";
 import RedactRegion from "@/components/values/RedactRegion.vue";
 import SliderParam from "@/components/values/SliderValue.vue";
-import {DefaultSizingParams} from "@/composables/params/sizing";
-import type {RedactRect} from "@/composables/params/redact";
+import {type RedactRect, DefaultSizingParams} from "@foxy/url-builder";
+import buildUrl from "@/composables/build-url";
 
 const {
 	currentApp,
@@ -54,7 +53,7 @@ const imageUrl = computed(() => {
 		return null;
 	}
 
-	return buildUrl(currentApp.value.url, currentSource.value.key, currentApp.value.signingKey, imageKey.value, { sizing: { ...DefaultSizingParams, width: 300 } }, null, false, currentSource.value.imgixMode);
+	return buildUrl(imageKey.value, { sizing: { ...DefaultSizingParams, width: 300 } });
 });
 
 const currentValue = computed({

@@ -2,7 +2,7 @@
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import {ColorPicker} from "vue3-colorpicker";
 import shortUUID from "short-uuid";
-import type {GradientStops} from "@/composables/params/gradient-map";
+import type {GradientStops} from "@foxy/url-builder";
 
 const props = defineProps<{
 	modelValue: GradientStops[],

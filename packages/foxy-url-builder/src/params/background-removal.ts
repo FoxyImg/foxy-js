@@ -1,5 +1,5 @@
-import type {BaseParam, BuiltParams, ComposableParam, ImageParams} from "../params";
-import base64 from "../../utils/base-64";
+import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import base64 from "../utils/base-64";
 
 export type BackgroundRemovalParams = BaseParam & {
 	mode: 'photoroom' | 'clipdrop' | 'fg' | 'person',
