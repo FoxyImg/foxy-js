@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import EditorPanel from "@/components/values/EditorPanel.vue";
+import EditorPanel from "@/components/inputs/EditorPanel.vue";
 import {RotationModeOptions, type RotationParams} from "@foxy/url-builder";
-import SliderValue from "@/components/values/SliderValue.vue";
-import ObjectSelectValue from "@/components/values/ObjectSelectValue.vue";
+import SliderInput from "@/components/inputs/SliderInput.vue";
+import ObjectSelectInput from "@/components/inputs/ObjectSelectInput.vue";
 
 const props = defineProps<{
 	modelValue: RotationParams
@@ -21,7 +21,7 @@ const currentValue = computed({
 </script>
 <template>
 	<EditorPanel title="Rotation" collapse-key="rotation-editor" v-model="currentValue.enabled" :show-toggle="true" :disabled="!currentValue.enabled">
-		<SliderValue title="Rotation" v-model="currentValue.rotation" :min="0" :max="360" :step="1" :default="0" suffix="°" />
-		<ObjectSelectValue title="Rotation Mode" v-model="currentValue.mode" :default="0" :allow-null="false" :options="RotationModeOptions" />
+		<SliderInput title="Rotation" v-model="currentValue.rotation" :min="0" :max="360" :step="1" :default="0" suffix="°" />
+		<ObjectSelectInput title="Rotation Mode" v-model="currentValue.mode" :default="0" :allow-null="false" :options="RotationModeOptions" />
 	</EditorPanel>
 </template>

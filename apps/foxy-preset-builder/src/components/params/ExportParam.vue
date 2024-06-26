@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import EditorPanel from "@/components/values/EditorPanel.vue";
+import EditorPanel from "@/components/inputs/EditorPanel.vue";
 import {ExportFormatOptions, type ExportParams} from "@foxy/url-builder";
-import ObjectSelectValue from "@/components/values/ObjectSelectValue.vue";
-import SliderValue from "@/components/values/SliderValue.vue";
-import ToggleValue from "@/components/values/ToggleValue.vue";
+import ObjectSelectInput from "@/components/inputs/ObjectSelectInput.vue";
+import SliderInput from "@/components/inputs/SliderInput.vue";
+import ToggleInput from "@/components/inputs/ToggleInput.vue";
 
 const props = defineProps<{
 	modelValue: ExportParams
@@ -22,10 +22,10 @@ const currentValue = computed({
 </script>
 <template>
 	<EditorPanel title="Format" collapse-key="format-editor">
-		<ObjectSelectValue title="File Format" v-model="currentValue.format" default="webp" :allow-null="false" :options="ExportFormatOptions" />
-		<SliderValue title="Quality" v-model="currentValue.quality" :min="0" :max="100" :step="1" :default="85" />
-		<SliderValue v-if="currentValue.format === 'webp'" title="Reduction Effort" v-model="currentValue.reductionEffort" :min="0" :max="6" :step="1" :default="4" />
-		<ToggleValue title="Lossless" v-model="currentValue.lossless" />
-		<ToggleValue title="Near Lossless" v-model="currentValue.nearLossless" />
+		<ObjectSelectInput title="File Format" v-model="currentValue.format" default="webp" :allow-null="false" :options="ExportFormatOptions" />
+		<SliderInput title="Quality" v-model="currentValue.quality" :min="0" :max="100" :step="1" :default="85" />
+		<SliderInput v-if="currentValue.format === 'webp'" title="Reduction Effort" v-model="currentValue.reductionEffort" :min="0" :max="6" :step="1" :default="4" />
+		<ToggleInput title="Lossless" v-model="currentValue.lossless" />
+		<ToggleInput title="Near Lossless" v-model="currentValue.nearLossless" />
 	</EditorPanel>
 </template>

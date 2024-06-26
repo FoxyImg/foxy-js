@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import {computed, onMounted} from 'vue';
 import pDebounce from "p-debounce";
-import OverlayImageSamples from "@/components/values/OverlayImageSamples.vue";
+import ImageKeyImageSamples from "@/components/inputs/ImageKeyImageSamples.vue";
 import {ImageSearchIcon} from "@foxy/vue-ui";
 
 const props = withDefaults(defineProps<{
 	title: string,
 	modelValue: string|null,
-	overlayImages: string[],
 	default: string|null,
+	sampleImages: string[],
 }>(), {
 });
 
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: string|null): void;
-	(e: 'removeOverlayImage', value: string): void;
-	(e: 'addOverlayImage', value: string): void;
+	(e: 'removeSampleImage', value: string): void;
+	(e: 'addSampleImage', value: string): void;
 }>();
 
 function updateModelValue(value: string|null) {
@@ -30,15 +30,16 @@ const currentValue = computed({
 });
 
 function addImage() {
-	if (currentValue.value === null) {
+	console.log('adding image');
+	if (currentValue.value === null || currentValue.value.trim().length === 0) {
 		return;
 	}
 
-	if (props.overlayImages.includes(currentValue.value)) {
+	if (props.sampleImages.includes(currentValue.value)) {
 		return;
 	}
 
-	emit('addOverlayImage', currentValue.value);
+	emit('addSampleImage', currentValue.value);
 }
 </script>
 <template>
@@ -52,7 +53,7 @@ function addImage() {
 						<ImageSearchIcon class="w-5 h-auto fill-black" />
 					</div>
 					<template #popper>
-						<OverlayImageSamples v-model="currentValue" :overlay-images="overlayImages" @remove-overlay-image="emit('removeOverlayImage', $event)" />
+						<ImageKeyImageSamples v-model="currentValue" :sample-images="sampleImages" @remove-sample-image="emit('removeSampleImage', $event)" />
 					</template>
 				</VDropdown>
 			</div>

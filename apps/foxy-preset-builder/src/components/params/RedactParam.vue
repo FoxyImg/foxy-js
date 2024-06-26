@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import EditorPanel from "@/components/values/EditorPanel.vue";
+import EditorPanel from "@/components/inputs/EditorPanel.vue";
 import type {ImageMeta, RedactParams} from "@foxy/url-builder";
-import TagsValue from "@/components/values/TagsValue.vue";
-import SliderValue from "@/components/values/SliderValue.vue";
-import ColorValue from "@/components/values/ColorValue.vue";
-import RedactRegionValue from "@/components/values/RedactRegionValue.vue";
-import ToggleValue from "@/components/values/ToggleValue.vue";
+import TagsInput from "@/components/inputs/TagsInput.vue";
+import SliderInput from "@/components/inputs/SliderInput.vue";
+import ColorInput from "@/components/inputs/ColorInput.vue";
+import RedactRegionInput from "@/components/inputs/RedactRegionInput.vue";
+import ToggleInput from "@/components/inputs/ToggleInput.vue";
 
 const props = defineProps<{
 	modelValue: RedactParams,
@@ -59,15 +59,15 @@ const redactFaceOptions = computed(() => {
 </script>
 <template>
 	<EditorPanel title="Redact" collapse-key="redact-editor" v-model="currentValue.enabled" :show-toggle="true" :disabled="!currentValue.enabled">
-		<TagsValue title="Faces" :options="redactFaceOptions" v-model="currentValue.faces" placeholder="Faces to redact" />
-		<TagsValue title="People" :options="redactPersonOptions" v-model="currentValue.people" placeholder="People to redact" />
-		<RedactRegionValue v-model="currentValue.regions" :corner-radius="currentValue.cornerRadius" :image-key="imageKey" />
-		<SliderValue title="Blur" v-model="currentValue.blur" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="" />
-		<SliderValue title="Pixelate" v-model="currentValue.pixelate" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-		<ToggleValue title="Use Fill Color" v-model="currentValue.useColor" />
-		<ColorValue v-if="currentValue.useColor" title="Fill Color" v-model="currentValue.color" :default="null" />
-		<SliderValue title="Blur Mask" v-model="currentValue.blurMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="" />
-		<SliderValue title="Expand Mask" v-model="currentValue.expandMask" :min="0" :max="200" :step="1" :default="0" default-label="None" suffix="%" />
-		<SliderValue title="Pixelate Mask" v-model="currentValue.pixelateMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+		<TagsInput title="Faces" :options="redactFaceOptions" v-model="currentValue.faces" placeholder="Faces to redact" />
+		<TagsInput title="People" :options="redactPersonOptions" v-model="currentValue.people" placeholder="People to redact" />
+		<RedactRegionInput v-model="currentValue.regions" :corner-radius="currentValue.cornerRadius" :image-key="imageKey" />
+		<SliderInput title="Blur" v-model="currentValue.blur" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="" />
+		<SliderInput title="Pixelate" v-model="currentValue.pixelate" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+		<ToggleInput title="Use Fill Color" v-model="currentValue.useColor" />
+		<ColorInput v-if="currentValue.useColor" title="Fill Color" v-model="currentValue.color" :default="null" />
+		<SliderInput title="Blur Mask" v-model="currentValue.blurMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="" />
+		<SliderInput title="Expand Mask" v-model="currentValue.expandMask" :min="0" :max="200" :step="1" :default="0" default-label="None" suffix="%" />
+		<SliderInput title="Pixelate Mask" v-model="currentValue.pixelateMask" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
 	</EditorPanel>
 </template>

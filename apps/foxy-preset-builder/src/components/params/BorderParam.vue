@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {computed, watch} from "vue";
-import EditorPanel from "@/components/values/EditorPanel.vue";
-import SliderValue from "@/components/values/SliderValue.vue";
-import ColorValue from "@/components/values/ColorValue.vue";
+import EditorPanel from "@/components/inputs/EditorPanel.vue";
+import SliderInput from "@/components/inputs/SliderInput.vue";
+import ColorInput from "@/components/inputs/ColorInput.vue";
 import type {BorderParams} from "@foxy/url-builder";
 import {useStorage} from "@vueuse/core";
 import {ConstraintLineLongIcon, ConstrainIcon} from "@foxy/vue-ui";
@@ -52,13 +52,13 @@ watch(() => [currentValue.value.top, currentValue.value.left, currentValue.value
 </script>
 <template>
 	<EditorPanel :title="noun" :collapse-key="collapseKey" v-model="currentValue.enabled" :show-toggle="true" :disabled="!currentValue.enabled">
-		<ColorValue :title="`${noun} Color`" v-model="currentValue.color" :default="null" />
+		<ColorInput :title="`${noun} Color`" v-model="currentValue.color" :default="null" />
 		<div class="flex items-center gap-1">
 			<div class="flex-1 flex flex-col gap-3">
-				<SliderValue :title="`Top ${noun}`" v-model="currentValue.top" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-				<SliderValue :title="`Right ${noun}`" v-model="currentValue.right" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-				<SliderValue :title="`Bottom ${noun}`" v-model="currentValue.bottom" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
-				<SliderValue :title="`Left ${noun}`" v-model="currentValue.left" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+				<SliderInput :title="`Top ${noun}`" v-model="currentValue.top" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+				<SliderInput :title="`Right ${noun}`" v-model="currentValue.right" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+				<SliderInput :title="`Bottom ${noun}`" v-model="currentValue.bottom" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
+				<SliderInput :title="`Left ${noun}`" v-model="currentValue.left" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
 			</div>
 			<div class="flex flex-col items-center justify-center gap-[8px]">
 				<ConstraintLineLongIcon class="w-[11px] h-auto stroke-neutral-300" />

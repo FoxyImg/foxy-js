@@ -2,7 +2,7 @@
 import type {GradientStops} from "@foxy/url-builder";
 import {computed} from "vue";
 import {GradientEditor} from "@foxy/vue-ui";
-import GradientMapPresetsSelector from "@/components/values/GradientMapPresetsSelector.vue";
+import GradientMapPresetsSelector from "@/components/inputs/GradientMapPresetsSelector.vue";
 import {BookmarkIcon, ReverseIcon} from "@foxy/vue-ui";
 
 const props = defineProps<{

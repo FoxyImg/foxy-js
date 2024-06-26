@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import ColorValue from "@/components/values/ColorValue.vue";
-import EditorPanel from "@/components/values/EditorPanel.vue";
+import ColorInput from "@/components/inputs/ColorInput.vue";
+import EditorPanel from "@/components/inputs/EditorPanel.vue";
 import SourceCropParam from "@/components/params/SourceCropParam.vue";
 import SizingParam from "@/components/params/SizingParam.vue";
 import BackgroundRemovalParam from "@/components/params/BackgroundRemovalParam.vue";
@@ -41,7 +41,7 @@ const emit = defineEmits<{
 		<SourceCropParam v-model="imageParams.sourceCrop" :image-meta="imageMeta" :image-key="imageKey" />
 		<SizingParam v-model="imageParams.sizing" :image-key="imageKey" :image-meta="imageMeta" :face-count="faceCount" :people-count="peopleCount" />
 		<EditorPanel title="Image Attributes" collapse-key="image-attributes">
-			<ColorValue title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
+			<ColorInput title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
 		</EditorPanel>
 		<BackgroundRemovalParam
 			v-model="imageParams.backgroundRemoval"

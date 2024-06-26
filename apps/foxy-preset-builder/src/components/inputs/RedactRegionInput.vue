@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed, inject, ref, watch} from "vue";
-import RedactRegion from "@/components/values/RedactRegion.vue";
-import SliderParam from "@/components/values/SliderValue.vue";
+import RedactRegion from "@/components/inputs/RedactRegion.vue";
+import SliderParam from "@/components/inputs/SliderInput.vue";
 import {type RedactRect, DefaultSizingParams, type SourceCropParams} from "@foxy/url-builder";
 import type {URLBuilder} from "@/types/url-builder";
 
