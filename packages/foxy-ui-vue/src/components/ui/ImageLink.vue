@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import copy from "copy-to-clipboard";
-import {LinkIcon, BookmarkIcon} from "@foxy/vue-ui";
-import {CopyIcon} from "@foxy/vue-ui";
+import LinkIcon from "../icons/LinkIcon.vue";
+import BookmarkIcon from "../icons/BookmarkIcon.vue";
+import CopyIcon from "../icons/CopyIcon.vue";
 
 import { hideAllPoppers } from "floating-vue";
 

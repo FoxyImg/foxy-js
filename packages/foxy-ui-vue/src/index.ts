@@ -1,9 +1,10 @@
-//region Icons
+export {default as Toggle} from "./components/forms/Toggle.vue";
+
 export {default as BookmarkIcon} from "./components/icons/BookmarkIcon.vue";
 export {default as BrokenIcon} from "./components/icons/BrokenIcon.vue";
 export {default as CloseIcon} from "./components/icons/CloseIcon.vue";
-export {default as ConstrainLineIcon} from "./components/icons/ConstrainLineIcon.vue";
 export {default as ConstrainIcon} from "./components/icons/ConstrainIcon.vue";
+export {default as ConstrainLineIcon} from "./components/icons/ConstrainLineIcon.vue";
 export {default as ConstraintLineLongIcon} from "./components/icons/ConstraintLineLongIcon.vue";
 export {default as CopyIcon} from "./components/icons/CopyIcon.vue";
 export {default as DebugIcon} from "./components/icons/DebugIcon.vue";
@@ -21,4 +22,11 @@ export {default as PersonIcon} from "./components/icons/PersonIcon.vue";
 export {default as ReloadIcon} from "./components/icons/ReloadIcon.vue";
 export {default as ReverseIcon} from "./components/icons/ReverseIcon.vue";
 export {default as SaveIcon} from "./components/icons/SaveIcon.vue";
-//endregion Icons
+
+export {default as GradientEditor} from "./components/ui/GradientEditor.vue";
+export {default as ImageLink} from "./components/ui/ImageLink.vue";
+export {default as JSONViewer} from "./components/ui/JSONViewer.vue";
+export {default as LoaderFeedback} from "./components/ui/LoaderFeedback.vue";
+export {default as SmallLabel} from "./components/ui/SmallLabel.vue";
+export {default as Tab} from "./components/ui/Tab.vue";
+export {default as Tabs} from "./components/ui/Tabs.vue";

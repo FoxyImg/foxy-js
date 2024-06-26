@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import ColorValue from "../values/ColorValue.vue";
-import EditorPanel from "../values/EditorPanel.vue";
-import SourceCropParam from "../params/SourceCropParam.vue";
-import SizingParam from "../params/SizingParam.vue";
-import BackgroundRemovalParam from "../params/BackgroundRemovalParam.vue";
-import RotationParam from "../params/RotationParam.vue";
-import AdjustmentsParam from "../params/AdjustmentsParam.vue";
-import StylizeParam from "../params/StylizeParam.vue";
-import GradientMapParam from "../params/GradientMapParam.vue";
-import BorderParam from "../params/BorderParam.vue";
-import MaskParam from "../params/MaskParam.vue";
-import RedactParam from "../params/RedactParam.vue";
-import ExportParam from "../params/ExportParam.vue";
-import LevelsParam from "../params/LevelsParam.vue";
+import ColorValue from "@/components/values/ColorValue.vue";
+import EditorPanel from "@/components/values/EditorPanel.vue";
+import SourceCropParam from "@/components/params/SourceCropParam.vue";
+import SizingParam from "@/components/params/SizingParam.vue";
+import BackgroundRemovalParam from "@/components/params/BackgroundRemovalParam.vue";
+import RotationParam from "@/components/params/RotationParam.vue";
+import AdjustmentsParam from "@/components/params/AdjustmentsParam.vue";
+import StylizeParam from "@/components/params/StylizeParam.vue";
+import GradientMapParam from "@/components/params/GradientMapParam.vue";
+import BorderParam from "@/components/params/BorderParam.vue";
+import MaskParam from "@/components/params/MaskParam.vue";
+import RedactParam from "@/components/params/RedactParam.vue";
+import ExportParam from "@/components/params/ExportParam.vue";
+import LevelsParam from "@/components/params/LevelsParam.vue";
 
 import {type ImageMeta, type ImageParams} from "@foxy/url-builder";
 

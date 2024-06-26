@@ -4,12 +4,11 @@ import {storeToRefs} from "pinia";
 
 import HeaderImageKeyInput from "@/components/header/HeaderImageKeyInput.vue";
 import EditorPanel from "@/components/values/EditorPanel.vue";
-import Tabs from "@/components/UI/Tabs.vue";
-import Tab from "@/components/UI/Tab.vue";
+import {Tabs, Tab} from "@foxy/vue-ui";
 import {BrokenIcon, DebugIcon, FaceIcon, PersonIcon, ReloadIcon} from "@foxy/vue-ui";
-import LoaderFeedback from "@/components/UI/LoaderFeedback.vue";
+import {LoaderFeedback} from "@foxy/vue-ui";
 import ToggleParam from "@/components/values/ToggleValue.vue";
-import SmallLabel from "@/components/UI/SmallLabel.vue";
+import {SmallLabel} from "@foxy/vue-ui";
 import SourceEditModal from "@/components/modals/SourceEditModal.vue";
 import FoxySourceSelector from "@/components/header/FoxySourceSelector.vue";
 import StatusInfo from "@/components/UI/StatusInfo.vue";
@@ -22,11 +21,11 @@ import useFoxyAppEditor from "@/composables/foxy-app-editor";
 
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import {useImageParamsStore} from "@/stores/image-params-store";
-import JSONViewer from "@/components/UI/JSONViewer.vue";
+import {JSONViewer} from "@foxy/vue-ui";
 import useFoxyPresetEditor from "@/composables/foxy-preset-editor";
 import FoxyPresetSelector from "@/components/header/FoxyPresetSelector.vue";
 import FoxyPresetEditModal from "@/components/modals/FoxyPresetEditModal.vue";
-import ImageLink from "@/components/UI/ImageLink.vue";
+import {ImageLink} from "@foxy/vue-ui";
 import ParamsEditor from "@/components/editors/ParamsEditor.vue";
 import OverlaysEditor from "@/components/editors/OverlaysEditor.vue";
 import {buildUrl} from "@/composables/build-url";
@@ -276,6 +275,9 @@ onMounted(() => {
 						@reset-image-params="resetParams" />
 					<OverlaysEditor
 						v-show="paramsEditorMode === 'overlays'"
+						v-model="imageParams"
+						:overlay-images="currentSource?.overlayImages ?? []"
+						:image-meta="imageMeta"
 						class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100" />
 					<div v-show="paramsEditorMode === 'presets'" class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100">
 					</div>

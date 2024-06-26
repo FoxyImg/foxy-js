@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import {ColorPicker} from "vue3-colorpicker";
+import "vue3-colorpicker/style.css";
 import shortUUID from "short-uuid";
 import type {GradientStops} from "@foxy/url-builder";
 

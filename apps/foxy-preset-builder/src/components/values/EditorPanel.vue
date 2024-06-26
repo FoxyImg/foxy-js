@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import SmallLabel from "@/components/UI/SmallLabel.vue";
+import {SmallLabel} from "@foxy/vue-ui";
 import {DragHandleIcon, DownArrowIcon} from "@foxy/vue-ui";
 import {computed, ref} from "vue";
-import Toggle from "@/components/UI/Toggle.vue";
+import {Toggle} from "@foxy/vue-ui";
 import {useStorage} from "@vueuse/core";
 
 const props = withDefaults(defineProps< {

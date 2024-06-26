@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import ModalContainer from "@/components/UI/ModalContainer.vue";
 import {computed, inject, reactive, ref, toRaw, watch} from "vue";
-import SmallLabel from "@/components/UI/SmallLabel.vue";
+import {SmallLabel} from "@foxy/vue-ui";
 import { Cropper } from 'vue-advanced-cropper';
 import 'vue-advanced-cropper/dist/style.css';
-import LoaderFeedback from "@/components/UI/LoaderFeedback.vue";
+import {LoaderFeedback} from "@foxy/vue-ui";
 import useImageLoader from "@/composables/image-loader";
-import Toggle from "@/components/UI/Toggle.vue";
+import {Toggle} from "@foxy/vue-ui";
 import {type SourceCropParams} from "@foxy/url-builder";
 import type {URLBuilder} from "@/types/url-builder";
 

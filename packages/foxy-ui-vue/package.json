@@ -33,7 +33,12 @@
     "test:types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
-    "@foxy/url-builder": "workspace:*"
+    "@foxy/url-builder": "workspace:*",
+    "copy-to-clipboard": "^3.3.3",
+    "floating-vue": "^5.2.2",
+    "short-uuid": "^5.2.0",
+    "vue-json-pretty": "^2.4.0",
+    "vue3-colorpicker": "^2.3.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.2",

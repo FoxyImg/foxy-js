@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ModalContainer from "@/components/UI/ModalContainer.vue";
 import {computed, reactive, ref, toRaw} from "vue";
-import SmallLabel from "@/components/UI/SmallLabel.vue";
+import {SmallLabel} from "@foxy/vue-ui";
 import type {FoxyApp} from "@/types/foxy-app";
 import useFoxyAppEditor from "@/composables/foxy-app-editor";
 import {storeToRefs} from "pinia";
@@ -9,7 +9,7 @@ import {useImageParamsStore} from "@/stores/image-params-store";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import type {FoxyPreset} from "@/types/foxy-preset";
 import slugify from "slugify";
-import JSONViewer from "@/components/UI/JSONViewer.vue";
+import {JSONViewer} from "@foxy/vue-ui";
 
 const {
 	currentPreset,

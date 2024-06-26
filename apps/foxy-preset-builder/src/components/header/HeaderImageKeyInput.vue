@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import SmallLabel from "@/components/UI/SmallLabel.vue";
+import {SmallLabel} from "@foxy/vue-ui";
 
 import pDebounce from 'p-debounce';
 import {ImageSearchIcon} from "@foxy/vue-ui";

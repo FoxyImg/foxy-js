@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import 'vue-json-pretty/lib/styles.css';
 import VueJsonPretty from "vue-json-pretty";
-import {CopyIcon} from "@foxy/vue-ui";
+import CopyIcon from "../icons/CopyIcon.vue";
 import copy from "copy-to-clipboard";
 
 const props = defineProps<{

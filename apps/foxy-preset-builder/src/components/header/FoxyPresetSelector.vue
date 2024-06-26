@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import SmallLabel from "@/components/UI/SmallLabel.vue";
+import {SmallLabel} from "@foxy/vue-ui";
 import type {FoxyPreset} from "@/types/foxy-preset";
 import {properCase} from "@/utils/ucfirst";
 import {DeleteSourceIcon, EditSourceIcon, NewSourceIcon, ReloadIcon, SaveIcon} from "@foxy/vue-ui";
