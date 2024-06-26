@@ -1,18 +1,22 @@
 <script setup lang="ts">
-import {storeToRefs} from "pinia";
-import {useImageParamsStore} from "@/stores/image-params-store";
 import {ref, watch} from "vue";
 import { animations } from "@formkit/drag-and-drop";
 import {useDragAndDrop} from "@formkit/drag-and-drop/vue";
 import shortUUID from "short-uuid";
-import {DefaultOverlayParams} from "@foxy/url-builder";
+import {DefaultOverlayParams, type ImageMeta, type ImageParams} from "@foxy/url-builder";
 import OverlayParam from "@/components/params/OverlayParam.vue";
 
-const {
-	imageParams,
-} = storeToRefs(useImageParamsStore());
+const props = defineProps<{
+	modelValue: ImageParams,
+	overlayImages: string[],
+	imageMeta: ImageMeta|null,
+}>();
 
-const [parent, overlays] = useDragAndDrop(imageParams.value.overlays.overlays ?? [], {
+const emit = defineEmits<{
+	(e: 'update:modelValue', value: ImageParams): void
+}>();
+
+const [parent, overlays] = useDragAndDrop(props.modelValue.overlays.overlays ?? [], {
 	dragHandle: ".drag-handle",
 	plugins: [
 		animations()
@@ -20,7 +24,13 @@ const [parent, overlays] = useDragAndDrop(imageParams.value.overlays.overlays ??
 });
 
 watch(overlays, () => {
-	imageParams.value.overlays.overlays = overlays.value;
+	emit('update:modelValue', {
+		...props.modelValue,
+		overlays: {
+			...props.modelValue.overlays,
+			overlays: overlays.value,
+		}
+	});
 });
 
 const overlayType = ref<"image"|"text"|"rect"|"ellipse">("image");
@@ -53,7 +63,13 @@ function removeOverlay(id:string) {
 			</div>
 		</div>
 		<div class="flex flex-col gap-3" ref="parent">
-			<OverlayParam v-for="(overlay, index) in overlays" v-model="overlays[index]" :draggable="true" :key="`overlay-${overlay.id}`" @remove="removeOverlay(overlay.id)"  />
+			<OverlayParam
+				v-for="(overlay, index) in overlays"
+				v-model="overlays[index]"
+				:draggable="true"
+				:overlay-images="overlayImages"
+				:image-meta="imageMeta"
+				:key="`overlay-${overlay.id}`" @remove="removeOverlay(overlay.id)" @remove-overlay-image="removeOverlay"  />
 		</div>
 	</div>
 </template>
