@@ -2,32 +2,42 @@
 import {computed, onMounted, provide, reactive, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 
+import {
+	BrokenIcon,
+	DebugIcon,
+	FaceIcon,
+	PersonIcon,
+	ReloadIcon,
+
+	EditorPanel,
+	Tabs,
+	Tab,
+	LoaderFeedback,
+	ToggleInput,
+	SmallLabel,
+	StatusInfo,
+	JSONViewer,
+	ImageLink,
+	ParamsEditor,
+	OverlaysEditor,
+
+	useImageLoader,
+} from "@foxy/vue-ui";
+
 import HeaderImageKeyInput from "@/components/header/HeaderImageKeyInput.vue";
-import EditorPanel from "@/components/inputs/EditorPanel.vue";
-import {Tabs, Tab} from "@foxy/vue-ui";
-import {BrokenIcon, DebugIcon, FaceIcon, PersonIcon, ReloadIcon} from "@foxy/vue-ui";
-import {LoaderFeedback} from "@foxy/vue-ui";
-import ToggleParam from "@/components/inputs/ToggleInput.vue";
-import {SmallLabel} from "@foxy/vue-ui";
 import SourceEditModal from "@/components/modals/SourceEditModal.vue";
 import FoxySourceSelector from "@/components/header/FoxySourceSelector.vue";
-import StatusInfo from "@/components/UI/StatusInfo.vue";
 import FoxyAppSelector from "@/components/header/FoxyAppSelector.vue";
 import FoxyAppEditModal from "@/components/modals/FoxyAppEditModal.vue";
 
-import useImageLoader from "@/composables/image-loader";
 import useFoxySourceEditor from "@/composables/foxy-source-editor";
 import useFoxyAppEditor from "@/composables/foxy-app-editor";
 
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import {useImageParamsStore} from "@/stores/image-params-store";
-import {JSONViewer} from "@foxy/vue-ui";
 import useFoxyPresetEditor from "@/composables/foxy-preset-editor";
 import FoxyPresetSelector from "@/components/header/FoxyPresetSelector.vue";
 import FoxyPresetEditModal from "@/components/modals/FoxyPresetEditModal.vue";
-import {ImageLink} from "@foxy/vue-ui";
-import ParamsEditor from "@/components/editors/ParamsEditor.vue";
-import OverlaysEditor from "@/components/editors/OverlaysEditor.vue";
 import {buildUrl} from "@/composables/build-url";
 
 const {
@@ -221,18 +231,18 @@ onMounted(() => {
 											<SmallLabel>Debug Options</SmallLabel>
 											<EditorPanel title="Image Recognition" class="w-[400px]" collapse-key="debug-recognition">
 												<div class="grid grid-cols-2 gap-3">
-													<ToggleParam title="Outline Faces" v-model="imageParams.debug.faces" />
-													<ToggleParam title="Outline All Faces" v-model="imageParams.debug.allFaces" />
-													<ToggleParam title="Outline People" v-model="imageParams.debug.people" />
-													<ToggleParam title="Outline All People" v-model="imageParams.debug.allPeople" />
-													<ToggleParam title="Outline Other Labels" v-model="imageParams.debug.otherLabels" />
+													<ToggleInput title="Outline Faces" v-model="imageParams.debug.faces" />
+													<ToggleInput title="Outline All Faces" v-model="imageParams.debug.allFaces" />
+													<ToggleInput title="Outline People" v-model="imageParams.debug.people" />
+													<ToggleInput title="Outline All People" v-model="imageParams.debug.allPeople" />
+													<ToggleInput title="Outline Other Labels" v-model="imageParams.debug.otherLabels" />
 												</div>
 											</EditorPanel>
 											<EditorPanel title="Caching" class="w-[400px]" collapse-key="debug-caching">
 												<div class="grid grid-cols-2 gap-3">
-													<ToggleParam title="Disable Source Cache" v-model="imageParams.debug.disableSourceCache" />
-													<ToggleParam title="Disable Meta Cache" v-model="imageParams.debug.disableMetaCache" />
-													<ToggleParam title="Disable Render Cache" v-model="imageParams.debug.disableRenderCache" />
+													<ToggleInput title="Disable Source Cache" v-model="imageParams.debug.disableSourceCache" />
+													<ToggleInput title="Disable Meta Cache" v-model="imageParams.debug.disableMetaCache" />
+													<ToggleInput title="Disable Render Cache" v-model="imageParams.debug.disableRenderCache" />
 												</div>
 											</EditorPanel>
 											</div>

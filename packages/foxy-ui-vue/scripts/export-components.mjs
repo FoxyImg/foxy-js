@@ -1,6 +1,15 @@
 import fs from "fs";
 import path from "node:path";
 
+const indexFile = fs.readFileSync('./src/index.ts', 'utf8');
+
+const regex = /(\/\/region\s+Manual\s+Exports(.*)\/\/endregion\s+Manual\s+Exports)/gms;
+const m = regex.exec(indexFile);
+let savedExports = "";
+if (m.length > 0) {
+	savedExports = m[1];
+}
+
 let lastDirectory = null;
 const exportList = fs
 	.readdirSync('./src/components', { withFileTypes: true, recursive: true })
@@ -17,4 +26,9 @@ const exportList = fs
 		return exportStr;
 	});
 
-fs.writeFileSync('./src/index.ts', exportList.join('\n'));
+const allExports = exportList.join('\n');
+fs.writeFileSync('./src/index.ts', `
+${allExports}
+
+${savedExports}
+`);

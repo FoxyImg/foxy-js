@@ -33,10 +33,15 @@
     "test:types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
+    "@formkit/drag-and-drop": "^0.1.4",
     "@foxy/url-builder": "workspace:*",
+    "@vueform/multiselect": "^2.6.8",
+    "@vueuse/core": "^10.11.0",
     "copy-to-clipboard": "^3.3.3",
     "floating-vue": "^5.2.2",
+    "p-debounce": "^4.0.0",
     "short-uuid": "^5.2.0",
+    "vue-advanced-cropper": "^2.8.9",
     "vue-json-pretty": "^2.4.0",
     "vue3-colorpicker": "^2.3.0"
   },

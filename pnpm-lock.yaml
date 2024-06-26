@@ -147,18 +147,33 @@ importers:
 
   packages/foxy-ui-vue:
     dependencies:
+      '@formkit/drag-and-drop':
+        specifier: ^0.1.4
+        version: 0.1.4
       '@foxy/url-builder':
         specifier: workspace:*
         version: link:../foxy-url-builder
+      '@vueform/multiselect':
+        specifier: ^2.6.8
+        version: 2.6.8
+      '@vueuse/core':
+        specifier: ^10.11.0
+        version: 10.11.0(vue@3.4.30)
       copy-to-clipboard:
         specifier: ^3.3.3
         version: 3.3.3
       floating-vue:
         specifier: ^5.2.2
         version: 5.2.2(vue@3.4.30)
+      p-debounce:
+        specifier: ^4.0.0
+        version: 4.0.0
       short-uuid:
         specifier: ^5.2.0
         version: 5.2.0
+      vue-advanced-cropper:
+        specifier: ^2.8.9
+        version: 2.8.9(vue@3.4.30)
       vue-json-pretty:
         specifier: ^2.4.0
         version: 2.4.0(vue@3.4.30)
@@ -1901,7 +1916,7 @@ packages:
     dependencies:
       '@vue/compiler-ssr': 3.4.30
       '@vue/shared': 3.4.30
-      vue: 3.4.30(typescript@5.5.2)
+      vue: 3.4.30(typescript@5.4.5)
 
   /@vue/shared@3.4.30:
     resolution: {integrity: sha512-CLg+f8RQCHQnKvuHY9adMsMaQOcqclh6Z5V9TaoMgy0ut0tz848joZ7/CYFFyF/yZ5i2yaw7Fn498C+CNZVHIg==}
@@ -3050,7 +3065,7 @@ packages:
         optional: true
     dependencies:
       '@floating-ui/dom': 1.1.1
-      vue: 3.4.30(typescript@5.5.2)
+      vue: 3.4.30(typescript@5.4.5)
       vue-resize: 2.0.0-alpha.1(vue@3.4.30)
     dev: false
 
@@ -5167,6 +5182,7 @@ packages:
     resolution: {integrity: sha512-NcRtPEOsPFFWjobJEtfihkLCZCXZt/os3zf8nTxjVH3RvTSxjrCamJpbExGvYOF+tFHc3pA65qpdwPbzjohhew==}
     engines: {node: '>=14.17'}
     hasBin: true
+    dev: true
 
   /ufo@1.5.3:
     resolution: {integrity: sha512-Y7HYmWaFwPUmkoQCUIAYpKqkOf+SbVj/2fJJZ4RJMCfZp0rTGwRbzQD+HghfnhKOjL9E01okqz+ncJskGYfBNw==}
@@ -5471,7 +5487,7 @@ packages:
       '@vue/composition-api':
         optional: true
     dependencies:
-      vue: 3.4.30(typescript@5.5.2)
+      vue: 3.4.30(typescript@5.4.5)
     dev: false
 
   /vue-json-pretty@2.4.0(vue@3.4.30):
@@ -5480,7 +5496,7 @@ packages:
     peerDependencies:
       vue: '>=3.0.0'
     dependencies:
-      vue: 3.4.30(typescript@5.5.2)
+      vue: 3.4.30(typescript@5.4.5)
     dev: false
 
   /vue-resize@2.0.0-alpha.1(vue@3.4.30):
@@ -5488,7 +5504,7 @@ packages:
     peerDependencies:
       vue: ^3.0.0
     dependencies:
-      vue: 3.4.30(typescript@5.5.2)
+      vue: 3.4.30(typescript@5.4.5)
     dev: false
 
   /vue-template-compiler@2.7.16:
@@ -5517,7 +5533,7 @@ packages:
       vue: ^2.0.0 || ^3.0.0
     dependencies:
       is-plain-object: 5.0.0
-      vue: 3.4.30(typescript@5.5.2)
+      vue: 3.4.30(typescript@5.4.5)
     dev: false
 
   /vue3-colorpicker@2.3.0(@aesoper/normal-utils@0.1.5)(@popperjs/core@2.11.8)(@vueuse/core@10.11.0)(gradient-parser@1.0.2)(lodash-es@4.17.21)(tinycolor2@1.6.0)(vue-types@4.2.1)(vue@3.4.30):
@@ -5538,7 +5554,7 @@ packages:
       gradient-parser: 1.0.2
       lodash-es: 4.17.21
       tinycolor2: 1.6.0
-      vue: 3.4.30(typescript@5.5.2)
+      vue: 3.4.30(typescript@5.4.5)
       vue-types: 4.2.1(vue@3.4.30)
     dev: false
 
@@ -5571,6 +5587,7 @@ packages:
       '@vue/server-renderer': 3.4.30(vue@3.4.30)
       '@vue/shared': 3.4.30
       typescript: 5.5.2
+    dev: true
 
   /which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}

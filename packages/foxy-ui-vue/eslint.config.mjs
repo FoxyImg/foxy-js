@@ -6,6 +6,8 @@ export default unjs({
   ],
   rules: {
     // rule overrides
+	  "unicorn/no-null": "off",
+	  "unicorn/prefer-add-event-listener": "off",
   },
   markdown: {
     rules: {

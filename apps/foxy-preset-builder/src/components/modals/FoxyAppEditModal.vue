@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ModalContainer from "@/components/UI/ModalContainer.vue";
+import {ModalContainer} from "@foxy/vue-ui";
 import {reactive, ref, toRaw} from "vue";
 import {SmallLabel} from "@foxy/vue-ui";
 import type {FoxyApp} from "@/types/foxy-app";
