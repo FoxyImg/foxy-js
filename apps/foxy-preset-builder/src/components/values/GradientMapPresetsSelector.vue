@@ -1,17 +1,24 @@
 <script setup lang="ts">
-import {useImageParamsStore} from "@/stores/image-params-store";
-import {storeToRefs} from "pinia";
 import GradientMapPreset from "@/components/values/GradientMapPreset.vue";
-import Icon from "@/components/UI/Icon.vue";
-import {DefaultImageParams} from "@foxy/url-builder";
+import {DeleteSourceIcon} from "@foxy/vue-ui";
+import {DefaultImageParams, type GradientMapParams, type GradientStops} from "@foxy/url-builder";
 import { hideAllPoppers } from "floating-vue";
-import {useFileDialog} from "@vueuse/core";
+import {useFileDialog, useStorage} from "@vueuse/core";
 //@ts-ignore
 import {StreamReader} from "@/lib/grd-parser/stream-reader";
 //@ts-ignore
 import PSDGradient from "@/lib/grd-parser/psd-gradient";
 import colorToHex from "@/utils/hex-color";
-import {onMounted} from "vue";
+
+const props = defineProps<{
+	modelValue: GradientStops[],
+}>();
+
+const emit = defineEmits<{
+	(e: 'update:modelValue', value: GradientStops[]): void
+}>();
+
+const gradientMapPresets = useStorage<GradientMapParams[]>('foxy_gradient_map_presets',[]);
 
 const { files, open, reset, onChange} = useFileDialog({
 	accept: '.json,.grd',
@@ -62,13 +69,8 @@ function parseGRD(data:StreamReader) {
 		}
 }
 
-const {
-	imageParams,
-	gradientMapPresets
-} = storeToRefs(useImageParamsStore());
-
 function addPreset() {
-	gradientMapPresets.value.push(JSON.parse(JSON.stringify(imageParams.value.gradientMap)));
+	gradientMapPresets.value.push(JSON.parse(JSON.stringify(props.modelValue)));
 }
 
 function deletePreset(index:number) {
@@ -77,12 +79,8 @@ function deletePreset(index:number) {
 
 function selectPreset(index:number) {
 	hideAllPoppers();
-	imageParams.value.gradientMap.stops = JSON.parse(JSON.stringify(gradientMapPresets.value[index].stops));
+	emit('update:modelValue', JSON.parse(JSON.stringify(gradientMapPresets.value[index].stops)));
 }
-
-onMounted(() => {
-	console.log(gradientMapPresets.value);
-});
 
 </script>
 <template>
@@ -95,7 +93,7 @@ onMounted(() => {
 				<div v-else class="flex flex-col gap-1">
 					<div v-for="(preset, index) in gradientMapPresets" :key="index" class="cursor-pointer w-full max-h-[32px] h-[32px] relative group">
 						<div class="cursor-pointer w-[32px] aspect-square flex items-center justify-center absolute right-0 top-0" @click="deletePreset(index)">
-							<Icon name="delete-source" class="w-4 h-auto fill-red-600"></Icon>
+							<DeleteSourceIcon class="w-4 h-auto fill-red-600"></DeleteSourceIcon>
 						</div>
 						<GradientMapPreset :stops="preset.stops" @click="selectPreset(index)" class="absolute transition-all top-0 h-full w-full left-0 group-hover:w-[calc(100%-32px)]" />
 					</div>

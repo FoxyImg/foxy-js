@@ -1,24 +1,21 @@
 <script setup lang="ts">
 import {computed, onMounted} from 'vue';
-import Icon from "@/components/UI/Icon.vue";
 import pDebounce from "p-debounce";
-import {storeToRefs} from "pinia";
-import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import OverlayImageSamples from "@/components/values/OverlayImageSamples.vue";
-
-const {
-	currentSource
-} = storeToRefs(useFoxyAppStore());
+import {ImageSearchIcon} from "@foxy/vue-ui";
 
 const props = withDefaults(defineProps<{
 	title: string,
 	modelValue: string|null,
+	overlayImages: string[],
 	default: string|null,
 }>(), {
 });
 
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: string|null): void;
+	(e: 'removeOverlayImage', value: string): void;
+	(e: 'addOverlayImage', value: string): void;
 }>();
 
 function updateModelValue(value: string|null) {
@@ -33,32 +30,16 @@ const currentValue = computed({
 });
 
 function addImage() {
-	console.log('adding image');
-	if (currentValue.value === null || currentValue.value.trim().length === 0) {
+	if (currentValue.value === null) {
 		return;
 	}
 
-	if (currentSource.value === null) {
+	if (props.overlayImages.includes(currentValue.value)) {
 		return;
 	}
 
-	if (!currentSource.value.overlayImages) {
-		currentSource.value.overlayImages = [];
-	}
-
-	if (currentSource.value.overlayImages.includes(currentValue.value)) {
-		return;
-	}
-
-	console.log('adding image');
-	currentSource.value.overlayImages.push(currentValue.value);
+	emit('addOverlayImage', currentValue.value);
 }
-
-onMounted(() => {
-	if (currentSource.value !== null && currentSource.value.overlayImages === null) {
-		currentSource.value.overlayImages = [];
-	}
-});
 </script>
 <template>
 	<div class="flex flex-col gap-1.5">
@@ -68,10 +49,10 @@ onMounted(() => {
 				<input type="text" v-model="currentValue" class="flex-1 border border-neutral-200 text-xs rounded-md py-1.5 px-1" @enter="addImage" @paste="addImage" />
 				<VDropdown>
 					<div class="cursor-pointer flex items-center gap-1 aspect-square p-1">
-						<Icon name="image-search" class="w-5 h-auto fill-black" />
+						<ImageSearchIcon class="w-5 h-auto fill-black" />
 					</div>
 					<template #popper>
-						<OverlayImageSamples v-model="currentValue" />
+						<OverlayImageSamples v-model="currentValue" :overlay-images="overlayImages" @remove-overlay-image="emit('removeOverlayImage', $event)" />
 					</template>
 				</VDropdown>
 			</div>

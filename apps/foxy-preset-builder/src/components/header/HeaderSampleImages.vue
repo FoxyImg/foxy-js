@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {computed, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {DefaultImageParams} from "@foxy/url-builder";
 import { hideAllPoppers } from "floating-vue";
-import Icon from "@/components/UI/Icon.vue";
+import {CloseIcon} from "@foxy/vue-ui";
 import {useFileDialog} from "@vueuse/core";
-import buildUrl from "@/composables/build-url";
+import {buildUrl} from "@/composables/build-url";
 
 const props = defineProps<{
 	host:string,
@@ -15,11 +15,23 @@ const props = defineProps<{
 	sampleImages: string[],
 }>();
 
+
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: string|null): void;
 	(e: 'removeSampleImage', value: string): void;
 	(e: 'importSampleImages', value: string[]): void;
 }>();
+
+const loadedImages = ref<{ [key:string]:string }>({});
+for(const sampleImage of props.sampleImages) {
+	buildUrl(sampleImage, {sizing: { crop: ['crop'], width: 256, height: 256}}).then((url) => {
+		if (url) {
+			loadedImages.value[sampleImage] = url;
+		}
+
+		console.log('loadedImages', loadedImages.value);
+	});
+}
 
 const currentValue = computed({
 	get: () => props.modelValue,
@@ -81,10 +93,10 @@ function exportSampleImages() {
 		<div class="flex-1 relative aspect-square">
 			<div class="absolute inset-0 bg-neutral-100 overflow-y-auto p-1.5">
 				<div class="grid grid-cols-3 gap-1">
-					<div v-for="(image, index) in sampleImages" :key="index" class="cursor-pointer relative bg-checkered">
-						<img :src="buildUrl(image, imageParams) ?? ''" @click="selectImage(image)" class="cursor-pointer object-contain w-full h-full bg-black/25 aspect-square">
-						<div class="absolute right-1 top-1 rounded-full bg-white/50 backdrop-blur p-1 cursor-pointer" @click="removeImage(image)">
-							<Icon name="close" class="fill-current w-1.5 h-auto" />
+					<div v-for="(imageUrl, imageKey, index) in loadedImages" :key="index" class="cursor-pointer relative bg-checkered">
+						<img :src="imageUrl" @click="selectImage(imageKey as string)" class="cursor-pointer object-contain w-full h-full bg-black/25 aspect-square">
+						<div class="absolute right-1 top-1 rounded-full bg-white/50 backdrop-blur p-1 cursor-pointer" @click="removeImage(imageKey as string)">
+							<CloseIcon class="fill-current w-1.5 h-auto" />
 						</div>
 					</div>
 				</div>

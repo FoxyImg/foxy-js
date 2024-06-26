@@ -53,17 +53,17 @@ export const useRedactParam:ComposableParam<RedactParams> = () => {
 		}
 
 		if (params.faces.length > 0) {
-			urlParams['redact:faces'] = `/redact:faces:${params.faces.join(',')}`;
+			urlParams['redact:faces'] = `${params.faces.join(',')}`;
 		}
 
 		if (params.people.length > 0) {
-			urlParams['redact:people'] = `/redact:people:${params.people.join(',')}`;
+			urlParams['redact:people'] = `${params.people.join(',')}`;
 		}
 
 		if (params.regions.length > 0) {
 			for(const region of params.regions) {
 				if (region.width > 0 && region.height > 0) {
-					urlParams['redact:region'] = `/redact:region:${region.cornerRadius ?? 0}:${region.rotation ?? 0}:${region.left},${region.top},${region.width},${region.height}`;
+					urlParams['redact:region'] = `${region.cornerRadius ?? 0}:${region.rotation ?? 0}:${region.left},${region.top},${region.width},${region.height}`;
 				}
 			}
 		}

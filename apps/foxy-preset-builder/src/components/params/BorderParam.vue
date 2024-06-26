@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import {computed, watch} from "vue";
 import EditorPanel from "@/components/values/EditorPanel.vue";
-import Icon from "@/components/UI/Icon.vue";
 import SliderValue from "@/components/values/SliderValue.vue";
 import ColorValue from "@/components/values/ColorValue.vue";
 import type {BorderParams} from "@foxy/url-builder";
 import {useStorage} from "@vueuse/core";
+import {ConstraintLineLongIcon, ConstrainIcon} from "@foxy/vue-ui";
 
 const props = defineProps<{
 	noun: string,
@@ -61,11 +61,11 @@ watch(() => [currentValue.value.top, currentValue.value.left, currentValue.value
 				<SliderValue :title="`Left ${noun}`" v-model="currentValue.left" :min="0" :max="512" :step="1" :default="0" default-label="None" suffix="px" />
 			</div>
 			<div class="flex flex-col items-center justify-center gap-[8px]">
-				<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300" />
+				<ConstraintLineLongIcon class="w-[11px] h-auto stroke-neutral-300" />
 				<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainBorder}" @click="constrainBorder = !constrainBorder">
-					<Icon name="constrain" class="fill-black w-3 h-auto" />
+					<ConstrainIcon class="fill-black w-3 h-auto" />
 				</div>
-				<Icon name="constraint-line-long" class="w-[11px] h-auto stroke-neutral-300 rotate-180 -scale-x-100" />
+				<ConstraintLineLongIcon class="w-[11px] h-auto stroke-neutral-300 rotate-180 -scale-x-100" />
 			</div>
 		</div>
 	</EditorPanel>

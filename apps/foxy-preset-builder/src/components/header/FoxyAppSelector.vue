@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
-import Icon from "@/components/UI/Icon.vue";
 import type {FoxyApp} from "@/types/foxy-app";
+import {DeleteSourceIcon, EditSourceIcon, NewSourceIcon} from "@foxy/vue-ui";
 
 const props = defineProps<{
 	modelValue: string|null,
@@ -28,9 +28,9 @@ const currentValue = computed({
 			<select v-model="currentValue" class="w-full min-w-[200px] border border-neutral-200 text-xs flex-1 rounded-md py-1.5 px-1">
 				<option v-for="app in apps" :key="app.id!" :value="app.id" :selected="app.id === currentValue">{{ app.name }}</option>
 			</select>
-			<div v-tooltip="'Add Foxy App'" class="cursor-pointer" @click="emit('addApp')"><Icon name="new-source" class="w-auto h-3.5" /></div>
-			<div v-tooltip="'Edit Foxy App'" class="cursor-pointer" @click="emit('editApp')" :class="{'pointer-events-none opacity-35': currentValue == null}"><Icon name="edit-source" class="w-auto h-4" /></div>
-			<div v-tooltip="'Delete Foxy App'" class="cursor-pointer" @click="emit('deleteApp')"  :class="{'pointer-events-none opacity-35': currentValue == null}"><Icon name="delete-source" class="fill-red-600 w-auto h-4"  /></div>
+			<div v-tooltip="'Add Foxy App'" class="cursor-pointer" @click="emit('addApp')"><NewSourceIcon class="w-auto h-3.5" /></div>
+			<div v-tooltip="'Edit Foxy App'" class="cursor-pointer" @click="emit('editApp')" :class="{'pointer-events-none opacity-35': currentValue == null}"><EditSourceIcon class="w-auto h-4" /></div>
+			<div v-tooltip="'Delete Foxy App'" class="cursor-pointer" @click="emit('deleteApp')"  :class="{'pointer-events-none opacity-35': currentValue == null}"><DeleteSourceIcon class="fill-red-600 w-auto h-4"  /></div>
 		</div>
 	</div>
 </template>

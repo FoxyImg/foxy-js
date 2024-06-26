@@ -66,6 +66,11 @@ export function foxy(host:string, accessKey:string, secret:string|undefined = un
 				url.searchParams.set(key.replaceAll(':', '-'), builtParams[key] ?? "");
 			}
 
+			if (params.metaOnly) {
+				url.searchParams.set('meta', '1');
+				sigParams.push('meta=1');
+			}
+
 			if (secret) {
 				sigParams.sort((a, b) => a.localeCompare(b));
 				const sigParamsStr = trimStartingSlash(decodeURI(imageKey).replaceAll('%2C', ',')) + '?' + sigParams.join('&');
@@ -89,6 +94,10 @@ export function foxy(host:string, accessKey:string, secret:string|undefined = un
 
 			for(const key of Object.keys(builtParams)) {
 				newUrl += builtParams[key] === null || builtParams[key] === '' ? `/${key}` : `/${key}:${builtParams[key]}`;
+			}
+
+			if (params.metaOnly) {
+				newUrl += '/meta';
 			}
 
 			const queryString:string[] = [];

@@ -1,8 +1,9 @@
 import {foxy, type PartialImageParams} from "@foxy/url-builder";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import {storeToRefs} from "pinia";
+import type {URLBuilder} from "@/types/url-builder";
 
-export default function buildUrl(imageKey: string, params:PartialImageParams) {
+export const buildUrl:URLBuilder = async (imageKey: string, params:PartialImageParams) =>{
 		const {
 			currentApp,
 			currentSource,

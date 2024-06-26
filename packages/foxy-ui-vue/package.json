@@ -1,0 +1,53 @@
+{
+  "name": "@foxy/vue-ui",
+  "version": "0.0.1",
+  "description": "",
+  "repository": "foxy/foxy-js",
+  "license": "MIT",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "stub": "unbuild --stub",
+    "watch": "node --watch-path=src dist/index.mjs",
+    "dev": "vitest dev",
+    "lint": "eslint . && biome check .",
+    "lint:fix": "automd && eslint . --fix && biome check --apply .",
+    "prepack": "pnpm build",
+    "play": "jiti playground",
+    "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
+    "test": "pnpm lint && pnpm test:types && vitest run --coverage",
+    "test:types": "tsc --noEmit --skipLibCheck"
+  },
+  "dependencies": {
+    "@foxy/url-builder": "workspace:*"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.2",
+    "@types/node": "^20.14.8",
+    "@vitest/coverage-v8": "^1.6.0",
+    "automd": "^0.3.7",
+    "changelogen": "^0.5.5",
+    "eslint": "^9.5.0",
+    "eslint-config-unjs": "^0.3.2",
+    "jiti": "^1.21.6",
+    "typescript": "^5.5.2",
+    "unbuild": "^2.0.0",
+    "vitest": "^1.6.0",
+    "vue": "^3.4.30"
+  },
+  "packageManager": "pnpm@9.4.0"
+}

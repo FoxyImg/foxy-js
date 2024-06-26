@@ -1,25 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import type {Face} from "@foxy/url-builder";
-import Icon from "@/components/UI/Icon.vue";
-import {storeToRefs} from "pinia";
-import {useFoxyAppStore} from "@/stores/foxy-app-store";
-import {useImageParamsStore} from "@/stores/image-params-store";
-import buildUrl from "@/composables/build-url";
+import {computed, inject, ref, watch} from 'vue';
+import {DefaultSizingParams, type Face, type ImageMeta} from "@foxy/url-builder";
+import {FocalPointerIcon} from "@foxy/vue-ui";
+import type {URLBuilder} from "@/types/url-builder";
 
-const {
-	currentApp,
-	currentSource,
-	imageKey,
-} = storeToRefs(useFoxyAppStore());
-
-const {
-	imageMeta,
-} = storeToRefs(useImageParamsStore());
-
+const buildUrl:URLBuilder = inject("buildUrl") as URLBuilder;
 
 const props = defineProps<{
 	modelValue: {x: number, y:number},
+	imageKey: string|null,
+	imageMeta: ImageMeta|null,
 }>();
 
 const emit = defineEmits(['update:modelValue']);
@@ -40,13 +30,13 @@ const focalPointStyle = computed(() => {
 	};
 });
 
-const imageUrl = computed(() => {
-	if (!currentSource.value || !currentApp.value || !currentApp.value.url || !currentSource.value.key || !currentApp.value.signingKey || !imageKey.value) {
-		return null;
+const imageUrl = ref<string|null>(null);
+watch(() => props.imageKey, async (newVal) => {
+	if (props.imageKey) {
+		imageUrl.value = await buildUrl(props.imageKey, { sizing: { ...DefaultSizingParams, width: 300 } });
 	}
+}, {immediate: true});
 
-	return buildUrl(imageKey.value, { sizing: { width: 300 }});
-});
 
 let boundingRect:DOMRect|null = null;
 const mouseIsDown = ref(false);
@@ -117,6 +107,6 @@ function faceStyle(face:Face) {
 		<template v-if="imageMeta">
 			<div v-for="(face, key, idx) in imageMeta.faces" class="pointer-events-none border border-white absolute drop-shadow" :style="faceStyle(face)"></div>
 		</template>
-		<Icon name="focal-pointer" :style="focalPointStyle" class="w-5 h-auto pointer-events-none absolute -translate-x-1/2 -translate-y-1/2" />
+		<FocalPointerIcon :style="focalPointStyle" class="w-5 h-auto pointer-events-none absolute -translate-x-1/2 -translate-y-1/2" />
 	</div>
 </template>

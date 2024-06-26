@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type {GradientStops} from "@foxy/url-builder";
-import {computed, onMounted, onUnmounted, ref} from "vue";
+import {computed} from "vue";
 import GradientEditor from "@/components/UI/GradientEditor.vue";
-import GradienMapPresetsSelector from "@/components/values/GradienMapPresetsSelector.vue";
-import Icon from "@/components/UI/Icon.vue";
+import GradientMapPresetsSelector from "@/components/values/GradientMapPresetsSelector.vue";
+import {BookmarkIcon, ReverseIcon} from "@foxy/vue-ui";
 
 const props = defineProps<{
 	title: string,
@@ -39,15 +39,15 @@ function reverseGradient() {
 				<label :class="{'font-bold text-neutral-700': enabled}">{{  title  }}</label>
 				<VDropdown>
 					<div class="cursor-pointer aspect-square">
-						<Icon name="bookmark" class="w-3 h-auto stroke-neutral-500" />
+						<BookmarkIcon class="w-3 h-auto stroke-neutral-500" />
 					</div>
 					<template #popper>
-						<GradienMapPresetsSelector />
+						<GradientMapPresetsSelector v-model="currentValue" />
 					</template>
 				</VDropdown>
 			</div>
 			<div class="cursor-pointer flex items-center justify-center" @click="reverseGradient">
-				<Icon name="reverse" class="w-3.5 h-auto stroke-neutral-500" />
+				<ReverseIcon class="w-3.5 h-auto stroke-neutral-500" />
 			</div>
 		</div>
 		<GradientEditor v-model="currentValue" />

@@ -8,10 +8,8 @@ import {
 	OverlayTypeOptions,
 	RotationOptions,
 	HGravityOptions,
-	VGravityOptions
+	VGravityOptions, type ImageMeta
 } from "@foxy/url-builder";
-import {storeToRefs} from "pinia";
-import {useImageParamsStore} from "@/stores/image-params-store";
 import ObjectSelectValue from "@/components/values/ObjectSelectValue.vue";
 import OverlayImageValue from "@/components/values/OverlayImageValue.vue";
 import SubstitutionsValue from "@/components/values/SubstitutionsValue.vue";
@@ -19,19 +17,19 @@ import ToggleValue from "@/components/values/ToggleValue.vue";
 import SliderValue from "@/components/values/SliderValue.vue";
 import SelectValue from "@/components/values/SelectValue.vue";
 import ColorValue from "@/components/values/ColorValue.vue";
-import Icon from "@/components/UI/Icon.vue";
-
-const {
-	imageMeta,
-} = storeToRefs(useImageParamsStore());
+import {DeleteSourceIcon} from "@foxy/vue-ui";
 
 const props = defineProps<{
-	modelValue: OverlayParams
+	modelValue: OverlayParams,
+	overlayImages: string[],
+	imageMeta: ImageMeta|null,
 }>();
 
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: OverlayParams): void
 	(e: 'remove'): void
+	(e: 'addOverlayImage', value: string): void;
+	(e: 'removeOverlayImage', value: string): void;
 }>();
 
 
@@ -50,28 +48,28 @@ function overlayTitle(overlay:OverlayParams) {
 }
 
 const imageWidth = computed(() => {
-	if (imageMeta.value === null) {
+	if (props.imageMeta === null) {
 		return 1920;
 	}
 
-	return imageMeta.value.width;
+	return props.imageMeta.width;
 });
 
 const imageHeight = computed(() => {
-	if (imageMeta.value === null) {
+	if (props.imageMeta === null) {
 		return 1920;
 	}
 
-	return imageMeta.value.height;
+	return props.imageMeta.height;
 });
 </script>
 <template>
 	<EditorPanel :title="overlayTitle(currentValue)" v-model="currentValue.enabled"  :show-toggle="true"   :disabled="!currentValue.enabled" :collapse-key="`overlay-${currentValue.id}`">
 		<template #extras-right>
-			<Icon name="delete-source" class="w-auto h-3.5 fill-red-600 cursor-pointer" @click="emit('remove')" />
+			<DeleteSourceIcon class="w-auto h-3.5 fill-red-600 cursor-pointer" @click="emit('remove')" />
 		</template>
 		<ObjectSelectValue title="Overlay Type" v-model="currentValue.type" default="image" :allow-null="false" :options="OverlayTypeOptions" />
-		<OverlayImageValue v-if="currentValue.type === 'image'" title="Overlay Image Key" default="" v-model="currentValue.url" />
+		<OverlayImageValue v-if="currentValue.type === 'image'" title="Overlay Image Key" default="" v-model="currentValue.url" :overlay-images="overlayImages" @add-overlay-image="emit('addOverlayImage', $event)" @remove-overlay-image="emit('removeOverlayImage', $event)" />
 		<ObjectSelectValue v-if="currentValue.type === 'image'" title="Image Scaling" v-model="currentValue.fit" default="fit" :allow-null="false" :options="FitOptions" />
 		<SubstitutionsValue title="Text Substitutions" :default="[]" v-model="currentValue.substitutions" />
 		<ToggleValue v-if="currentValue.type === 'image'" title="Trim Overlay Image" v-model="currentValue.trim" />

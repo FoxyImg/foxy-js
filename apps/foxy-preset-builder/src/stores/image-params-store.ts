@@ -15,7 +15,7 @@ import {
 	base64
 } from "@foxy/url-builder";
 
-import buildUrl from "@/composables/build-url";
+import {buildUrl} from "@/composables/build-url";
 
 export const useImageParamsStore = defineStore("foxy-image-params-store", () => {
 	const {
@@ -62,14 +62,14 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		return imageMeta.value.people.length;
 	});
 
-	function buildImageUrl() {
+	async function buildImageUrl() {
 		console.log(currentSource.value, currentApp.value);
 		if (!currentSource.value || !currentApp.value || !currentSource.value.key || !currentApp.value.signingKey || !currentApp.value.url || !imageKey.value) {
 			currentImageUrl.value = null;
 			return;
 		}
 
-		currentImageUrl.value = buildUrl(imageKey.value, imageParams.value);
+		currentImageUrl.value = await buildUrl(imageKey.value, imageParams.value);
 	}
 	const debouncedBuildImageUrl = pDebounce(buildImageUrl, 1000);
 
@@ -79,7 +79,8 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			return;
 		}
 
-		const metaUrl = buildUrl(imageKey.value, {metaOnly: true})
+		const metaUrl = await buildUrl(imageKey.value, {metaOnly: true})
+		console.log(metaUrl);
 		if (metaUrl) {
 			const response = await fetch(metaUrl);
 			if (!response.ok) {
@@ -98,7 +99,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			return;
 		}
 
-		const presetUrl = buildUrl(imageKey.value, { ...imageParams.value, showPreset: true });
+		const presetUrl = await buildUrl(imageKey.value, { ...imageParams.value, showPreset: true });
 		if (presetUrl) {
 			const response = await fetch(presetUrl);
 			if (!response.ok) {
@@ -119,7 +120,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 	const debouncedFetchCurrentPresetJSONObject = pDebounce(fetchCurrentPresetJSONObject, 1000);
 
 	async function reload() {
-		buildImageUrl();
+		await buildImageUrl();
 		await fetchCurrentPresetJSONObject();
 		await fetchImageMeta();
 	}
@@ -242,8 +243,9 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		await debouncedFetchImageMeta();
 	}, { deep: true });
 
-	watch(imageParams, () => {
+	watch(imageParams, async () => {
 		currentPresetChanged.value = true;
+		await debouncedBuildImageUrl();
 	}, {deep: true});
 
 	watch(currentPresetId, () => {

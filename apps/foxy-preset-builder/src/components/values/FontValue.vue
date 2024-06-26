@@ -1,24 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import {useImageParamsStore} from "@/stores/image-params-store";
-import {storeToRefs} from "pinia";
-import Icon from "@/components/UI/Icon.vue";
 import { hideAllPoppers } from "floating-vue";
-
-const {
-	imageParams,
-	fontPresets
-} = storeToRefs(useImageParamsStore());
+import {FontIcon, DeleteSourceIcon} from "@foxy/vue-ui";
 
 const props = withDefaults(defineProps<{
 	title: string,
 	modelValue: string|null,
 	default: string|null,
+	fontPresets: string[],
 }>(), {
 });
 
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: string|null): void;
+	(e: 'addFontPreset', value: string): void;
+	(e: 'removeFontPreset', value: string): void;
 }>();
 
 const currentValue = computed({
@@ -31,19 +27,19 @@ function addFont() {
 		return;
 	}
 
-	if (fontPresets.value.includes(currentValue.value)) {
+	if (props.fontPresets.includes(currentValue.value)) {
 		return;
 	}
 
-	fontPresets.value.push(currentValue.value);
+	emit('addFontPreset', currentValue.value);
 }
 
 function deleteFont(index:number) {
-	fontPresets.value.splice(index, 1);
+	emit('addFontPreset', props.fontPresets[index]);
 }
 
 function selectFont(index:number) {
-	imageParams.value.watermark.font = fontPresets.value[index];
+	currentValue.value = props.fontPresets[index];
 	hideAllPoppers();
 }
 </script>
@@ -55,7 +51,7 @@ function selectFont(index:number) {
 				<input type="text" v-model="currentValue" class="w-full border border-neutral-200 text-xs flex-1 rounded-md py-1.5 px-1" />
 				<VDropdown>
 					<div class="cursor-pointer flex items-center gap-1 aspect-square p-1">
-						<Icon name="font" class="w-5 h-auto fill-black" />
+						<FontIcon class="w-5 h-auto fill-black" />
 					</div>
 					<template #popper>
 						<div class="flex flex-col">
@@ -67,14 +63,12 @@ function selectFont(index:number) {
 									<div v-for="(font, index) in fontPresets" :key="index" class="cursor-pointer flex items-center hover:bg-neutral-100">
 										<div class="flex-1 px-3 py-2.5 text-xs" @click="selectFont(index)">{{font}}</div>
 										<div class="cursor-pointer w-[32px] aspect-square flex items-center justify-center" @click="deleteFont(index)">
-											<Icon name="delete-source" class="w-4 h-auto fill-red-600"></Icon>
+											<DeleteSourceIcon name="delete-source" class="w-4 h-auto fill-red-600"></DeleteSourceIcon>
 										</div>
 									</div>
 								</div>
 							</div>
 							<div class="flex items-center justify-center gap-3 text-xs px-3 py-1.5 border-t">
-								<button class="px-2 py-1" type="button">Export ...</button>
-								<button class="px-2 py-1" type="button" @click="open">Import ...</button>
 								<button class="px-2 py-1" type="button" @click="addFont">Add Font</button>
 							</div>
 						</div>

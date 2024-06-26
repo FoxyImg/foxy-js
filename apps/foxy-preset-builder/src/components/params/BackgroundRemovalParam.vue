@@ -7,11 +7,14 @@ import ColorValue from "@/components/values/ColorValue.vue";
 import ImageKeyValue from "@/components/values/ImageKeyValue.vue";
 
 const props = defineProps<{
-	modelValue: BackgroundRemovalParams
+	modelValue: BackgroundRemovalParams,
+	sampleImages: string[],
 }>();
 
 const emit = defineEmits<{
-	(e: 'update:modelValue', value: BackgroundRemovalParams): void
+	(e: 'update:modelValue', value: BackgroundRemovalParams): void;
+	(e: 'removeSampleImage', value: string): void;
+	(e: 'addSampleImage', value: string): void;
 }>();
 
 const currentValue = computed({
@@ -23,6 +26,13 @@ const currentValue = computed({
 	<EditorPanel title="Background Removal" collapse-key="background-removal" v-model="currentValue.enabled" :show-toggle="true" :disabled="!currentValue.enabled">
 		<ObjectSelectValue title="Mode" v-model="currentValue.mode" default="photoroom" :allow-null="false" :options="BackgroundRemovalModeOptions" />
 		<ColorValue title="Background Color" v-model="currentValue.backgroundColor" :default="null" />
-		<ImageKeyValue title="Background Image" :default="null" v-model="currentValue.imageKey" />
+		<ImageKeyValue
+			title="Background Image"
+			:default="null"
+			v-model="currentValue.imageKey"
+			:sample-images="sampleImages"
+			@remove-sample-image="emit('removeSampleImage', $event)"
+			@add-sample-image="emit('addSampleImage', $event)"
+		/>
 	</EditorPanel>
 </template>

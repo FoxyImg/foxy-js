@@ -3,7 +3,7 @@ import {computed} from "vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
 
 import pDebounce from 'p-debounce';
-import Icon from "@/components/UI/Icon.vue";
+import {ImageSearchIcon} from "@foxy/vue-ui";
 import HeaderSampleImages from "@/components/header/HeaderSampleImages.vue";
 
 const props = withDefaults(defineProps<{
@@ -43,7 +43,7 @@ const currentValue = computed({
 			<input :type="type" class="w-full border border-neutral-200 rounded-md px-2 py-1 text-sm" v-model="currentValue" />
 			<div v-if="host && accessKey && secret" class="aspect-square cursor-pointer">
 				<VDropdown>
-						<div class="w-4 aspect-square"><Icon name="image-search" class="w-auto h-4" /></div>
+						<div class="w-4 aspect-square"><ImageSearchIcon class="w-auto h-4" /></div>
 						<template #popper>
 							<HeaderSampleImages v-model="currentValue" :host="host" :access-key="accessKey" :secret="secret" :sample-images="sampleImages" :imgix-mode="imgixMode" @remove-sample-image="emit('removeSampleImage', $event)" @import-sample-images="emit('importSampleImages', $event)" />
 						</template>

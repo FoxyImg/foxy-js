@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SmallLabel from "@/components/UI/SmallLabel.vue";
-import Icon from "@/components/UI/Icon.vue";
+import {DragHandleIcon, DownArrowIcon} from "@foxy/vue-ui";
 import {computed, ref} from "vue";
 import Toggle from "@/components/UI/Toggle.vue";
 import {useStorage} from "@vueuse/core";
@@ -33,8 +33,8 @@ const expanded = props.collapseKey ? useStorage('editor-panel-collapsed-'+props.
 	<div v-auto-animate class="editor-panel p-3 rounded-lg shadow bg-white flex flex-col gap-3 border border-neutral-200" :key="`Section ${title}`" :class="{'opacity-50': disabled}">
 		<div v-if="title" class="flex items-center justify-start gap-1">
 			<div class="flex-1 truncate flex items-center justify-start gap-1 cursor-pointer" @click="expanded = !expanded">
-				<Icon v-if="draggable" name="drag-handle" class="drag-handle w-3 h-auto fill-black"></Icon>
-				<Icon name="down-arrow" class="w-3 h-auto fill-black transition-transform" :class="{'-rotate-90': !expanded }"></Icon>
+				<DragHandleIcon v-if="draggable" class="drag-handle w-3 h-auto fill-black"></DragHandleIcon>
+				<DownArrowIcon class="w-3 h-auto fill-black transition-transform" :class="{'-rotate-90': !expanded }"></DownArrowIcon>
 				<SmallLabel class="w-full truncate">{{ title }}</SmallLabel>
 			</div>
 			<div class="flex items-center gap-2">

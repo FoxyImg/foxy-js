@@ -1,0 +1,24 @@
+//region Icons
+export {default as BookmarkIcon} from "./components/icons/BookmarkIcon.vue";
+export {default as BrokenIcon} from "./components/icons/BrokenIcon.vue";
+export {default as CloseIcon} from "./components/icons/CloseIcon.vue";
+export {default as ConstrainLineIcon} from "./components/icons/ConstrainLineIcon.vue";
+export {default as ConstrainIcon} from "./components/icons/ConstrainIcon.vue";
+export {default as ConstraintLineLongIcon} from "./components/icons/ConstraintLineLongIcon.vue";
+export {default as CopyIcon} from "./components/icons/CopyIcon.vue";
+export {default as DebugIcon} from "./components/icons/DebugIcon.vue";
+export {default as DeleteSourceIcon} from "./components/icons/DeleteSourceIcon.vue";
+export {default as DownArrowIcon} from "./components/icons/DownArrowIcon.vue";
+export {default as DragHandleIcon} from "./components/icons/DragHandleIcon.vue";
+export {default as EditSourceIcon} from "./components/icons/EditSourceIcon.vue";
+export {default as FaceIcon} from "./components/icons/FaceIcon.vue";
+export {default as FocalPointerIcon} from "./components/icons/FocalPointerIcon.vue";
+export {default as FontIcon} from "./components/icons/FontIcon.vue";
+export {default as ImageSearchIcon} from "./components/icons/ImageSearchIcon.vue";
+export {default as LinkIcon} from "./components/icons/LinkIcon.vue";
+export {default as NewSourceIcon} from "./components/icons/NewSourceIcon.vue";
+export {default as PersonIcon} from "./components/icons/PersonIcon.vue";
+export {default as ReloadIcon} from "./components/icons/ReloadIcon.vue";
+export {default as ReverseIcon} from "./components/icons/ReverseIcon.vue";
+export {default as SaveIcon} from "./components/icons/SaveIcon.vue";
+//endregion Icons

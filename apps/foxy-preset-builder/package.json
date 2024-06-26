@@ -14,6 +14,7 @@
     "@formkit/auto-animate": "^0.8.2",
     "@formkit/drag-and-drop": "^0.1.4",
     "@foxy/url-builder": "workspace:*",
+    "@foxy/vue-ui": "workspace:*",
     "@noction/vue-bezier": "^1.11.2",
     "@vueform/multiselect": "^2.6.8",
     "@vueuse/core": "^10.11.0",

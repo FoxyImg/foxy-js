@@ -1,25 +1,18 @@
 <script setup lang="ts">
 import ModalContainer from "@/components/UI/ModalContainer.vue";
-import {computed, reactive, ref, toRaw, watch} from "vue";
+import {computed, inject, reactive, ref, toRaw, watch} from "vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
-import {storeToRefs} from "pinia";
-import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import { Cropper } from 'vue-advanced-cropper';
 import 'vue-advanced-cropper/dist/style.css';
 import LoaderFeedback from "@/components/UI/LoaderFeedback.vue";
 import useImageLoader from "@/composables/image-loader";
 import Toggle from "@/components/UI/Toggle.vue";
-import type {SourceCropParams} from "@foxy/url-builder";
-import buildUrl from "@/composables/build-url";
-
-const {
-	currentApp,
-	currentSource,
-	imageKey,
-} = storeToRefs(useFoxyAppStore());
+import {type SourceCropParams} from "@foxy/url-builder";
+import type {URLBuilder} from "@/types/url-builder";
 
 const props = defineProps<{
 	modelValue: SourceCropParams,
+	imageKey: string|null,
 }>();
 
 const modalProps = reactive<{
@@ -32,6 +25,8 @@ const modalProps = reactive<{
 	showClose: true
 });
 
+const buildUrl:URLBuilder = inject("buildUrl") as URLBuilder;
+
 const emit = defineEmits(['update:modelValue', 'save', 'close']);
 
 const currentCrop = ref<SourceCropParams>(JSON.parse(JSON.stringify(props.modelValue)));
@@ -41,13 +36,12 @@ function saveCrop() {
 	emit('close');
 }
 
-const imageUrl = computed(() => {
-	if (!currentSource.value || !currentApp.value || !currentApp.value.url || !currentSource.value.key || !currentApp.value.signingKey || !imageKey.value) {
-		return null;
+const imageUrl = ref<string|null>(null);
+watch(() => props.imageKey, async (newVal) => {
+	if (props.imageKey) {
+		imageUrl.value = await buildUrl(props.imageKey, {});
 	}
-
-	return buildUrl(imageKey.value, {});
-});
+}, {immediate: true});
 
 const {
 	isLoading,

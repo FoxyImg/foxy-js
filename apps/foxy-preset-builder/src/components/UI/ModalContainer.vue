@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Icon from "@/components/UI/Icon.vue";
+import {CloseIcon} from "@foxy/vue-ui";
 
 const emit = defineEmits(['close']);
 withDefaults(defineProps<{
@@ -20,7 +20,7 @@ withDefaults(defineProps<{
 			<div v-if="showTitle" class="flex items-center justify-between border-b border-b-neutral-300">
 				<div class="p-3 text-base font-bold">{{ title }}</div>
 				<div v-if="showClose" @click="emit('close')" class="p-3 cursor-pointer">
-					<Icon name="close" class="fill-black w-2 h-auto" />
+					<CloseIcon class="fill-black w-2 h-auto" />
 				</div>
 			</div>
 			<slot></slot>

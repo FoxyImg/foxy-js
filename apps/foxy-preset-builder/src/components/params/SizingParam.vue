@@ -1,31 +1,29 @@
 <script setup lang="ts">
 import {computed, watch} from "vue";
 import EditorPanel from "@/components/values/EditorPanel.vue";
-import {type SizingParams, CropOptions, HGravityOptions, InterestingOptions, VGravityOptions} from "@foxy/url-builder";
+import {
+	type ImageMeta,
+	type SizingParams,
+	CropOptions,
+	HGravityOptions,
+	InterestingOptions,
+	VGravityOptions
+} from "@foxy/url-builder";
 import TagsValue from "@/components/values/TagsValue.vue";
 import SelectValue from "@/components/values/SelectValue.vue";
 import SliderValue from "@/components/values/SliderValue.vue";
 import FocalPointValue from "@/components/values/FocalPointValue.vue";
 import ObjectSelectValue from "@/components/values/ObjectSelectValue.vue";
 import ToggleValue from "@/components/values/ToggleValue.vue";
-import {storeToRefs} from "pinia";
-import {useImageParamsStore} from "@/stores/image-params-store";
 import {useStorage} from "@vueuse/core";
-import {useFoxyAppStore} from "@/stores/foxy-app-store";
-import Icon from "@/components/UI/Icon.vue";
-
-const {
-	imageKey,
-} = storeToRefs(useFoxyAppStore());
-
-const {
-	imageMeta,
-	faceCount,
-	peopleCount,
-} = storeToRefs(useImageParamsStore());
+import {ConstrainLineIcon, ConstrainIcon} from "@foxy/vue-ui";
 
 const props = defineProps<{
-	modelValue: SizingParams
+	modelValue: SizingParams,
+	imageKey: string|null,
+	imageMeta: ImageMeta|null,
+	faceCount: number,
+	peopleCount: number,
 }>();
 
 const emit = defineEmits<{
@@ -46,8 +44,8 @@ const personOptions = computed(() => {
 		{ label: 'All People', value: -1 },
 	];
 
-	if (imageMeta.value && imageMeta.value.people && imageMeta.value.people.length > 0) {
-		options.push(...imageMeta.value.people.map((person:any, index:number) => ({
+	if (props.imageMeta && props.imageMeta.people && props.imageMeta.people.length > 0) {
+		options.push(...props.imageMeta.people.map((person:any, index:number) => ({
 			label: `Person ${index + 1} - ${person.name}`,
 			value: index,
 		})));
@@ -63,8 +61,8 @@ const faceOptions = computed(() => {
 		{ label: 'All Faces', value: -1 },
 	];
 
-	if (imageMeta.value && imageMeta.value.faces && imageMeta.value.faces.length > 0) {
-		options.push(...imageMeta.value.faces.map((face:any, index:number) => ({
+	if (props.imageMeta && props.imageMeta.faces && props.imageMeta.faces.length > 0) {
+		options.push(...props.imageMeta.faces.map((face:any, index:number) => ({
 			label: `Face #${index + 1}`,
 			value: index,
 		})));
@@ -99,11 +97,11 @@ watch(() => [currentValue.value.width, currentValue.value.height], (newVal, oldV
 				<SliderValue title="Height" v-model="currentValue.height" :min="0" :max="3840" :step="1" :default="0" default-label="None" suffix="px" />
 			</div>
 			<div class="flex flex-col items-center justify-center gap-1">
-				<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500" />
+				<ConstrainLineIcon class="w-3 h-auto stroke-neutral-500" />
 				<div class="cursor-pointer border border-neutral-300 rounded-lg p-1" :class="{'bg-neutral-300': constrainDimensions}" @click="constrainDimensions = !constrainDimensions">
-					<Icon name="constrain" class="fill-black w-3 h-auto" />
+					<ConstrainIcon class="fill-black w-3 h-auto" />
 				</div>
-				<Icon name="contrain-line" class="w-3 h-auto stroke-neutral-500 rotate-180 -scale-x-100" />
+				<ConstrainLineIcon class="w-3 h-auto stroke-neutral-500 rotate-180 -scale-x-100" />
 			</div>
 		</div>
 		<SliderValue v-if="currentValue.crop.length > 0" title="Aspect Ratio Width" v-model="currentValue.aspectRatioWidth" :min="0" :max="128" :step="1" :default="0" default-label="None" />
@@ -115,7 +113,7 @@ watch(() => [currentValue.value.width, currentValue.value.height], (newVal, oldV
 		</div>
 	</EditorPanel>
 	<EditorPanel v-if="currentValue.crop.includes('focus') && imageKey" collapse-key="focal-point-editor" title="Focal Point"  :disabled="!currentValue.enabled">
-		<FocalPointValue v-model="currentValue.focalPoint"/>
+		<FocalPointValue v-model="currentValue.focalPoint" :image-key="imageKey" :image-meta="imageMeta" />
 		<SliderValue title="Focal Point Zoom" v-model="currentValue.focalPointZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
 	</EditorPanel>
 	<EditorPanel v-if="currentValue.crop.includes('face') && faceCount > 0" title="Face Crop Options" collapse-key="face-crop-options"  :disabled="!currentValue.enabled">

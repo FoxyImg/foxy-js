@@ -1,26 +1,17 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue';
-import {storeToRefs} from "pinia";
-import {useFoxyAppStore} from "@/stores/foxy-app-store";
+import {computed, inject, ref, watch} from 'vue';
 import SourceCropModal from "@/components/modals/SourceCropModal.vue";
-import {useImageParamsStore} from "@/stores/image-params-store";
-import { type SourceCropParams, DefaultSizingParams} from "@foxy/url-builder";
-import buildUrl from "@/composables/build-url";
+import {type SourceCropParams, DefaultSizingParams, type ImageMeta} from "@foxy/url-builder";
+import type {URLBuilder} from "@/types/url-builder";
 
-const {
-	currentApp,
-	currentSource,
-	imageKey,
-} = storeToRefs(useFoxyAppStore());
-
-const {
-	imageMeta,
-} = storeToRefs(useImageParamsStore());
+const buildUrl:URLBuilder = inject("buildUrl") as URLBuilder;
 
 const props = withDefaults(defineProps<{
 	title: string,
 	modelValue: SourceCropParams,
 	default: SourceCropParams,
+	imageMeta: ImageMeta|null,
+	imageKey: string|null,
 }>(), {
 });
 
@@ -33,18 +24,17 @@ const currentValue = computed({
 	set: (value) => emit('update:modelValue', value),
 });
 
-const imageUrl = computed(() => {
-	if (!currentSource.value || !currentApp.value || !currentApp.value.url || !currentSource.value.key || !currentApp.value.signingKey || !imageKey.value) {
-		return null;
+const imageUrl = ref<string|null>(null);
+watch(() => props.imageKey, async (newVal) => {
+	if (props.imageKey) {
+		imageUrl.value = await buildUrl(props.imageKey, { sizing: { ...DefaultSizingParams, width: 300 } });
 	}
-
-	return buildUrl(imageKey.value, { sizing: { ...DefaultSizingParams, width: 300 } });
-});
+}, {immediate: true});
 
 const showCropModal = ref(false);
 
 const cropStyle = computed(() => {
-	if (imageMeta.value === null || currentValue.value.width === 0 || currentValue.value.height === 0) {
+	if (props.imageMeta === null || currentValue.value.width === 0 || currentValue.value.height === 0) {
 		return {
 			left: '0',
 			top: '0',
@@ -53,10 +43,10 @@ const cropStyle = computed(() => {
 		};
 	}
 
-	const x = currentValue.value.x / imageMeta.value.width * 100.0;
-	const y = currentValue.value.y / imageMeta.value.height * 100.0;
-	const w = currentValue.value.width / imageMeta.value.width * 100.0;
-	const h = currentValue.value.height / imageMeta.value.height * 100.0;
+	const x = currentValue.value.x / props.imageMeta.width * 100.0;
+	const y = currentValue.value.y / props.imageMeta.height * 100.0;
+	const w = currentValue.value.width / props.imageMeta.width * 100.0;
+	const h = currentValue.value.height / props.imageMeta.height * 100.0;
 
 	return {
 		left: 0,
@@ -81,17 +71,17 @@ const cropStyle = computed(() => {
 });
 
 const cropBorderStyle = computed(() => {
-	if (imageMeta.value === null || currentValue.value.width === 0 || currentValue.value.height === 0) {
+	if (props.imageMeta === null || currentValue.value.width === 0 || currentValue.value.height === 0) {
 		return {
 			display: 'none',
 		};
 	}
 
 	return {
-		width: `${currentValue.value.width / imageMeta.value.width * 100.0}%`,
-		height: `${currentValue.value.height / imageMeta.value.height * 100.0}%`,
-		left: `${currentValue.value.x / imageMeta.value.width * 100.0}%`,
-		top: `${currentValue.value.y / imageMeta.value.height * 100.0}%`,
+		width: `${currentValue.value.width / props.imageMeta.width * 100.0}%`,
+		height: `${currentValue.value.height / props.imageMeta.height * 100.0}%`,
+		left: `${currentValue.value.x / props.imageMeta.width * 100.0}%`,
+		top: `${currentValue.value.y / props.imageMeta.height * 100.0}%`,
 	}
 });
 
@@ -101,7 +91,7 @@ const imageRef = ref<HTMLImageElement|null>(null);
 const imageRect = ref<DOMRect|null>(null);
 
 function mouseDown(e:MouseEvent) {
-	if (!imageMeta.value || imageRef.value === null) {
+	if (!props.imageMeta || imageRef.value === null) {
 		return;
 	}
 
@@ -113,17 +103,17 @@ function mouseDown(e:MouseEvent) {
 }
 
 function mouseMove(e:MouseEvent) {
-	if (!imageMeta.value || !isMouseDown.value || imageRef.value === null) {
+	if (!props.imageMeta || !isMouseDown.value || imageRef.value === null) {
 		return;
 	}
 
 	const newPos = {x: e.clientX - imageRect.value!.x, y: e.clientY - imageRect.value!.y};
 	const dx = newPos.x - lastMousePos.value.x;
 	const dy = newPos.y - lastMousePos.value.y;
-	const nx = currentValue.value.x + ((dx / imageRect.value!.width) * imageMeta.value!.width);
-	const ny = currentValue.value.y + ((dy / imageRect.value!.width) * imageMeta.value!.height);
-	const mx = imageMeta.value!.width - currentValue.value.width;
-	const my = imageMeta.value!.height - currentValue.value.height;
+	const nx = currentValue.value.x + ((dx / imageRect.value!.width) * props.imageMeta.width);
+	const ny = currentValue.value.y + ((dy / imageRect.value!.width) * props.imageMeta.height);
+	const mx = props.imageMeta.width - currentValue.value.width;
+	const my = props.imageMeta.height - currentValue.value.height;
 
 	currentValue.value.x = Math.min(mx, Math.max(0, nx));
 	currentValue.value.y = Math.min(my, Math.max(0, ny));
@@ -133,7 +123,7 @@ function mouseMove(e:MouseEvent) {
 }
 
 function mouseUp(e:MouseEvent) {
-	if (!imageMeta.value || !isMouseDown.value || imageRef.value === null) {
+	if (!props.imageMeta || !isMouseDown.value || imageRef.value === null) {
 		return;
 	}
 
@@ -163,6 +153,6 @@ function mouseUp(e:MouseEvent) {
 		</div>
 	</div>
 	<teleport to="#modals">
-		<SourceCropModal v-if="showCropModal" v-model="currentValue" @close="showCropModal = false" />
+		<SourceCropModal v-if="showCropModal" v-model="currentValue" @close="showCropModal = false" :image-key="imageKey" />
 	</teleport>
 </template>

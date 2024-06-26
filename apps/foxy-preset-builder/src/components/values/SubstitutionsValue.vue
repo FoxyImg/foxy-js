@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type {OverlaySubstitutionParam} from "@foxy/url-builder";
-import Icon from "@/components/UI/Icon.vue";
+import {DeleteSourceIcon} from "@foxy/vue-ui";
 
 const props = withDefaults(defineProps<{
 	title: string,
@@ -46,7 +46,7 @@ function deleteSubstitution(index:number) {
 					<input type="text" v-model="substitution.key" class="flex-1 border border-neutral-200 text-xs rounded-md py-1.5 px-1" />
 					<input type="text" v-model="substitution.value" class="flex-1 border border-neutral-200 text-xs rounded-md py-1.5 px-1" />
 					<div class="flex aspect-square cursor-pointer items-center justify-center" @click="deleteSubstitution(index)">
-						<Icon name="delete-source" class="w-auto h-3.5 fill-red-600 cursor-pointer" />
+						<DeleteSourceIcon class="w-auto h-3.5 fill-red-600 cursor-pointer" />
 					</div>
 				</div>
 			</div>

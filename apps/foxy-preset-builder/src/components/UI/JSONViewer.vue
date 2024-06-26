@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import 'vue-json-pretty/lib/styles.css';
 import VueJsonPretty from "vue-json-pretty";
-import Icon from "@/components/UI/Icon.vue";
+import {CopyIcon} from "@foxy/vue-ui";
 import copy from "copy-to-clipboard";
 
 const props = defineProps<{
@@ -18,7 +18,7 @@ function copyJson() {
 			<VueJsonPretty :data="jsonObject" :showLineNumber="true" :showIcon="true" :showDoubleQuotes="false" :showLength="true" />
 		</div>
 		<div @click="copyJson" class="cursor-pointer backdrop-blur absolute right-1 top-1 px-2 py-1 bg-black/10 rounded-lg text-xxs font-bold uppercase text-black flex items-center gap-0.5">
-			<Icon name="copy-icon" class="fill-black w-3 h-auto" />
+			<CopyIcon class="fill-black w-3 h-auto" />
 			Copy
 		</div>
 	</div>

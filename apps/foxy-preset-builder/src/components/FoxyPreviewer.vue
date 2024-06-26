@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref, watch} from "vue";
+import {computed, onMounted, provide, reactive, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 
 import HeaderImageKeyInput from "@/components/header/HeaderImageKeyInput.vue";
 import EditorPanel from "@/components/values/EditorPanel.vue";
 import Tabs from "@/components/UI/Tabs.vue";
 import Tab from "@/components/UI/Tab.vue";
-import Icon from "@/components/UI/Icon.vue";
+import {BrokenIcon, DebugIcon, FaceIcon, PersonIcon, ReloadIcon} from "@foxy/vue-ui";
 import LoaderFeedback from "@/components/UI/LoaderFeedback.vue";
 import ToggleParam from "@/components/values/ToggleValue.vue";
 import SmallLabel from "@/components/UI/SmallLabel.vue";
@@ -29,6 +29,7 @@ import FoxyPresetEditModal from "@/components/modals/FoxyPresetEditModal.vue";
 import ImageLink from "@/components/UI/ImageLink.vue";
 import ParamsEditor from "@/components/editors/ParamsEditor.vue";
 import OverlaysEditor from "@/components/editors/OverlaysEditor.vue";
+import {buildUrl} from "@/composables/build-url";
 
 const {
 	apps,
@@ -45,10 +46,14 @@ const {
 } = storeToRefs(useFoxyAppStore());
 
 const {
-	removeSampleImage
+	addSampleImage,
+	removeSampleImage,
+	addOverlayImage,
+	removeOverlayImage,
 } = useFoxyAppStore();
 
 const {
+	imageParams,
 	currentImageUrl,
 	currentPresetImageUrl,
 	imageMeta,
@@ -63,6 +68,7 @@ const {
 	fetchImageMeta,
 	fetchCurrentPresetJSONObject,
 	reload,
+	resetParams
 } = useImageParamsStore();
 
 const {
@@ -100,8 +106,10 @@ const {
 		syncFoxyPresets,
 } = useFoxyPresetEditor();
 
+provide("buildUrl", buildUrl);
+
 onMounted(async () => {
-	buildImageUrl();
+	await buildImageUrl();
 	await fetchCurrentPresetJSONObject();
 	await fetchImageMeta();
 });
@@ -173,7 +181,7 @@ onMounted(() => {
 					<template v-if="currentTab === 'preview' || !imageMeta">
 						<div class="group absolute left-0 top-0 right-0 bottom-0 flex items-center justify-center bg-checkered">
 							<div v-if="error" class="absolute left-1/2 top-1/2 -translate-x-1/2 flex flex-col items-center justify-center bg-white/15 p-2 rounded-lg backdrop-blur overflow-hidden transform-gpu">
-								<Icon name="broken" class="fill-red-600 w-16 h-auto" />
+								<BrokenIcon class="fill-red-600 w-16 h-auto" />
 								<div class="font-bold">Oops.</div>
 							</div>
 							<template v-else-if="currentImageUrl">
@@ -197,35 +205,35 @@ onMounted(() => {
 						<div class="absolute left-0 bottom-0 right-0 flex items-center p-1.5">
 							<div class="flex-1 flex items-center justify-start gap-3">
 								<StatusInfo v-if="imageSizeText">{{imageSizeText}}, {{Math.floor(loadTime)}}ms</StatusInfo>
-								<StatusInfo v-tooltip="`${faceCount} faces found.`" v-if="imageMeta && isLoaded" class="cursor-pointer"><Icon name="face" class="fill-black w-3 h-auto" /> {{ faceCount }}</StatusInfo>
-								<StatusInfo v-tooltip="`${peopleCount} people found.`" v-if="imageMeta && isLoaded" class="cursor-pointer"><Icon name="person" class="fill-black w-3 h-auto"/> {{ peopleCount }}</StatusInfo>
+								<StatusInfo v-tooltip="`${faceCount} faces found.`" v-if="imageMeta && isLoaded" class="cursor-pointer"><FaceIcon class="fill-black w-3 h-auto" /> {{ faceCount }}</StatusInfo>
+								<StatusInfo v-tooltip="`${peopleCount} people found.`" v-if="imageMeta && isLoaded" class="cursor-pointer"><PersonIcon class="fill-black w-3 h-auto"/> {{ peopleCount }}</StatusInfo>
 							</div>
 							<div class="flex-1 flex items-center justify-end gap-3 ">
 								<div class="cursor-pointer aspect-square rounded-full bg-white/50 hover:bg-white backdrop-blur-lg p-1.5" @click="reload">
-									<Icon name="reload" class="fill-current w-4 h-auto" />
+									<ReloadIcon class="fill-current w-4 h-auto" />
 								</div>
 								<div>
 									<VDropdown>
 										<div class="cursor-pointer aspect-square rounded-full bg-white/50 hover:bg-white backdrop-blur-lg p-1.5">
-											<Icon name="debug" class="fill-current w-4 h-auto" />
+											<DebugIcon class="fill-current w-4 h-auto" />
 										</div>
 										<template #popper>
 											<div class="p-3 rounded-lg bg-neutral-100 flex flex-col gap-3">
 											<SmallLabel>Debug Options</SmallLabel>
 											<EditorPanel title="Image Recognition" class="w-[400px]" collapse-key="debug-recognition">
 												<div class="grid grid-cols-2 gap-3">
-													<ToggleParam title="Outline Faces" v-model="debugParams.faces" />
-													<ToggleParam title="Outline All Faces" v-model="debugParams.allFaces" />
-													<ToggleParam title="Outline People" v-model="debugParams.people" />
-													<ToggleParam title="Outline All People" v-model="debugParams.allPeople" />
-													<ToggleParam title="Outline Other Labels" v-model="debugParams.otherLabels" />
+													<ToggleParam title="Outline Faces" v-model="imageParams.debug.faces" />
+													<ToggleParam title="Outline All Faces" v-model="imageParams.debug.allFaces" />
+													<ToggleParam title="Outline People" v-model="imageParams.debug.people" />
+													<ToggleParam title="Outline All People" v-model="imageParams.debug.allPeople" />
+													<ToggleParam title="Outline Other Labels" v-model="imageParams.debug.otherLabels" />
 												</div>
 											</EditorPanel>
 											<EditorPanel title="Caching" class="w-[400px]" collapse-key="debug-caching">
 												<div class="grid grid-cols-2 gap-3">
-													<ToggleParam title="Disable Source Cache" v-model="debugParams.disableSourceCache" />
-													<ToggleParam title="Disable Meta Cache" v-model="debugParams.disableMetaCache" />
-													<ToggleParam title="Disable Render Cache" v-model="debugParams.disableRenderCache" />
+													<ToggleParam title="Disable Source Cache" v-model="imageParams.debug.disableSourceCache" />
+													<ToggleParam title="Disable Meta Cache" v-model="imageParams.debug.disableMetaCache" />
+													<ToggleParam title="Disable Render Cache" v-model="imageParams.debug.disableRenderCache" />
 												</div>
 											</EditorPanel>
 											</div>
@@ -249,11 +257,26 @@ onMounted(() => {
 				<Tabs>
 					<Tab v-model="paramsEditorMode" value="params">Parameters</Tab>
 					<Tab v-model="paramsEditorMode" value="overlays">Overlays</Tab>
-					<Tab v-if="error && size === 666" v-model="paramsEditorMode" value="presets">Presets</Tab>
 				</Tabs>
 				<div class="flex-1 relative">
-					<ParamsEditor v-show="paramsEditorMode === 'params'" class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100" />
-					<OverlaysEditor v-show="paramsEditorMode === 'overlays'" class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100" />
+					<ParamsEditor
+						v-show="paramsEditorMode === 'params'"
+						class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100"
+						:image-params="imageParams"
+						:image-key="imageKey"
+						:image-meta="imageMeta"
+						:face-count="faceCount"
+						:people-count="peopleCount"
+						:sample-images="currentSource?.sampleImages ?? []"
+						:overlay-images="currentSource?.overlayImages ?? []"
+						@remove-sample-image="removeSampleImage"
+						@add-sample-image="addSampleImage"
+						@add-overlay-image="addOverlayImage"
+						@remove-overlay-image="removeOverlayImage"
+						@reset-image-params="resetParams" />
+					<OverlaysEditor
+						v-show="paramsEditorMode === 'overlays'"
+						class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100" />
 					<div v-show="paramsEditorMode === 'presets'" class="absolute top-0 left-0 w-full h-full overflow-y-auto overscroll-contain bg-neutral-100">
 					</div>
 				</div>

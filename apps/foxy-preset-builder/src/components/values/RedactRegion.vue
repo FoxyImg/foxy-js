@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type {RedactRect} from "@foxy/url-builder";
 import {computed, ref} from "vue";
-import Icon from "@/components/UI/Icon.vue";
+import {CloseIcon} from "@foxy/vue-ui";
 
 const props = defineProps<{
 	modelValue: RedactRect,
@@ -91,7 +91,7 @@ function mouseUp(e:MouseEvent) {
 <template>
 	<div ref="regionDiv" :style="style" class="border border-white absolute drop-shadow cursor-move" @mousedown.stop.prevent="mouseDown">
 		<div @click="emit('remove')" class="pointer-events-auto cursor-pointer absolute left-0 top-0 p-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 hover:bg-white backdrop-blur-lg">
-			<Icon name="close" class="fill-black w-1.5 h-auto" />
+			<CloseIcon class="fill-black w-1.5 h-auto" />
 		</div>
 	</div>
 </template>

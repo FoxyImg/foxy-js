@@ -41,6 +41,16 @@ export const useFoxyAppStore = defineStore("foxy-app-store", () => {
 		},
 	})
 
+	const overlayImages = computed({
+		get: () => currentSource.value?.overlayImages ?? [],
+		set: (value) => {
+			console.log('setting overlay images', value);
+			if (currentSource.value) {
+				currentSource.value.overlayImages = value
+			}
+		},
+	})
+
 	const currentPresetChanged = ref(false);
 	const currentPresetId = ref<string|null>(null);
 	const currentPreset = computed(() => {
@@ -71,6 +81,27 @@ export const useFoxyAppStore = defineStore("foxy-app-store", () => {
 		sampleImages.value.splice(idx, 1);
 	}
 
+	function addSampleImage(imageKey:string) {
+		if (!sampleImages.value.includes(imageKey)) {
+			sampleImages.value.push(imageKey);
+		}
+	}
+
+	function removeOverlayImage(imageKey:string) {
+		const idx = overlayImages.value.indexOf(imageKey);
+		if (idx === -1) {
+			return;
+		}
+
+		overlayImages.value.splice(idx, 1);
+	}
+
+	function addOverlayImage(imageKey:string) {
+		if (!overlayImages.value.includes(imageKey)) {
+			overlayImages.value.push(imageKey);
+		}
+	}
+
 	watch(currentAppId, () => {
 		currentPresetChanged.value = false;
 	});
@@ -91,7 +122,10 @@ export const useFoxyAppStore = defineStore("foxy-app-store", () => {
 		currentPreset,
 		currentPresets,
 
-		removeSampleImage
+		addSampleImage,
+		removeSampleImage,
+		addOverlayImage,
+		removeOverlayImage,
 	}
 }, {
 	persist: {

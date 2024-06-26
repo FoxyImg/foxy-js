@@ -1,26 +1,21 @@
 <script setup lang="ts">
 import {computed, onMounted} from 'vue';
-import Icon from "@/components/UI/Icon.vue";
 import pDebounce from "p-debounce";
-import {storeToRefs} from "pinia";
-import {useFoxyAppStore} from "@/stores/foxy-app-store";
-import OverlayImageSamples from "@/components/values/OverlayImageSamples.vue";
-import HeaderSampleImages from "@/components/header/HeaderSampleImages.vue";
 import ImageKeyImageSamples from "@/components/values/ImageKeyImageSamples.vue";
-
-const {
-	currentSource
-} = storeToRefs(useFoxyAppStore());
+import {ImageSearchIcon} from "@foxy/vue-ui";
 
 const props = withDefaults(defineProps<{
 	title: string,
 	modelValue: string|null,
 	default: string|null,
+	sampleImages: string[],
 }>(), {
 });
 
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: string|null): void;
+	(e: 'removeSampleImage', value: string): void;
+	(e: 'addSampleImage', value: string): void;
 }>();
 
 function updateModelValue(value: string|null) {
@@ -40,16 +35,11 @@ function addImage() {
 		return;
 	}
 
-	if (currentSource.value === null) {
+	if (props.sampleImages.includes(currentValue.value)) {
 		return;
 	}
 
-	if (currentSource.value.sampleImages.includes(currentValue.value)) {
-		return;
-	}
-
-	console.log('adding image');
-	currentSource.value.sampleImages.push(currentValue.value);
+	emit('addSampleImage', currentValue.value);
 }
 </script>
 <template>
@@ -60,10 +50,10 @@ function addImage() {
 				<input type="text" v-model="currentValue" class="flex-1 border border-neutral-200 text-xs rounded-md py-1.5 px-1" @enter="addImage" @paste="addImage" />
 				<VDropdown>
 					<div class="cursor-pointer flex items-center gap-1 aspect-square p-1">
-						<Icon name="image-search" class="w-5 h-auto fill-black" />
+						<ImageSearchIcon class="w-5 h-auto fill-black" />
 					</div>
 					<template #popper>
-						<ImageKeyImageSamples v-model="currentValue" />
+						<ImageKeyImageSamples v-model="currentValue" :sample-images="sampleImages" @remove-sample-image="emit('removeSampleImage', $event)" />
 					</template>
 				</VDropdown>
 			</div>
