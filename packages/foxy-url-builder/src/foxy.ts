@@ -16,6 +16,7 @@ import {type BuiltParams, getImageParams, type PartialImageParams} from "./param
 import {leadingSlash, trimStartingSlash} from "./utils/slash-it";
 import signHMAC256 from "./utils/sign";
 import base64 from "./utils/base-64";
+import {useDebugParam} from "./params/debug";
 
 const sourceCropParam = useSourceCropParam();
 const sizingParam = useSizingParam();
@@ -31,6 +32,7 @@ const redactParam = useRedactParam();
 const exportParam = useExportParam()
 const overlaysParam = useOverlaysParam();
 const levelsParam = useLevelsParam();
+const debugParam = useDebugParam();
 
 export function foxy(host:string, accessKey:string, secret:string|undefined = undefined, imgixMode:boolean = false, cacheBuster:boolean = false) {
 	const buildUrl = (imageKey:string, params:PartialImageParams) => {
@@ -52,6 +54,7 @@ export function foxy(host:string, accessKey:string, secret:string|undefined = un
 		maskParam.buildParams(builtParams, imageParams.mask);
 		exportParam.buildParams(builtParams, imageParams.export);
 		overlaysParam.buildParams(builtParams, imageParams.overlays);
+		debugParam.buildParams(builtParams, imageParams.debug);
 
 		if (imageParams.backgroundColor) {
 			builtParams['bg'] = imageParams.backgroundColor;

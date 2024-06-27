@@ -1,6 +1,6 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 
-export type DebugParams = BaseParam & {
+type BaseDebugParams = {
 	faces: boolean,
 	allFaces: boolean,
 	people: boolean,
@@ -11,6 +11,9 @@ export type DebugParams = BaseParam & {
 	disableMetaCache: boolean,
 	disableRenderCache: boolean,
 }
+
+export type DebugParams = BaseParam & BaseDebugParams;
+export type FoxyDebugParams = Partial<BaseDebugParams>;
 
 export const DefaultDebugParams: DebugParams = {
 	enabled: true,
@@ -26,7 +29,7 @@ export const DefaultDebugParams: DebugParams = {
 	disableRenderCache: false,
 }
 
-export const useDebugParam:ComposableParam<DebugParams> = () => {
+export const useDebugParam:ComposableParam<DebugParams, FoxyDebugParams> = () => {
 	function buildParams(urlParams: BuiltParams, params:DebugParams) {
 		const debug:string[] = [];
 
@@ -75,7 +78,11 @@ export const useDebugParam:ComposableParam<DebugParams> = () => {
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:DebugParams) {
+	function importParams(foxyParams:FoxyDebugParams):DebugParams {
+		return {
+			...DefaultDebugParams,
+			...foxyParams,
+		}
 	}
 
 	return {

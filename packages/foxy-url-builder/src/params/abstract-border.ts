@@ -1,12 +1,15 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 
-export type BorderParams = BaseParam & {
+type BaseBorderParams = {
 	color: string|null,
 	left: number,
 	top: number,
 	right: number,
 	bottom: number,
 }
+
+export type BorderParams = BaseParam & BaseBorderParams;
+export type FoxyBorderParams = Partial<BaseBorderParams>;
 
 export const DefaultBorderParams:BorderParams = {
 	enabled: true,
@@ -17,9 +20,9 @@ export const DefaultBorderParams:BorderParams = {
 	bottom: 0,
 }
 
-export const useAbstractBorderParam:ComposableParam<BorderParams> = (prefix?:string) => {
+export const useAbstractBorderParam:ComposableParam<BorderParams, FoxyBorderParams> = (prefix?:string) => {
 	function buildParams(urlParams: BuiltParams, params:BorderParams) {
-		if (!prefix) {
+		if (!prefix || !params.enabled) {
 			return urlParams;
 		}
 
@@ -36,7 +39,11 @@ export const useAbstractBorderParam:ComposableParam<BorderParams> = (prefix?:str
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:BorderParams) {
+	function importParams(foxyParams:FoxyBorderParams):BorderParams {
+		return {
+			...DefaultBorderParams,
+			...foxyParams,
+		}
 	}
 
 	return {

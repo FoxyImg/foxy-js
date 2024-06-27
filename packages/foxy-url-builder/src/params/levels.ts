@@ -1,10 +1,12 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import {DeepPartial} from "../deep-partial";
 
 export type ChannelLevelsParams = BaseParam & {
 	shadows: number,
 	mid: number,
 	highlights: number,
 }
+export type FoxyChannelLevelsParams = Partial<ChannelLevelsParams>;
 
 export const DefaultChannelLevelsParams: ChannelLevelsParams = {
 	enabled: true,
@@ -13,12 +15,15 @@ export const DefaultChannelLevelsParams: ChannelLevelsParams = {
 	highlights: 255,
 }
 
-export type LevelsParams = BaseParam & {
+type BaseLevelsParams = {
 	all: ChannelLevelsParams,
 	red: ChannelLevelsParams,
 	green: ChannelLevelsParams,
 	blue: ChannelLevelsParams,
 }
+
+export type LevelsParams = BaseParam & BaseLevelsParams;
+export type FoxyLevelsParams = DeepPartial<BaseLevelsParams>;
 
 export const DefaultLevelsParams: LevelsParams = {
 	enabled: true,
@@ -28,7 +33,7 @@ export const DefaultLevelsParams: LevelsParams = {
 	blue: { ...DefaultChannelLevelsParams },
 }
 
-export const useChannelLevelsParam:ComposableParam<ChannelLevelsParams> = (prefix?:string) => {
+export const useChannelLevelsParam:ComposableParam<ChannelLevelsParams, FoxyChannelLevelsParams> = (prefix?:string) => {
 	function buildParams(urlParams: BuiltParams, params:ChannelLevelsParams) {
 		if (!params.enabled || prefix === undefined) {
 			return urlParams;
@@ -38,14 +43,18 @@ export const useChannelLevelsParam:ComposableParam<ChannelLevelsParams> = (prefi
 			return urlParams;
 		}
 
-		const mid = Math.floor((params.mid / 100.0) * (params.highlights - params.shadows));
+		const mid = Math.floor((params.mid / 100) * (params.highlights - params.shadows));
 
 		urlParams[`${prefix}`] = `${params.shadows.toFixed(0)}:${mid.toFixed(0)}:${params.highlights.toFixed(0)}`;
 
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:ChannelLevelsParams) {
+	function importParams(foxyParams:FoxyChannelLevelsParams):ChannelLevelsParams {
+		return {
+			...DefaultChannelLevelsParams,
+			...foxyParams,
+		}
 	}
 
 	return {
@@ -54,7 +63,7 @@ export const useChannelLevelsParam:ComposableParam<ChannelLevelsParams> = (prefi
 	}
 }
 
-export const useLevelsParam:ComposableParam<LevelsParams> = () => {
+export const useLevelsParam:ComposableParam<LevelsParams, FoxyLevelsParams> = () => {
 	const allChannels = useChannelLevelsParam('l:all');
 	const redChannel = useChannelLevelsParam('l:r');
 	const greenChannel = useChannelLevelsParam('l:g');
@@ -73,7 +82,14 @@ export const useLevelsParam:ComposableParam<LevelsParams> = () => {
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:LevelsParams) {
+	function importParams(foxyParams:FoxyLevelsParams):LevelsParams {
+		return {
+			enabled: true,
+			all: {...DefaultChannelLevelsParams, ...foxyParams.all},
+			red: {...DefaultChannelLevelsParams, ...foxyParams.red},
+			green: {...DefaultChannelLevelsParams, ...foxyParams.green},
+			blue: {...DefaultChannelLevelsParams, ...foxyParams.blue},
+		}
 	}
 
 	return {

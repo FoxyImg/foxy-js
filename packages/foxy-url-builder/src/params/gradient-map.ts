@@ -1,4 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import {DeepPartial} from "../deep-partial";
 
 export const enum BlendModes {
 	BlendModeClear = 0,
@@ -56,19 +57,27 @@ export const BlendModeOptions = [
 	{ label: 'Exclusion', value: BlendModes.BlendModeExclusion },
 ];
 
-export type GradientStops = {
-	enabled: boolean,
+export type GradientStops = BaseParam & {
 	stop: number,
 	color: string,
 }
 
-export type GradientMapParams = BaseParam & {
+export const DefaultGradientStops: GradientStops = {
+	enabled: true,
+	stop: 0,
+	color: '#000000',
+}
+
+type BaseGradientMapParams = {
 	stops: GradientStops[],
 	opacity: number,
 	monochrome: boolean,
 	blur: number,
 	blendMode: BlendModes,
 }
+
+export type GradientMapParams = BaseParam & BaseGradientMapParams;
+export type FoxyGradientMapParams = Partial<BaseGradientMapParams>;
 
 export const DefaultGradientMapParams: GradientMapParams = {
 	enabled: true,
@@ -82,7 +91,7 @@ export const DefaultGradientMapParams: GradientMapParams = {
 	blendMode: BlendModes.BlendModeOver,
 }
 
-export const useGradientMapParam:ComposableParam<GradientMapParams> = () => {
+export const useGradientMapParam:ComposableParam<GradientMapParams, FoxyGradientMapParams> = () => {
 	function buildParams(urlParams: BuiltParams, params:GradientMapParams) {
 		if (!params.enabled || params.opacity === 0) {
 			return urlParams;
@@ -116,7 +125,19 @@ export const useGradientMapParam:ComposableParam<GradientMapParams> = () => {
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:GradientMapParams) {
+	function importParams(foxyParams:FoxyGradientMapParams):GradientMapParams {
+		const stops:GradientStops[] = foxyParams.stops ? foxyParams.stops.map((stop:GradientStops) => {
+			return {
+				...DefaultGradientStops,
+				...stop,
+			}
+		}) : [];
+
+		return {
+			...DefaultGradientMapParams,
+			...foxyParams,
+			stops,
+		}
 	}
 
 	return {

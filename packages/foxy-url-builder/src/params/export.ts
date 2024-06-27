@@ -7,13 +7,16 @@ export const ExportFormatOptions = [
 	{ label: 'AVIF', value: 'avif' },
 ]
 
-export type ExportParams = BaseParam & {
+type BaseExportParams = {
 	format: string,
 	quality: number,
 	reductionEffort: number,
 	lossless: boolean,
 	nearLossless: boolean,
 }
+
+export type ExportParams = BaseParam & BaseExportParams;
+export type FoxyExportParams = Partial<BaseExportParams>;
 
 export const DefaultExportParams: ExportParams = {
 	enabled: true,
@@ -24,7 +27,7 @@ export const DefaultExportParams: ExportParams = {
 	nearLossless: false,
 }
 
-export const useExportParam:ComposableParam<ExportParams> = () => {
+export const useExportParam:ComposableParam<ExportParams, FoxyExportParams> = () => {
 	function buildParams(urlParams: BuiltParams, params:ExportParams) {
 		if (params.format !== 'webp') {
 			urlParams['fmt'] = params.format;
@@ -34,7 +37,7 @@ export const useExportParam:ComposableParam<ExportParams> = () => {
 			urlParams['q'] = `${params.quality}`;
 		}
 
-		if (params.format === 'webp' && params.reductionEffort !== 4) {
+		if (params.format === 'webp' && params.reductionEffort && params.reductionEffort !== 4) {
 			urlParams['reduction'] = `:${params.reductionEffort}`;
 		}
 
@@ -49,7 +52,11 @@ export const useExportParam:ComposableParam<ExportParams> = () => {
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:ExportParams) {
+	function importParams(foxyParams:FoxyExportParams):ExportParams {
+		return {
+			...DefaultExportParams,
+			...foxyParams,
+		}
 	}
 
 	return {

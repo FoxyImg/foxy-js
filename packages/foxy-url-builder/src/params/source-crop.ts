@@ -1,11 +1,14 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 
-export type SourceCropParams = BaseParam & {
+type BaseSourceCropParams = {
 	x: number,
 	y: number,
 	width: number,
 	height: number,
 }
+
+export type SourceCropParams = BaseParam & BaseSourceCropParams;
+export type FoxySourceCropParams = Partial<BaseSourceCropParams>;
 
 export const DefaultSourceCropParams: SourceCropParams = {
 	enabled: true,
@@ -15,7 +18,7 @@ export const DefaultSourceCropParams: SourceCropParams = {
 	height: 0,
 }
 
-export const useSourceCropParam:ComposableParam<SourceCropParams> = () => {
+export const useSourceCropParam:ComposableParam<SourceCropParams, FoxySourceCropParams> = () => {
 	function buildParams(urlParams: BuiltParams, params:SourceCropParams) {
 		if (params.enabled && params.width > 0 && params.height > 0) {
 			urlParams['src'] = [
@@ -29,7 +32,11 @@ export const useSourceCropParam:ComposableParam<SourceCropParams> = () => {
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:SourceCropParams) {
+	function importParams(foxyParams:FoxySourceCropParams):SourceCropParams {
+		return {
+			...DefaultSourceCropParams,
+			...foxyParams,
+		}
 	}
 
 	return {

@@ -26,6 +26,20 @@ export type RedactParams = BaseParam & {
 	cornerRadius: number,
 }
 
+export type FoxyRedactParams = {
+	faces?: number[],
+	people?: number[],
+	regions?: RedactRect[],
+	blur?: number,
+	expandMask?: number,
+	blurMask?: number,
+	pixelateMask?: number,
+	useColor?: boolean,
+	color?: string,
+	pixelate?: number,
+	cornerRadius?: number,
+}
+
 export const DefaultRedactParams: RedactParams = {
 	enabled: true,
 	faces: [],
@@ -42,7 +56,7 @@ export const DefaultRedactParams: RedactParams = {
 }
 
 
-export const useRedactParam:ComposableParam<RedactParams> = () => {
+export const useRedactParam:ComposableParam<RedactParams, FoxyRedactParams> = () => {
 	function buildParams(urlParams: BuiltParams, params:RedactParams) {
 		if (!params.enabled) {
 			return urlParams;
@@ -61,9 +75,11 @@ export const useRedactParam:ComposableParam<RedactParams> = () => {
 		}
 
 		if (params.regions.length > 0) {
+			let currentRegionIdx = 0;
 			for(const region of params.regions) {
 				if (region.width > 0 && region.height > 0) {
-					urlParams['redact:region'] = `${region.cornerRadius ?? 0}:${region.rotation ?? 0}:${region.left},${region.top},${region.width},${region.height}`;
+					urlParams[`redact:region:${currentRegionIdx}`] = `${region.cornerRadius ?? 0}:${region.rotation ?? 0}:${region.left},${region.top},${region.width},${region.height}`;
+					currentRegionIdx++;
 				}
 			}
 		}
@@ -95,7 +111,24 @@ export const useRedactParam:ComposableParam<RedactParams> = () => {
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:RedactParams) {
+	function importParams(foxyParams:FoxyRedactParams):RedactParams {
+		const faces = foxyParams.faces ? foxyParams.faces.map(face => face === -1 ? 'all' : `${face}`) : DefaultRedactParams.faces;
+		const people = foxyParams.people ? foxyParams.people.map(person => person === -1 ? 'all' : `${person}`) : DefaultRedactParams.people;
+
+		return {
+			enabled: true,
+			faces,
+			people,
+			regions: foxyParams.regions ?? DefaultRedactParams.regions,
+			blur: foxyParams.blur ?? DefaultRedactParams.blur,
+			expandMask: foxyParams.expandMask ?? DefaultRedactParams.expandMask,
+			blurMask: foxyParams.blurMask ?? DefaultRedactParams.blurMask,
+			pixelateMask: foxyParams.pixelateMask ?? DefaultRedactParams.pixelateMask,
+			useColor: foxyParams.useColor ?? DefaultRedactParams.useColor,
+			color: foxyParams.color ?? DefaultRedactParams.color,
+			pixelate: foxyParams.pixelate ?? DefaultRedactParams.pixelate,
+			cornerRadius: foxyParams.cornerRadius ?? DefaultRedactParams.cornerRadius,
+		}
 	}
 
 	return {

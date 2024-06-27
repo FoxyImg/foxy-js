@@ -1,9 +1,12 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 
-export type RotationParams = BaseParam & {
+type BaseRotationParams = {
 	rotation: number,
 	mode: string
 }
+
+export type RotationParams = BaseParam & BaseRotationParams;
+export type FoxyRotationParams = Partial<BaseRotationParams>;
 
 export const DefaultRotationParams: RotationParams = {
 	enabled: true,
@@ -24,7 +27,7 @@ export const RotationOptions = [
 	{ label: '270', value: 270 },
 ]
 
-export const useRotationParam:ComposableParam<RotationParams> = () => {
+export const useRotationParam:ComposableParam<RotationParams, FoxyRotationParams> = () => {
 	function buildParams(urlParams: BuiltParams, params:RotationParams) {
 		if (!params.enabled) {
 			return urlParams;
@@ -42,7 +45,11 @@ export const useRotationParam:ComposableParam<RotationParams> = () => {
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:RotationParams) {
+	function importParams(foxyParams:FoxyRotationParams):RotationParams {
+		return {
+			...DefaultRotationParams,
+			...foxyParams,
+		}
 	}
 
 	return {

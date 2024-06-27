@@ -5,11 +5,14 @@ export const StylizeOrderOptions = [
 	{ label: 'Pixelate', value: 'px' },
 ];
 
-export type StylizeParams = BaseParam & {
+type BaseStylizeParams = {
 	order: string[],
 	blur: number,
 	pixelate: number,
 }
+
+export type StylizeParams = BaseParam & BaseStylizeParams;
+export type FoxyStylizeParams = Partial<BaseStylizeParams>;
 
 export const DefaultStylizeParams: StylizeParams = {
 	enabled: true,
@@ -18,7 +21,7 @@ export const DefaultStylizeParams: StylizeParams = {
 	order: ['blur', 'px'],
 }
 
-export const useStylizeParam:ComposableParam<StylizeParams> = () => {
+export const useStylizeParam:ComposableParam<StylizeParams, FoxyStylizeParams> = () => {
 	function buildParams(urlParams: BuiltParams, params:StylizeParams) {
 		if (!params.enabled) {
 			return urlParams;
@@ -39,7 +42,11 @@ export const useStylizeParam:ComposableParam<StylizeParams> = () => {
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:StylizeParams) {
+	function importParams(foxyParams:FoxyStylizeParams):StylizeParams {
+		return {
+			...DefaultStylizeParams,
+			...foxyParams,
+		}
 	}
 
 	return {

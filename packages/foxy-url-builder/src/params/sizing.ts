@@ -1,4 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import calcAspectRatio from "../utils/aspect-ratio";
 
 export type BoxCropParams = {
 	index: number,
@@ -9,7 +10,31 @@ export type BoxCropParams = {
 	focus: boolean,
 }
 
-export type SizingParams = BaseParam & {
+export const DefaultFaceBoxCropParams: BoxCropParams = {
+	index: -1,
+	hGravity: 'center',
+	vGravity: 'top',
+	padding: 8,
+	zoom: 0,
+	focus: false,
+}
+
+export const DefaultPersonBoxCropParams: BoxCropParams = {
+	index: -1,
+	hGravity: 'center',
+	vGravity: 'center',
+	padding: 0,
+	zoom: 0,
+	focus: false,
+}
+
+export type FocalPointParams = {
+	x: number,
+	y: number,
+	zoom: number,
+}
+
+type BaseSizingParams = {
 	crop: string[],
 	width: number,
 	height: number,
@@ -19,11 +44,19 @@ export type SizingParams = BaseParam & {
 	smartMode: string|null,
 	hGravity: string,
 	vGravity: string,
-	focalPoint: { x: number, y: number },
-	focalPointZoom: number,
+	focalPoint: FocalPointParams,
 
 	face: BoxCropParams,
 	person: BoxCropParams,
+}
+
+export type SizingParams = BaseParam & BaseSizingParams;
+export type FoxySizingParams = Partial<BaseSizingParams> & {
+	aspectRatio?: number,
+	focalPoint?: Partial<FocalPointParams>,
+
+	face?: Partial<BoxCropParams>,
+	person?: Partial<BoxCropParams>,
 }
 
 export const DefaultSizingParams: SizingParams = {
@@ -38,41 +71,32 @@ export const DefaultSizingParams: SizingParams = {
 	smartMode: null,
 	hGravity: 'center',
 	vGravity: 'center',
-	focalPoint: { x: 0.5, y: 0.5 },
-	focalPointZoom: 0,
+	focalPoint: { x: 0.5, y: 0.5, zoom: 0 },
 
 	face: {
-		index: -1,
-		hGravity: 'center',
-		vGravity: 'top',
-		padding: 8,
-		zoom: 0,
-		focus: false,
+		...DefaultFaceBoxCropParams,
 	},
 
 	person: {
-		index: -1,
-		hGravity: 'center',
-		vGravity: 'center',
-		padding: 0,
-		zoom: 0,
-		focus: false,
+		...DefaultPersonBoxCropParams,
 	},
 }
 
-export const useSizingParam:ComposableParam<SizingParams> = () => {
+export const useSizingParam:ComposableParam<SizingParams, FoxySizingParams> = () => {
 	function processBoxParams(urlParams:BuiltParams, noun:string, params:BoxCropParams){
 		if (params.padding != 8) {
 			urlParams[`${noun}:pad`] = params.padding.toFixed(0);
 		}
 
-		if (params.index > -1) {
+		if (params.index >= 0) {
 			urlParams[`${noun}:index`] = params.index.toFixed(0);
-		} else if (params.index < -1) {
-			if (params.index === -2) {
+		} else {
+			if (params.index === -3) {
+				urlParams[`${noun}:index`] = 'smallest';
+			} else if (params.index === -2) {
 				urlParams[`${noun}:index`] = 'largest';
 			} else {
-				urlParams[`${noun}:index`] = 'smallest';
+				urlParams[`${noun}:index`] = 'all';
 			}
 		}
 
@@ -131,6 +155,7 @@ export const useSizingParam:ComposableParam<SizingParams> = () => {
 		}
 
 		if (params.crop.includes('face')) {
+			console.log('face', params.face);
 			processBoxParams(urlParams, 'face', params.face);
 		}
 
@@ -143,15 +168,38 @@ export const useSizingParam:ComposableParam<SizingParams> = () => {
 			const fpy = params.focalPoint.y.toFixed(4);
 			urlParams['fp'] = `${fpx}:${fpy}`;
 
-			if (params.focalPointZoom > 0) {
-				urlParams['fp:zoom'] = `${params.focalPointZoom}`;
+			if (params.focalPoint.zoom > 0) {
+				urlParams['fp:zoom'] = `${params.focalPoint.zoom}`;
 			}
 		}
 
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:SizingParams) {
+	function importParams(foxyParams:FoxySizingParams):SizingParams {
+		let arw = DefaultSizingParams.aspectRatioWidth;
+		let arh = DefaultSizingParams.aspectRatioHeight;
+
+		if (foxyParams.aspectRatio) {
+			const [w, h] = calcAspectRatio(foxyParams.aspectRatio, 50);
+			arw = w;
+			arh = h;
+		}
+
+		return {
+			...DefaultSizingParams,
+			...foxyParams,
+			aspectRatioWidth: arw,
+			aspectRatioHeight: arh,
+			face: {
+				...DefaultFaceBoxCropParams,
+				...foxyParams.face,
+			},
+			person: {
+				...DefaultPersonBoxCropParams,
+				...foxyParams.person,
+			},
+		}
 	}
 
 	return {

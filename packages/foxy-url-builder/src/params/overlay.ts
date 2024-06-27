@@ -91,9 +91,7 @@ export type OverlaySubstitutionParam = {
 	value: string,
 }
 
-export type OverlayParams =  OverlaySizeParams & {
-	id: string,
-	enabled: boolean,
+type BaseOverlayParams = OverlaySizeParams & {
 	type: 'image'|'text'
 	text: string|null,
 	font: string|null,
@@ -115,7 +113,18 @@ export type OverlayParams =  OverlaySizeParams & {
 	dropShadow: DropShadowParams,
 	background: OverlayBackgroundParams,
 	trim: boolean,
+}
+
+export type OverlayParams =  BaseOverlayParams & {
+	id: string,
+	enabled: boolean,
+
 	substitutions: OverlaySubstitutionParam[],
+}
+
+export type FoxyOverlayParams = Partial<BaseOverlayParams> & {
+	dropShadow?: Partial<DropShadowParams>,
+	background?: Partial<OverlayBackgroundParams>,
 }
 
 export const DefaultOverlayParams: OverlayParams = {
@@ -153,7 +162,7 @@ export const DefaultOverlayParams: OverlayParams = {
 }
 
 
-export const useOverlayParam:ComposableParam<OverlayParams> = (prefix?:string) => {
+export const useOverlayParam:ComposableParam<OverlayParams, FoxyOverlayParams> = (prefix?:string) => {
 	function buildParams(urlParams: BuiltParams, params:OverlayParams) {
 		if ((!params.url || params.url.trim().length === 0) && (!params.text || params.text.trim().length === 0)) {
 			return urlParams;
@@ -301,7 +310,19 @@ export const useOverlayParam:ComposableParam<OverlayParams> = (prefix?:string) =
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:OverlayParams) {
+	function importParams(foxyParams:FoxyOverlayParams):OverlayParams {
+		return {
+			...DefaultOverlayParams,
+			...foxyParams,
+			dropShadow: {
+				...DefaultDropShadowParams,
+				...foxyParams.dropShadow,
+			},
+			background: {
+				...DefaultOverlayBackgroundParams,
+				...foxyParams.background,
+			},
+		}
 	}
 
 	return {

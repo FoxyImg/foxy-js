@@ -2,10 +2,13 @@ import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 import base64 from "../utils/base-64";
 
 export type BackgroundRemovalParams = BaseParam & {
+	enabled: boolean,
 	mode: 'photoroom' | 'clipdrop' | 'fg' | 'person',
 	imageKey: string|null,
 	backgroundColor: string|null,
 }
+
+export type FoxyBackgroundRemovalParams = Partial<BackgroundRemovalParams>;
 
 export const DefaultBackgroundRemovalParams: BackgroundRemovalParams = {
 	enabled: false,
@@ -21,7 +24,7 @@ export const BackgroundRemovalModeOptions = [
 	{ label: 'Person', value: 'person' },
 ]
 
-export const useBackgroundRemovalParam:ComposableParam<BackgroundRemovalParams> = () => {
+export const useBackgroundRemovalParam:ComposableParam<BackgroundRemovalParams, FoxyBackgroundRemovalParams> = () => {
 	function buildParams(urlParams: BuiltParams, params:BackgroundRemovalParams) {
 		console.log('builtParams, background removal', params)
 		if (!params.enabled) {
@@ -37,7 +40,11 @@ export const useBackgroundRemovalParam:ComposableParam<BackgroundRemovalParams> 
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:BackgroundRemovalParams) {
+	function importParams(foxyParams:FoxyBackgroundRemovalParams):BackgroundRemovalParams {
+		return {
+			...DefaultBackgroundRemovalParams,
+			...foxyParams,
+		}
 	}
 
 	return {

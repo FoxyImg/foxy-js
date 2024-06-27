@@ -15,12 +15,14 @@ export const MaskFitOptions = [
 	{ label: 'Stretch', value: 'stretch' },
 ]
 
-export type MaskParams = BaseParam & {
+type BaseMaskParams = {
 	type: 'image' | 'rect' | 'square' | 'ellipse' | 'circle',
 	imageKey: string|null,
 	cornerRadius: number,
 	fit: 'fit' | 'fill' | 'stretch',
 }
+export type MaskParams = BaseParam & BaseMaskParams;
+export type FoxyMaskParams = Partial<BaseMaskParams>;
 
 export const DefaultMaskParams: MaskParams = {
 	enabled: false,
@@ -30,7 +32,7 @@ export const DefaultMaskParams: MaskParams = {
 	fit: 'fit',
 }
 
-export const useMaskParam:ComposableParam<MaskParams> = () => {
+export const useMaskParam:ComposableParam<MaskParams, FoxyMaskParams> = () => {
 	function buildParams(urlParams: BuiltParams, params:MaskParams) {
 		if (!params.enabled) {
 			return urlParams;
@@ -49,7 +51,11 @@ export const useMaskParam:ComposableParam<MaskParams> = () => {
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:MaskParams) {
+	function importParams(foxyParams:FoxyMaskParams):MaskParams {
+		return {
+			...DefaultMaskParams,
+			...foxyParams,
+		}
 	}
 
 	return {

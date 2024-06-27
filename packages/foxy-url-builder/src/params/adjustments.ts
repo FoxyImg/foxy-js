@@ -1,6 +1,6 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 
-export type AdjustmentsParams = BaseParam & {
+type BaseAdjustmentsParams = {
 	brightness: number,
 	saturation: number,
 	hue: number,
@@ -12,6 +12,9 @@ export type AdjustmentsParams = BaseParam & {
 	texture: number,
 	textureDensity: number,
 }
+
+export type AdjustmentsParams = BaseParam & BaseAdjustmentsParams;
+export type FoxyAdjustmentsParams = Partial<BaseAdjustmentsParams>;
 
 export const DefaultAdjustmentsParams: AdjustmentsParams = {
 	enabled: true,
@@ -27,7 +30,7 @@ export const DefaultAdjustmentsParams: AdjustmentsParams = {
 	textureDensity: 100,
 }
 
-export const useAdjustmentsParam:ComposableParam<AdjustmentsParams> = () => {
+export const useAdjustmentsParam:ComposableParam<AdjustmentsParams, FoxyAdjustmentsParams> = () => {
 	function buildParams(urlParams: BuiltParams, params:AdjustmentsParams) {
 		if (!params.enabled) {
 			return urlParams;
@@ -77,7 +80,11 @@ export const useAdjustmentsParam:ComposableParam<AdjustmentsParams> = () => {
 		return urlParams;
 	}
 
-	function importParams(foxyParams:any, params:AdjustmentsParams) {
+	function importParams(foxyParams:FoxyAdjustmentsParams):AdjustmentsParams {
+		return {
+			...DefaultAdjustmentsParams,
+			...foxyParams,
+		}
 	}
 
 	return {

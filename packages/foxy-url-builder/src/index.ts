@@ -21,6 +21,7 @@ export * from './image-meta';
 export * from './options';
 export * from './params';
 
+export { default as calcAspectRatio } from './utils/aspect-ratio';
 export { default as signHMAC256 } from './utils/sign';
 export * from './utils/slash-it';
 export { default as base64 } from './utils/base-64';
