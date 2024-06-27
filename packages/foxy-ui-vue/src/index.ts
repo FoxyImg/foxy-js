@@ -89,4 +89,6 @@ export * from "./types/url-builder";
 export {default as PSDGradient} from "./lib/grd-parser/psd-gradient";
 export {StreamReader} from "./lib/grd-parser/stream-reader";
 
+export * from "./vue-plugin";
+
 //endregion Manual Exports

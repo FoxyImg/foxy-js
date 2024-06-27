@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {computed, ref, watch} from "vue";
+import {computed, inject, ref, watch} from "vue";
 import {DefaultImageParams} from "@foxy/url-builder";
-import { hideAllPoppers } from "floating-vue";
 import {CloseIcon} from "@foxy/vue-ui";
 import {useFileDialog} from "@vueuse/core";
 import {buildUrl} from "@/composables/build-url";
+
+const hideAllPoppers = inject<() => void>("hideAllPoppers");
 
 const props = defineProps<{
 	host:string,
@@ -66,7 +67,9 @@ imageParams.height = 256;
 
 function selectImage(image: string) {
 	currentValue.value = image;
-	hideAllPoppers();
+	if (hideAllPoppers) {
+		hideAllPoppers();
+	}
 }
 
 function removeImage(image: string) {
