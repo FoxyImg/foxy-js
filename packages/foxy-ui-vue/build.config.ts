@@ -6,6 +6,8 @@ export default defineBuildConfig({
 		{ builder: 'mkdist', input: './src',pattern: ['**/*.vue'], loaders: ['vue'] },
 		{ builder: 'mkdist', input: './lib',pattern: ['**/*.js'], loaders: ['js'] },
 
+		{ builder: 'mkdist', input: './assets', pattern: ['**/*.css'], outDir: "./dist/", loaders: ['sass'] },
+
 		// *.ts -> *.js & *.cjs
 		// plz keep `esm` after `cjs`
 		{ builder: 'mkdist', input: './src', pattern: ['**/*.ts'], format: 'cjs', loaders: ['js'] },

@@ -2,7 +2,7 @@
 import {computed, onMounted} from 'vue';
 import pDebounce from "p-debounce";
 import ImageKeyImageSamples from "../inputs/ImageKeyImageSamples.vue";
-import ImageSeachIcon from "../icons/ImageSearchIcon.vue";
+import ImageSearchIcon from "../icons/ImageSearchIcon.vue";
 
 const props = withDefaults(defineProps<{
 	title: string,

@@ -14,7 +14,7 @@ const properCase = (sentence, separator = ' ', join = ' ') => {
 
 
 const svgFiles = fs
-	.readdirSync('./src/assets/icons', { withFileTypes: true })
+	.readdirSync('./assets/icons', { withFileTypes: true })
 	.filter((f) => !f.isDirectory() && f.name.endsWith('.svg'))
 	.map((f) => f.name);
 
@@ -22,7 +22,7 @@ for (const svgFile of svgFiles) {
 	let templateTagName = properCase(path.basename(svgFile, '.svg'), '-', '') + 'Icon';
 	templateTagName = templateTagName.replaceAll('IconIcon', 'Icon');
 
-	const svg = fs.readFileSync(`./src/assets/icons/${svgFile}`, 'utf8');
+	const svg = fs.readFileSync(`./assets/icons/${svgFile}`, 'utf8');
 	fs.writeFileSync(`./src/components/icons/${templateTagName}.vue`, `
 <template>
 	${svg}

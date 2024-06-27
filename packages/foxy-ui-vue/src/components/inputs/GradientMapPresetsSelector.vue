@@ -5,7 +5,7 @@ import {DefaultImageParams, type GradientMapParams, type GradientStops} from "@f
 import { hideAllPoppers } from "floating-vue";
 import {useFileDialog, useStorage} from "@vueuse/core";
 //@ts-ignore
-import {StreamReader} from "@/lib/grd-parser/stream-reader";
+import {StreamReader} from "../../lib/grd-parser/stream-reader";
 //@ts-ignore
 import PSDGradient from "../../lib/grd-parser/psd-gradient";
 import colorToHex from "../../utils/hex-color";

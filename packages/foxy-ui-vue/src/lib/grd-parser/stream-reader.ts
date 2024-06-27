@@ -1,3 +1,4 @@
+//@ts-nocheck
 /**
  * This code from  https://github.com/imaya/js/StreamReader.js
  * comment out code dependent google clojure
