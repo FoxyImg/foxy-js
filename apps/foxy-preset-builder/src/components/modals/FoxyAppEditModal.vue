@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {reactive, ref, toRaw} from "vue";
+import {reactive, ref} from "vue";
 import {ModalContainer, SmallLabel} from "@foxy/vue-ui";
 import type {FoxyApp} from "@/types/foxy-app";
 import useFoxyAppEditor from "@/composables/foxy-app-editor";

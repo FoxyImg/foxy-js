@@ -2,7 +2,7 @@ import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import {ref} from "vue";
 import {useImageParamsStore} from "@/stores/image-params-store";
-import {properCase} from "@/utils/ucfirst";
+import {properCase} from "@foxy/url-builder";
 import slugify from "slugify";
 
 export default function useFoxyPresetEditor() {
@@ -149,8 +149,7 @@ export default function useFoxyPresetEditor() {
 		if (!presetsResponse.ok) {
 			console.error("Could not fetch presets", presetsResponse.status, presetsResponse.statusText);
 		} else {
-			const presets = await presetsResponse.json();
-			currentApp.value.presets = presets;
+			currentApp.value.presets = await presetsResponse.json();
 		}
 	}
 

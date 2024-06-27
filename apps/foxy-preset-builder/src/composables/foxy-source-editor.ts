@@ -1,6 +1,6 @@
 import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
-import {ref, toRaw} from "vue";
+import {ref} from "vue";
 import {DefaultFoxySource, type FoxySource} from "@/types/foxy-source";
 
 export default function useFoxySourceEditor() {

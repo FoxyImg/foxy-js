@@ -1,25 +1,18 @@
 <script setup lang="ts">
-import {computed, onMounted, provide, reactive, ref, watch} from "vue";
+import {onMounted, provide, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 
 import {
-	BrokenIcon,
-	DebugIcon,
-	FaceIcon,
-	PersonIcon,
-	ReloadIcon,
-
-	EditorPanel,
 	Tabs,
 	Tab,
-	LoaderFeedback,
-	ToggleInput,
-	SmallLabel,
-	StatusInfo,
 	JSONViewer,
-	ImageLink,
 	ParamsEditor,
 	OverlaysEditor,
+
+	PreviewImage,
+	DominantColors,
+	ImageInfo,
+	ImageActions,
 
 	useImageLoader,
 } from "@foxy/vue-ui";
@@ -142,33 +135,6 @@ watch(isLoaded, () => {
 });
 
 const previewImage = ref<HTMLImageElement|null>(null);
-const windowSize = reactive({
-	width: 0,
-	height: 0,
-});
-
-const imageSizeText = computed(() => {
-	if (!size.value || size.value.width === 0 || size.value.height === 0 || windowSize.width === 0) {
-		return null;
-	}
-
-	if (previewImage.value) {
-		const scale = Math.floor(((previewImage.value.clientWidth * previewImage.value.clientHeight) / (size.value.width * size.value.height)) * 100.0);
-		return `${size.value.width} x ${size.value.height} (${scale}%)`;
-	} else {
-		return `${size.value.width} x ${size.value.height}`;
-	}
-});
-
-onMounted(() => {
-	windowSize.width = window.innerWidth;
-	windowSize.height = window.innerHeight;
-
-	window.addEventListener("resize", () => {
-		windowSize.width = window.innerWidth;
-		windowSize.height = window.innerHeight;
-	});
-});
 </script>
 <template>
 	<div class="fixed inset-0 flex flex-col">
@@ -188,70 +154,11 @@ onMounted(() => {
 				<div class="bg-neutral-100 p-0.5"></div>
 				<div class="flex-1 relative flex flex-col border-4 border-t-0 border-neutral-100">
 					<template v-if="currentTab === 'preview' || !imageMeta">
-						<div class="group absolute left-0 top-0 right-0 bottom-0 flex items-center justify-center bg-checkered">
-							<div v-if="error" class="absolute left-1/2 top-1/2 -translate-x-1/2 flex flex-col items-center justify-center bg-white/15 p-2 rounded-lg backdrop-blur overflow-hidden transform-gpu">
-								<BrokenIcon class="fill-red-600 w-16 h-auto" />
-								<div class="font-bold">Oops.</div>
-							</div>
-							<template v-else-if="currentImageUrl">
-								<img
-									alt="Preview Image"
-									class="max-w-full max-h-full"
-									ref="previewImage"
-									:src="currentImageUrl">
-							</template>
-							<div v-if="isLoading" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-								<LoaderFeedback class=""/>
-							</div>
-						</div>
-						<div v-if="imageMeta && isLoaded && imageMeta.dominantColors.colors.length > 0" class="absolute left-0 top-0 flex items-center">
-							<div class="aspect-square w-3 h-3" :style="`background-color: rgb(${imageMeta.dominantColors.colors[0].r}, ${imageMeta.dominantColors.colors[0].g}, ${imageMeta.dominantColors.colors[0].b})`"></div>
-							<div v-if="imageMeta.dominantColors.lightest" class="aspect-square w-3 h-3" :style="`background-color: rgb(${imageMeta.dominantColors.lightest.r}, ${imageMeta.dominantColors.lightest.g}, ${imageMeta.dominantColors.lightest.b})`"></div>
-							<div v-if="imageMeta.dominantColors.darkest" class="aspect-square w-3 h-3" :style="`background-color: rgb(${imageMeta.dominantColors.darkest.r}, ${imageMeta.dominantColors.darkest.g}, ${imageMeta.dominantColors.darkest.b})`"></div>
-							<div class="w-2"></div>
-							<div v-for="color in imageMeta.dominantColors.colors" class="aspect-square w-3 h-3" :style="`background-color: rgb(${color.r}, ${color.g}, ${color.b})`"></div>
-						</div>
+						<PreviewImage :current-image-url="currentImageUrl" :error="error" :is-loading="isLoading" class="!absolute left-0 top-0 right-0 bottom-0" v-model="previewImage" />
+						<DominantColors :image-meta="imageMeta" :is-loaded="isLoaded" class="absolute left-0 top-0" />
 						<div class="absolute left-0 bottom-0 right-0 flex items-center p-1.5">
-							<div class="flex-1 flex items-center justify-start gap-3">
-								<StatusInfo v-if="imageSizeText">{{imageSizeText}}, {{Math.floor(loadTime)}}ms</StatusInfo>
-								<StatusInfo v-tooltip="`${faceCount} faces found.`" v-if="imageMeta && isLoaded" class="cursor-pointer"><FaceIcon class="fill-black w-3 h-auto" /> {{ faceCount }}</StatusInfo>
-								<StatusInfo v-tooltip="`${peopleCount} people found.`" v-if="imageMeta && isLoaded" class="cursor-pointer"><PersonIcon class="fill-black w-3 h-auto"/> {{ peopleCount }}</StatusInfo>
-							</div>
-							<div class="flex-1 flex items-center justify-end gap-3 ">
-								<div class="cursor-pointer aspect-square rounded-full bg-white/50 hover:bg-white backdrop-blur-lg p-1.5" @click="reload">
-									<ReloadIcon class="fill-current w-4 h-auto" />
-								</div>
-								<div>
-									<VDropdown>
-										<div class="cursor-pointer aspect-square rounded-full bg-white/50 hover:bg-white backdrop-blur-lg p-1.5">
-											<DebugIcon class="fill-current w-4 h-auto" />
-										</div>
-										<template #popper>
-											<div class="p-3 rounded-lg bg-neutral-100 flex flex-col gap-3">
-											<SmallLabel>Debug Options</SmallLabel>
-											<EditorPanel title="Image Recognition" class="w-[400px]" collapse-key="debug-recognition">
-												<div class="grid grid-cols-2 gap-3">
-													<ToggleInput title="Outline Faces" v-model="imageParams.debug.faces" />
-													<ToggleInput title="Outline All Faces" v-model="imageParams.debug.allFaces" />
-													<ToggleInput title="Outline People" v-model="imageParams.debug.people" />
-													<ToggleInput title="Outline All People" v-model="imageParams.debug.allPeople" />
-													<ToggleInput title="Outline Other Labels" v-model="imageParams.debug.otherLabels" />
-												</div>
-											</EditorPanel>
-											<EditorPanel title="Caching" class="w-[400px]" collapse-key="debug-caching">
-												<div class="grid grid-cols-2 gap-3">
-													<ToggleInput title="Disable Source Cache" v-model="imageParams.debug.disableSourceCache" />
-													<ToggleInput title="Disable Meta Cache" v-model="imageParams.debug.disableMetaCache" />
-													<ToggleInput title="Disable Render Cache" v-model="imageParams.debug.disableRenderCache" />
-												</div>
-											</EditorPanel>
-											</div>
-										</template>
-									</VDropdown>
-								</div>
-								<ImageLink v-if="currentImageUrl" :image-url="currentImageUrl" action-title="Copy Image URL" icon-name="link" />
-								<ImageLink v-if="currentPresetImageUrl" :image-url="currentPresetImageUrl" action-title="Copy Preset Image URL" icon-name="bookmark" />
-							</div>
+							<ImageInfo :size="size" :preview-image="previewImage" :load-time="loadTime" :image-meta="imageMeta" :face-count="faceCount" :people-count="peopleCount" :is-loaded="isLoaded" class="flex-1 justify-start" />
+							<ImageActions :image-params="imageParams" :current-image-url="currentImageUrl" :current-preset-image-url="currentPresetImageUrl" @reload="reload" class="flex-1 justify-end" />
 						</div>
 					</template>
 					<template v-else-if="currentTab === 'metadata'">

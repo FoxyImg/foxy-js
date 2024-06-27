@@ -3,13 +3,10 @@ import {computed, ref, watch} from "vue";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import pDebounce from "p-debounce";
 import SecureLS from "secure-ls";
-import calcAspectRatio from "@/utils/aspect-ratio";
-import exists from "@/utils/exists";
 import {
 	type ImageParams,
 	type ImageMeta,
 	type GradientMapParams,
-	type BoxCropParams,
 	DefaultImageParams,
 	base64
 } from "@foxy/url-builder";

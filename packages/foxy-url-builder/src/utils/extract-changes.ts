@@ -1,4 +1,4 @@
-import type {DeepPartial} from "@foxy/url-builder";
+import type {DeepPartial} from "../deep-partial";
 
 export function extractChanges<T>(sourceObj: T, defaultObj: T, skip:string[] = []):DeepPartial<T>|null|undefined {
 	if (sourceObj === undefined || defaultObj === undefined) {
@@ -14,7 +14,7 @@ export function extractChanges<T>(sourceObj: T, defaultObj: T, skip:string[] = [
 		if (skip.includes(key)) {
 			continue;
 		}
-		
+
 		if (sourceObj[key] === undefined) {
 			continue;
 		}

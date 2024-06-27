@@ -68,13 +68,18 @@ export {default as SourceCropParam} from "./components/params/SourceCropParam.vu
 export {default as StylizeParam} from "./components/params/StylizeParam.vue";
 
 export {default as GradientEditor} from "./components/ui/GradientEditor.vue";
-export {default as ImageLink} from "./components/ui/ImageLink.vue";
 export {default as JSONViewer} from "./components/ui/JSONViewer.vue";
 export {default as LoaderFeedback} from "./components/ui/LoaderFeedback.vue";
 export {default as SmallLabel} from "./components/ui/SmallLabel.vue";
-export {default as StatusInfo} from "./components/ui/StatusInfo.vue";
 export {default as Tab} from "./components/ui/Tab.vue";
 export {default as Tabs} from "./components/ui/Tabs.vue";
+
+export {default as ImageLink} from "./components/image/ImageLink.vue";
+export {default as PreviewImage} from "./components/image/PreviewImage.vue";
+export {default as DominantColors} from "./components/image/DominantColors.vue";
+export {default as StatusInfo} from "./components/image/StatusInfo.vue";
+export {default as ImageInfo} from "./components/image/ImageInfo.vue";
+export {default as ImageActions} from "./components/image/ImageActions.vue";
 
 //region Manual Exports
 
