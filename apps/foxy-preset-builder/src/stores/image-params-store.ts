@@ -3,7 +3,6 @@ import {computed, ref, watch} from "vue";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import pDebounce from "p-debounce";
 import SecureLS from "secure-ls";
-import {type FoxyBoundsPreset, type FoxyPreset} from "@/types/foxy-preset";
 import calcAspectRatio from "@/utils/aspect-ratio";
 import exists from "@/utils/exists";
 import {
@@ -16,6 +15,7 @@ import {
 } from "@foxy/url-builder";
 
 import {buildUrl} from "@/composables/build-url";
+import {importFoxyImageParams} from "@foxy/url-builder";
 
 export const useImageParamsStore = defineStore("foxy-image-params-store", () => {
 	const {
@@ -131,103 +131,6 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 		}
 	}
 
-	function foxyPresetToImageParams(foxyPreset: FoxyPreset) {
-		const params = JSON.parse(JSON.stringify(DefaultImageParams));
-
-		const ifExists = <T, N>(value: T|undefined|null, defaultValue: N): N  =>{
-			return exists(value) ? value as N : defaultValue;
-		}
-
-		const processBoxParams = (foxyBox:FoxyBoundsPreset, paramsBox:BoxCropParams) => {
-			let index = ifExists(foxyBox.index, paramsBox.index);
-			if (exists(foxyBox.largest)) {
-				index = foxyBox.largest! ? -2 : index;
-			} else if (exists(foxyBox.smallest)) {
-				index = foxyBox.smallest! ? -3 : index;
-			}
-
-			paramsBox.index = index;
-			paramsBox.padding = ifExists(foxyBox.padding, paramsBox.padding);
-			paramsBox.zoom = foxyBox.zoom ? foxyBox.zoom * 100 : paramsBox.zoom;
-			paramsBox.hGravity = ifExists(foxyBox.hGravity, paramsBox.hGravity);
-			paramsBox.vGravity = ifExists(foxyBox.vGravity, paramsBox.vGravity);
-			paramsBox.focus = ifExists(foxyBox.focus, paramsBox.focus);
-		}
-
-		if (exists(foxyPreset.size)) {
-			if (exists(foxyPreset.size!.crop) && foxyPreset.size!.crop!.length > 0) {
-				params.crop = foxyPreset.size!.crop!;
-			}
-
-			params.width = ifExists(foxyPreset.size!.width, params.width);
-			params.height = ifExists(foxyPreset.size!.height, params.height);
-
-			if (exists(foxyPreset.size!.aspectRatio)) {
-				const ar = calcAspectRatio(foxyPreset.size!.aspectRatio!, 50);
-				params.aspectRatioWidth = ar[0];
-				params.aspectRatioHeight = ar[1];
-			}
-
-			params.zoom = ifExists(foxyPreset.size!.zoom, params.zoom);
-			params.smartMode = ifExists(foxyPreset.size!.interesting, params.smartMode);
-			params.hGravity = ifExists(foxyPreset.size!.hGravity, params.hGravity);
-			params.vGravity = ifExists(foxyPreset.size!.vGravity, params.vGravity);
-
-			if (exists(foxyPreset.size!.focalPoint)) {
-				params.focalPoint = {
-					x: ifExists(foxyPreset.size!.focalPoint!.x, params.focalPoint.x),
-					y: ifExists(foxyPreset.size!.focalPoint!.y, params.focalPoint.y),
-				};
-
-				params.focalPointZoom = ifExists(foxyPreset.size!.focalPoint!.zoom, params.focalPointZoom);
-			}
-
-			if (exists(foxyPreset.size!.face)) {
-				processBoxParams(foxyPreset.size!.face!, params.face);
-			}
-
-			if (exists(foxyPreset.size!.person)) {
-				processBoxParams(foxyPreset.size!.person!, params.person);
-			}
-		}
-
-		if (exists(foxyPreset.padding)) {
-			params.padding.color = ifExists(foxyPreset.padding!.color, params.padding.color);
-			params.padding.left = ifExists(foxyPreset.padding!.left, params.padding.left);
-			params.padding.top = ifExists(foxyPreset.padding!.top, params.padding.top);
-			params.padding.right = ifExists(foxyPreset.padding!.right, params.padding.right);
-			params.padding.bottom = ifExists(foxyPreset.padding!.bottom, params.padding.bottom);
-		}
-
-		if (exists(foxyPreset.border)) {
-			params.border.color = ifExists(foxyPreset.border!.color, params.border.color);
-			params.border.left = ifExists(foxyPreset.border!.left, params.border.left);
-			params.border.top = ifExists(foxyPreset.border!.top, params.border.top);
-			params.border.right = ifExists(foxyPreset.border!.right, params.border.right);
-			params.border.bottom = ifExists(foxyPreset.border!.bottom, params.border.bottom);
-		}
-
-		if (exists(foxyPreset.redact)) {
-			params.redact.faces = foxyPreset.redact!.faces ? foxyPreset.redact!.faces.map((face) => face === -1 ? 'all' : `${face}`) : params.redact.faces;
-			params.redact.people = foxyPreset.redact!.people ? foxyPreset.redact!.people.map((person) => person === -1 ? 'all' : `${person}`) : params.redact.people;
-			params.redact.regions = ifExists(foxyPreset.redact!.regions, params.redact.regions);
-			params.redact.blur = ifExists(foxyPreset.redact!.blur, params.redact.blur);
-			params.redact.expandMask = ifExists(foxyPreset.redact!.expandMask, params.redact.expandMask);
-			params.redact.blurMask = ifExists(foxyPreset.redact!.blurMask, params.redact.blurMask);
-			params.redact.pixelateMask = ifExists(foxyPreset.redact!.pixelateMask, params.redact.pixelateMask);
-			params.redact.useColor = ifExists(foxyPreset.redact!.useColor, params.redact.useColor);
-			params.redact.color = ifExists(foxyPreset.redact!.color, params.redact.color);
-			params.redact.pixelate = ifExists(foxyPreset.redact!.pixelate, params.redact.pixelate);
-		}
-
-		if (exists(foxyPreset.background)) {
-			const color = ifExists(foxyPreset.background!.color, '#00000000');
-			params.backgroundColor = color.startsWith('#') ? color.substring(1) : color;
-		}
-
-		return params;
-	}
-
 	watch(currentSource, async () => {
 		imageMeta.value = null;
 		imageKey.value = currentSource.value?.sampleImages[0] ?? null;
@@ -253,7 +156,7 @@ export const useImageParamsStore = defineStore("foxy-image-params-store", () => 
 			return;
 		}
 
-		imageParams.value = foxyPresetToImageParams(currentPreset.value);
+		imageParams.value = importFoxyImageParams(currentPreset.value.params);
 	});
 
 	return {

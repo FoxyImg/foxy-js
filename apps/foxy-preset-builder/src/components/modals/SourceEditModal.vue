@@ -2,9 +2,8 @@
 import {ModalContainer} from "@foxy/vue-ui";
 import {SourceTypeOptions} from "@foxy/url-builder";
 import {nextTick, onMounted, reactive, ref} from "vue";
-import {SmallLabel} from "@foxy/vue-ui";
+import {SmallLabel, Toggle} from "@foxy/vue-ui";
 import type {FoxySource} from "@/types/foxy-source";
-import {Toggle} from "@foxy/vue-ui";
 
 const props = defineProps<{
 	editing: boolean,
