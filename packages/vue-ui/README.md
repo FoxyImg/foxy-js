@@ -1,4 +1,6 @@
-# packageName
+![Foxy Image Logo](.logo.png)
+
+# @foxyimg/vue-ui
 
 <!-- automd:badges color=yellow -->
 
@@ -7,7 +9,7 @@
 
 <!-- /automd -->
 
-This is my package description.
+The Vue components and utils used by the various Foxy Vue based apps.
 
 ## Usage
 
@@ -17,60 +19,36 @@ Install package:
 
 ```sh
 # ✨ Auto-detect
-npx nypm install packageName
+npx nypm install @foxyimg/vue-ui
 
 # npm
-npm install packageName
+npm install @foxyimg/vue-ui
 
 # yarn
-yarn add packageName
+yarn add @foxyimg/vue-ui
 
 # pnpm
-pnpm install packageName
+pnpm install @foxyimg/vue-ui
 
 # bun
-bun install packageName
+bun install @foxyimg/vue-ui
 ```
 
 <!-- /automd -->
 
-Import:
-
-<!-- automd:jsimport cjs cdn name="pkg" -->
-
-**ESM** (Node.js, Bun)
+Usage in Vue:
 
 ```js
-import {} from "pkg";
+import { FoxyVueUIPlugin } from "@foxyimg/vue-ui";
+
+import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App)
+	.use(FoxyVueUIPlugin)
+	.mount('#app')
 ```
 
-**CommonJS** (Legacy Node.js)
-
-```js
-const {} = require("pkg");
-```
-
-**CDN** (Deno, Bun and Browsers)
-
-```js
-import {} from "https://esm.sh/pkg";
-```
-
-<!-- /automd -->
-
-## Development
-
-<details>
-
-<summary>local development</summary>
-
-- Clone this repository
-- Install latest LTS version of [Node.js](https://nodejs.org/en/)
-- Enable [Corepack](https://github.com/nodejs/corepack) using `corepack enable`
-- Install dependencies using `pnpm install`
-- Run interactive tests using `pnpm dev`
-
-</details>
 
 ## License
 

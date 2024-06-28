@@ -1,4 +1,6 @@
-# packageName
+![Foxy Image Logo](.logo.png)
+
+# @foxyimg/url-builder
 
 <!-- automd:badges color=yellow -->
 
@@ -7,7 +9,7 @@
 
 <!-- /automd -->
 
-This is my package description.
+A typescript/javascript package for building Foxy Image image URLs.
 
 ## Usage
 
@@ -17,19 +19,19 @@ Install package:
 
 ```sh
 # ✨ Auto-detect
-npx nypm install packageName
+npx nypm install @foxyimg/url-builder
 
 # npm
-npm install packageName
+npm install @foxyimg/url-builder
 
 # yarn
-yarn add packageName
+yarn add @foxyimg/url-builder
 
 # pnpm
-pnpm install packageName
+pnpm install @foxyimg/url-builder
 
 # bun
-bun install packageName
+bun install @foxyimg/url-builder
 ```
 
 <!-- /automd -->
@@ -41,36 +43,29 @@ Import:
 **ESM** (Node.js, Bun)
 
 ```js
-import {} from "pkg";
+import {foxy} from "pkg";
 ```
 
 **CommonJS** (Legacy Node.js)
 
 ```js
-const {} = require("pkg");
-```
-
-**CDN** (Deno, Bun and Browsers)
-
-```js
-import {} from "https://esm.sh/pkg";
+const {foxy} = require("pkg");
 ```
 
 <!-- /automd -->
 
-## Development
+Usage:
 
-<details>
-
-<summary>local development</summary>
-
-- Clone this repository
-- Install latest LTS version of [Node.js](https://nodejs.org/en/)
-- Enable [Corepack](https://github.com/nodejs/corepack) using `corepack enable`
-- Install dependencies using `pnpm install`
-- Run interactive tests using `pnpm dev`
-
-</details>
+```js
+const {buildUrl} = foxy("https://foxy.example.com", "gweb2", "rapscallion", true);
+const url = buildUrl("/path/to/image.jpg", {
+	sizing: {
+		width: 640,
+		height: 640,
+		crop: ['crop']
+	}
+});
+```
 
 ## License
 

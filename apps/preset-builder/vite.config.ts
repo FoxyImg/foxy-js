@@ -12,7 +12,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      // "@foxy/vue-ui": fileURLToPath(new URL('./node_modules/@foxy/vue-ui/src', import.meta.url)),
+      "@foxyimg/vue-ui": fileURLToPath(new URL('./node_modules/@foxyimg/vue-ui/src', import.meta.url)),
+      "@foxyimg/url-builder": fileURLToPath(new URL('./node_modules/@foxyimg/url-builder/src', import.meta.url)),
     }
   }
 })

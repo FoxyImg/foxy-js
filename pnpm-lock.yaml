@@ -12,10 +12,10 @@ importers:
     dependencies:
       '@foxyimg/url-builder':
         specifier: workspace:*
-        version: link:../../packages/foxy-url-builder
+        version: link:../../packages/url-builder
       '@foxyimg/vue-ui':
         specifier: workspace:*
-        version: link:../../packages/foxy-ui-vue
+        version: link:../../packages/vue-ui
       '@noction/vue-bezier':
         specifier: ^1.11.2
         version: 1.11.2
@@ -232,7 +232,7 @@ importers:
     dependencies:
       '@foxyimg/url-builder':
         specifier: workspace:*
-        version: link:../foxy-url-builder
+        version: link:../url-builder
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.8.2
@@ -270,6 +270,122 @@ importers:
       vue:
         specifier: ^3.4.30
         version: 3.4.30(typescript@5.5.2)
+
+  packages/url-builder:
+    dependencies:
+      js-sha256:
+        specifier: ^0.11.0
+        version: 0.11.0
+    devDependencies:
+      '@biomejs/biome':
+        specifier: ^1.8.3
+        version: 1.8.3
+      '@types/node':
+        specifier: ^20.14.9
+        version: 20.14.9
+      '@vitest/coverage-v8':
+        specifier: ^1.6.0
+        version: 1.6.0(vitest@1.6.0)
+      automd:
+        specifier: ^0.3.7
+        version: 0.3.7
+      changelogen:
+        specifier: ^0.5.5
+        version: 0.5.5
+      eslint:
+        specifier: ^9.5.0
+        version: 9.5.0
+      eslint-config-unjs:
+        specifier: ^0.3.2
+        version: 0.3.2(eslint@9.5.0)(typescript@5.5.2)
+      jiti:
+        specifier: ^1.21.6
+        version: 1.21.6
+      typescript:
+        specifier: ^5.5.2
+        version: 5.5.2
+      unbuild:
+        specifier: ^2.0.0
+        version: 2.0.0(typescript@5.5.2)
+      vitest:
+        specifier: ^1.6.0
+        version: 1.6.0(@types/node@20.14.9)
+
+  packages/vue-ui:
+    dependencies:
+      '@formkit/auto-animate':
+        specifier: ^0.8.2
+        version: 0.8.2
+      '@formkit/drag-and-drop':
+        specifier: ^0.1.4
+        version: 0.1.4
+      '@foxyimg/url-builder':
+        specifier: workspace:*
+        version: link:../url-builder
+      '@vueform/multiselect':
+        specifier: ^2.6.8
+        version: 2.6.8
+      '@vueuse/core':
+        specifier: ^10.11.0
+        version: 10.11.0(vue@3.4.31)
+      copy-to-clipboard:
+        specifier: ^3.3.3
+        version: 3.3.3
+      floating-vue:
+        specifier: ^5.2.2
+        version: 5.2.2(vue@3.4.31)
+      p-debounce:
+        specifier: ^4.0.0
+        version: 4.0.0
+      short-uuid:
+        specifier: ^5.2.0
+        version: 5.2.0
+      vue-advanced-cropper:
+        specifier: ^2.8.9
+        version: 2.8.9(vue@3.4.31)
+      vue-json-pretty:
+        specifier: ^2.4.0
+        version: 2.4.0(vue@3.4.31)
+      vue3-colorpicker:
+        specifier: ^2.3.0
+        version: 2.3.0(@aesoper/normal-utils@0.1.5)(@popperjs/core@2.11.8)(@vueuse/core@10.11.0)(gradient-parser@1.0.2)(lodash-es@4.17.21)(tinycolor2@1.6.0)(vue-types@4.2.1)(vue@3.4.31)
+    devDependencies:
+      '@biomejs/biome':
+        specifier: ^1.8.3
+        version: 1.8.3
+      '@types/node':
+        specifier: ^20.14.9
+        version: 20.14.9
+      '@vitest/coverage-v8':
+        specifier: ^1.6.0
+        version: 1.6.0(vitest@1.6.0)
+      automd:
+        specifier: ^0.3.7
+        version: 0.3.7
+      changelogen:
+        specifier: ^0.5.5
+        version: 0.5.5
+      eslint:
+        specifier: ^9.5.0
+        version: 9.5.0
+      eslint-config-unjs:
+        specifier: ^0.3.2
+        version: 0.3.2(eslint@9.5.0)(typescript@5.5.2)
+      jiti:
+        specifier: ^1.21.6
+        version: 1.21.6
+      typescript:
+        specifier: ^5.5.2
+        version: 5.5.2
+      unbuild:
+        specifier: ^2.0.0
+        version: 2.0.0(typescript@5.5.2)
+      vitest:
+        specifier: ^1.6.0
+        version: 1.6.0(@types/node@20.14.9)
+      vue:
+        specifier: ^3.4.31
+        version: 3.4.31(typescript@5.5.2)
 
 packages:
 
@@ -1102,8 +1218,8 @@ packages:
       eslint-visitor-keys: 3.4.3
     dev: true
 
-  /@eslint-community/regexpp@4.10.1:
-    resolution: {integrity: sha512-Zm2NGpWELsQAD1xsJzGQpYfvICSsFkEpU0jxBjfdC6uNEWXcHnfs9hScFWtXVDVl+rBQJGrl4g1vcKIejpH9dA==}
+  /@eslint-community/regexpp@4.11.0:
+    resolution: {integrity: sha512-G/M/tIiMrTAxEWRfLfQJMmGNX28IxBg4PBz8XqQhqUHLFI6TL2htpIB1iQCj144V5ee/JaKyT9/WZ0MGZWfA7A==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
     dev: true
 
@@ -1685,7 +1801,7 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@eslint-community/regexpp': 4.10.1
+      '@eslint-community/regexpp': 4.11.0
       '@typescript-eslint/parser': 7.14.1(eslint@9.5.0)(typescript@5.5.2)
       '@typescript-eslint/scope-manager': 7.14.1
       '@typescript-eslint/type-utils': 7.14.1(eslint@9.5.0)(typescript@5.5.2)
@@ -2048,7 +2164,7 @@ packages:
     dependencies:
       '@vue/compiler-ssr': 3.4.31
       '@vue/shared': 3.4.31
-      vue: 3.4.31(typescript@5.5.2)
+      vue: 3.4.31(typescript@5.4.5)
 
   /@vue/shared@3.4.30:
     resolution: {integrity: sha512-CLg+f8RQCHQnKvuHY9adMsMaQOcqclh6Z5V9TaoMgy0ut0tz848joZ7/CYFFyF/yZ5i2yaw7Fn498C+CNZVHIg==}
@@ -2997,7 +3113,7 @@ packages:
     hasBin: true
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@9.5.0)
-      '@eslint-community/regexpp': 4.10.1
+      '@eslint-community/regexpp': 4.11.0
       '@eslint/config-array': 0.16.0
       '@eslint/eslintrc': 3.1.0
       '@eslint/js': 9.5.0
@@ -5745,7 +5861,7 @@ packages:
       '@vue/composition-api':
         optional: true
     dependencies:
-      vue: 3.4.31(typescript@5.5.2)
+      vue: 3.4.31(typescript@5.4.5)
     dev: false
 
   /vue-json-pretty@2.4.0(vue@3.4.31):
