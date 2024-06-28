@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import {SmallLabel} from "@foxy/vue-ui";
+import {SmallLabel} from "@foxyimg/vue-ui";
 
 import pDebounce from 'p-debounce';
-import {ImageSearchIcon} from "@foxy/vue-ui";
+import {ImageSearchIcon} from "@foxyimg/vue-ui";
 import HeaderSampleImages from "@/components/header/HeaderSampleImages.vue";
 
 const props = withDefaults(defineProps<{

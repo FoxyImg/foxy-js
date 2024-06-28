@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import EditorPanel from "../inputs/EditorPanel.vue";
-import {RotationModeOptions, type RotationParams} from "@foxy/url-builder";
+import {RotationModeOptions, type RotationParams} from "@foxyimg/url-builder";
 import SliderInput from "../inputs/SliderInput.vue";
 import ObjectSelectInput from "../inputs/ObjectSelectInput.vue";
 

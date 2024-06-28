@@ -3,7 +3,7 @@ import {ref, watch} from "vue";
 import { animations } from "@formkit/drag-and-drop";
 import {useDragAndDrop} from "@formkit/drag-and-drop/vue";
 import shortUUID from "short-uuid";
-import {DefaultOverlayParams, type ImageMeta, type ImageParams} from "@foxy/url-builder";
+import {DefaultOverlayParams, type ImageMeta, type ImageParams} from "@foxyimg/url-builder";
 import OverlayParam from "../params/OverlayParam.vue";
 
 const props = defineProps<{

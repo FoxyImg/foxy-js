@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue';
-import type {ChannelLevelsParams} from "@foxy/url-builder";
+import type {ChannelLevelsParams} from "@foxyimg/url-builder";
 import shortUUID from "short-uuid";
 
 const props = withDefaults(defineProps<{

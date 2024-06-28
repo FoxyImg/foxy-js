@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type {OverlaySubstitutionParam} from "@foxy/url-builder";
+import type {OverlaySubstitutionParam} from "@foxyimg/url-builder";
 import DeleteSourceIcon from "../icons/DeleteSourceIcon.vue";
 
 const props = withDefaults(defineProps<{

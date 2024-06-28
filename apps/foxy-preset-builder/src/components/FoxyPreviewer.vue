@@ -15,7 +15,7 @@ import {
 	ImageActions,
 
 	useImageLoader,
-} from "@foxy/vue-ui";
+} from "@foxyimg/vue-ui";
 
 import HeaderImageKeyInput from "@/components/header/HeaderImageKeyInput.vue";
 import SourceEditModal from "@/components/modals/SourceEditModal.vue";

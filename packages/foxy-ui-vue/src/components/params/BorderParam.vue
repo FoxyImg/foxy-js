@@ -3,7 +3,7 @@ import {computed, watch} from "vue";
 import EditorPanel from "../inputs/EditorPanel.vue";
 import SliderInput from "../inputs/SliderInput.vue";
 import ColorInput from "../inputs/ColorInput.vue";
-import type {BorderParams} from "@foxy/url-builder";
+import type {BorderParams} from "@foxyimg/url-builder";
 import {useStorage} from "@vueuse/core";
 import ConstraintLineLongIcon from "../icons/ConstraintLineLongIcon.vue";
 import ConstrainIcon from "../icons/ConstrainIcon.vue";

@@ -14,7 +14,7 @@ import RedactParam from "../params/RedactParam.vue";
 import ExportParam from "../params/ExportParam.vue";
 import LevelsParam from "../params/LevelsParam.vue";
 
-import {type ImageMeta, type ImageParams} from "@foxy/url-builder";
+import {type ImageMeta, type ImageParams} from "@foxyimg/url-builder";
 
 defineProps<{
 	imageParams: ImageParams,

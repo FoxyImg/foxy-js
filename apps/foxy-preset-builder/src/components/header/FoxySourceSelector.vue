@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import {SmallLabel} from "@foxy/vue-ui";
-import {DeleteSourceIcon, EditSourceIcon, NewSourceIcon} from "@foxy/vue-ui";
+import {SmallLabel} from "@foxyimg/vue-ui";
+import {DeleteSourceIcon, EditSourceIcon, NewSourceIcon} from "@foxyimg/vue-ui";
 import type {FoxySource} from "@/types/foxy-source";
 
 const props = defineProps<{

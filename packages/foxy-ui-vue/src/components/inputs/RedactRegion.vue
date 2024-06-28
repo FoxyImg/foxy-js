@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {RedactRect} from "@foxy/url-builder";
+import type {RedactRect} from "@foxyimg/url-builder";
 import {computed, ref} from "vue";
 import CloseIcon from "../icons/CloseIcon.vue";
 

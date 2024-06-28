@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import EditorPanel from "../inputs/EditorPanel.vue";
-import type {ImageMeta, RedactParams} from "@foxy/url-builder";
+import type {ImageMeta, RedactParams} from "@foxyimg/url-builder";
 import TagsInput from "../inputs/TagsInput.vue";
 import SliderInput from "../inputs/SliderInput.vue";
 import ColorInput from "../inputs/ColorInput.vue";

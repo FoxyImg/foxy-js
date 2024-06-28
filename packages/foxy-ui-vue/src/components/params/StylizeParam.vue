@@ -2,7 +2,7 @@
 import {computed} from "vue";
 import EditorPanel from "../inputs/EditorPanel.vue";
 import SliderInput from "../inputs/SliderInput.vue";
-import {StylizeOrderOptions, type StylizeParams} from "@foxy/url-builder";
+import {StylizeOrderOptions, type StylizeParams} from "@foxyimg/url-builder";
 import TagsInput from "../inputs/TagsInput.vue";
 
 const props = defineProps<{

@@ -1,7 +1,7 @@
-import {foxy, type PartialImageParams} from "@foxy/url-builder";
+import {foxy, type PartialImageParams} from "@foxyimg/url-builder";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import {storeToRefs} from "pinia";
-import type {URLBuilder} from "@foxy/vue-ui";
+import type {URLBuilder} from "@foxyimg/vue-ui";
 
 export const buildUrl:URLBuilder = async (imageKey: string, params:PartialImageParams) =>{
 		const {

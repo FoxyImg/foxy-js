@@ -1,5 +1,5 @@
 import type {FoxySource} from "@/types/foxy-source";
-import type {FoxyPreset} from "@foxy/url-builder";
+import type {FoxyPreset} from "@foxyimg/url-builder";
 
 export type FoxyApp = {
 	id: string|null,

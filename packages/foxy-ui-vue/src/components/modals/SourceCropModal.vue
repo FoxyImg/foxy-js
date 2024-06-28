@@ -7,7 +7,7 @@ import 'vue-advanced-cropper/dist/style.css';
 import LoaderFeedback from "../ui/LoaderFeedback.vue";
 import useImageLoader from "../../composables/image-loader";
 import Toggle from "../forms/Toggle.vue";
-import {type SourceCropParams} from "@foxy/url-builder";
+import {type SourceCropParams} from "@foxyimg/url-builder";
 import type {URLBuilder} from "../../types/url-builder";
 
 const props = defineProps<{

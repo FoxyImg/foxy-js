@@ -3,7 +3,7 @@ import {computed, onMounted, reactive} from "vue";
 import FaceIcon from "../icons/FaceIcon.vue"
 import PersonIcon from "../icons/PersonIcon.vue"
 import StatusInfo from "./StatusInfo.vue"
-import type {ImageMeta} from "@foxy/url-builder";
+import type {ImageMeta} from "@foxyimg/url-builder";
 
 const props = defineProps<{
 	size: { width: number, height: number }|null,

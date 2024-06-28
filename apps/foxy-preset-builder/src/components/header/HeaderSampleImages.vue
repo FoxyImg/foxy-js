@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed, inject, ref, watch} from "vue";
-import {DefaultImageParams} from "@foxy/url-builder";
-import {CloseIcon} from "@foxy/vue-ui";
+import {DefaultImageParams} from "@foxyimg/url-builder";
+import {CloseIcon} from "@foxyimg/vue-ui";
 import {useFileDialog} from "@vueuse/core";
 import {buildUrl} from "@/composables/build-url";
 

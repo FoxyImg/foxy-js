@@ -2,7 +2,7 @@
 import {computed, inject, ref, watch} from "vue";
 import RedactRegion from "../inputs/RedactRegion.vue";
 import SliderParam from "../inputs/SliderInput.vue";
-import {type RedactRect, DefaultSizingParams, type SourceCropParams} from "@foxy/url-builder";
+import {type RedactRect, DefaultSizingParams, type SourceCropParams} from "@foxyimg/url-builder";
 import type {URLBuilder} from "../../types/url-builder";
 
 const buildUrl:URLBuilder = inject("buildUrl") as URLBuilder;

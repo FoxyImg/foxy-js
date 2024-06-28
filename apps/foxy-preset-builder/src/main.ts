@@ -7,7 +7,7 @@ import Transitions from '@noction/vue-bezier'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
-import { FoxyVueUIPlugin } from "@foxy/vue-ui";
+import { FoxyVueUIPlugin } from "@foxyimg/vue-ui";
 
 import { createApp } from 'vue'
 import App from './App.vue'

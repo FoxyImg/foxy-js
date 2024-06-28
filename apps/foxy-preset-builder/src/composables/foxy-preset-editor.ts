@@ -2,7 +2,7 @@ import {storeToRefs} from "pinia";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import {ref} from "vue";
 import {useImageParamsStore} from "@/stores/image-params-store";
-import {properCase} from "@foxy/url-builder";
+import {properCase} from "@foxyimg/url-builder";
 import slugify from "slugify";
 
 export default function useFoxyPresetEditor() {

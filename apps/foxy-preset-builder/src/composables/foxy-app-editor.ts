@@ -2,7 +2,7 @@ import {ref} from "vue";
 import {DefaultFoxyApp, type FoxyApp} from "@/types/foxy-app";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import {storeToRefs} from "pinia";
-import type {FoxyPreset} from "@foxy/url-builder";
+import type {FoxyPreset} from "@foxyimg/url-builder";
 import type {FoxySource} from "@/types/foxy-source";
 
 export default function useFoxyAppEditor() {

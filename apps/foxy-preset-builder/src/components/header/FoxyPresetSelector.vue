@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {computed} from "vue";
-import {SmallLabel} from "@foxy/vue-ui";
-import type {FoxyPreset} from "@foxy/url-builder";
-import {properCase} from "@foxy/url-builder";
-import {DeleteSourceIcon, EditSourceIcon, NewSourceIcon, ReloadIcon, SaveIcon} from "@foxy/vue-ui";
+import {SmallLabel} from "@foxyimg/vue-ui";
+import type {FoxyPreset} from "@foxyimg/url-builder";
+import {properCase} from "@foxyimg/url-builder";
+import {DeleteSourceIcon, EditSourceIcon, NewSourceIcon, ReloadIcon, SaveIcon} from "@foxyimg/vue-ui";
 
 const props = defineProps<{
 	modelValue: string|null,

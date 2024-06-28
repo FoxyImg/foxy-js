@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import GradientMapPreset from "../inputs/GradientMapPreset.vue";
 import DeleteSourceIcon from "../icons/DeleteSourceIcon.vue";
-import {DefaultImageParams, type GradientMapParams, type GradientStops} from "@foxy/url-builder";
+import {DefaultImageParams, type GradientMapParams, type GradientStops} from "@foxyimg/url-builder";
 import { hideAllPoppers } from "floating-vue";
 import {useFileDialog, useStorage} from "@vueuse/core";
 //@ts-ignore

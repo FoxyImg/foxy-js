@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import EditorPanel from "../inputs/EditorPanel.vue";
-import {ExportFormatOptions, type ExportParams} from "@foxy/url-builder";
+import {ExportFormatOptions, type ExportParams} from "@foxyimg/url-builder";
 import ObjectSelectInput from "../inputs/ObjectSelectInput.vue";
 import SliderInput from "../inputs/SliderInput.vue";
 import ToggleInput from "../inputs/ToggleInput.vue";

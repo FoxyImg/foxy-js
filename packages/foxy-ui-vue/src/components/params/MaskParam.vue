@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import EditorPanel from "../inputs/EditorPanel.vue";
-import {MaskFitOptions, type MaskParams, MaskTypeOptions} from "@foxy/url-builder";
+import {MaskFitOptions, type MaskParams, MaskTypeOptions} from "@foxyimg/url-builder";
 import ObjectSelectInput from "../inputs/ObjectSelectInput.vue";
 import OverlayImageInput from "../inputs/OverlayImageInput.vue";
 import SliderInput from "../inputs/SliderInput.vue";

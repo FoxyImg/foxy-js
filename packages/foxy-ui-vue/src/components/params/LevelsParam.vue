@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import EditorPanel from "../inputs/EditorPanel.vue";
-import {DefaultChannelLevelsParams, type LevelsParams} from "@foxy/url-builder";
+import {DefaultChannelLevelsParams, type LevelsParams} from "@foxyimg/url-builder";
 import LevelsInput from "../inputs/LevelsInput.vue";
 
 const props = defineProps<{

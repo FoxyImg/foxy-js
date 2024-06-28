@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import {ModalContainer} from "@foxy/vue-ui";
+import {ModalContainer} from "@foxyimg/vue-ui";
 import {computed, reactive} from "vue";
 import {storeToRefs} from "pinia";
 import {useImageParamsStore} from "@/stores/image-params-store";
 import {useFoxyAppStore} from "@/stores/foxy-app-store";
 import slugify from "slugify";
-import {SmallLabel, JSONViewer} from "@foxy/vue-ui";
+import {SmallLabel, JSONViewer} from "@foxyimg/vue-ui";
 
 const {
 	currentPreset,

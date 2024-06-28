@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed, inject, ref, watch} from 'vue';
 import SourceCropModal from "../modals/SourceCropModal.vue";
-import {type SourceCropParams, DefaultSizingParams, type ImageMeta} from "@foxy/url-builder";
+import {type SourceCropParams, DefaultSizingParams, type ImageMeta} from "@foxyimg/url-builder";
 import type {URLBuilder} from "../../types/url-builder";
 
 const buildUrl:URLBuilder = inject("buildUrl") as URLBuilder;

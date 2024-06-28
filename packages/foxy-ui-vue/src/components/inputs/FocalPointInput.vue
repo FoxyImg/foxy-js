@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, inject, ref, watch} from 'vue';
-import {DefaultSizingParams, type Face, type ImageMeta} from "@foxy/url-builder";
+import {DefaultSizingParams, type Face, type ImageMeta} from "@foxyimg/url-builder";
 import FocalPointerIcon from "../icons/FocalPointerIcon.vue";
 import type {URLBuilder} from "../../types/url-builder";
 

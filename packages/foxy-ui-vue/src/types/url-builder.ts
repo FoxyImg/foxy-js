@@ -1,3 +1,3 @@
-import type {PartialImageParams} from "@foxy/url-builder";
+import type {PartialImageParams} from "@foxyimg/url-builder";
 
 export type URLBuilder = (imageKey: string, params:PartialImageParams) => Promise<string|null>;

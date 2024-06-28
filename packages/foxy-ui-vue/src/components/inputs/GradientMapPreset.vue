@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {GradientStops} from "@foxy/url-builder";
+import type {GradientStops} from "@foxyimg/url-builder";
 import {computed, ref} from "vue";
 import shortUUID from "short-uuid";
 

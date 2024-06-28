@@ -3,8 +3,8 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
-    "./node_modules/@foxy/vue-ui/src/**/*.{vue,js,ts,jsx,tsx}",
-    "./node_modules/@foxy/vue-ui/components/**/*.{vue,js,ts,jsx,tsx}",
+    "./node_modules/@foxyimg/vue-ui/src/**/*.{vue,js,ts,jsx,tsx}",
+    "./node_modules/@foxyimg/vue-ui/components/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {

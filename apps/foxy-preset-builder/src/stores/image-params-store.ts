@@ -9,10 +9,10 @@ import {
 	type GradientMapParams,
 	DefaultImageParams,
 	base64
-} from "@foxy/url-builder";
+} from "@foxyimg/url-builder";
 
 import {buildUrl} from "@/composables/build-url";
-import {importFoxyImageParams} from "@foxy/url-builder";
+import {importFoxyImageParams} from "@foxyimg/url-builder";
 
 export const useImageParamsStore = defineStore("foxy-image-params-store", () => {
 	const {

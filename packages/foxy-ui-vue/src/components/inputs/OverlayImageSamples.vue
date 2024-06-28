@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, inject, ref, watch} from "vue";
-import {DefaultImageParams} from "@foxy/url-builder";
+import {DefaultImageParams} from "@foxyimg/url-builder";
 import { hideAllPoppers } from "floating-vue";
 import type {URLBuilder} from "../../types/url-builder";
 import CloseIcon from "../icons/CloseIcon.vue";

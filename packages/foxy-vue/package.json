@@ -1,8 +1,8 @@
 {
-  "name": "@foxy/vue",
+  "name": "@foxyimg/vue",
   "version": "0.0.5",
   "description": "",
-  "repository": "unjs/packageName",
+  "repository": "foxyimg/foxy-js",
   "license": "MIT",
   "sideEffects": false,
   "type": "module",
@@ -33,7 +33,7 @@
     "test:types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
-    "@foxy/url-builder": "workspace:*"
+    "@foxyimg/url-builder": "workspace:*"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.2",

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type {ImageMeta, SourceCropParams} from "@foxy/url-builder";
-import {DefaultSourceCropParams} from "@foxy/url-builder";
+import type {ImageMeta, SourceCropParams} from "@foxyimg/url-builder";
+import {DefaultSourceCropParams} from "@foxyimg/url-builder";
 import {computed} from "vue";
 import EditorPanel from "../inputs/EditorPanel.vue";
 import SourceCropInput from "../inputs/SourceCropInput.vue";

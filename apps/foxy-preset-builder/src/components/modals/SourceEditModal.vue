@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {ModalContainer} from "@foxy/vue-ui";
-import {SourceTypeOptions} from "@foxy/url-builder";
+import {ModalContainer} from "@foxyimg/vue-ui";
+import {SourceTypeOptions} from "@foxyimg/url-builder";
 import {nextTick, onMounted, reactive, ref} from "vue";
-import {SmallLabel, Toggle} from "@foxy/vue-ui";
+import {SmallLabel, Toggle} from "@foxyimg/vue-ui";
 import type {FoxySource} from "@/types/foxy-source";
 
 const props = defineProps<{

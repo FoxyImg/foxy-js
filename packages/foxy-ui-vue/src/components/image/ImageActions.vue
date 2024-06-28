@@ -5,7 +5,7 @@ import ImageLink from "./ImageLink.vue";
 import SmallLabel from "../ui/SmallLabel.vue";
 import EditorPanel from "../inputs/EditorPanel.vue";
 import ToggleInput from "../inputs/ToggleInput.vue";
-import type {ImageMeta, ImageParams} from "@foxy/url-builder";
+import type {ImageMeta, ImageParams} from "@foxyimg/url-builder";
 
 defineProps<{
 	imageParams: ImageParams|null,

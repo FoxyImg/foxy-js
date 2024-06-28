@@ -10,7 +10,7 @@ import {
 	RotationOptions,
 	HGravityOptions,
 	VGravityOptions, type ImageMeta
-} from "@foxy/url-builder";
+} from "@foxyimg/url-builder";
 import ObjectSelectInput from "../inputs/ObjectSelectInput.vue";
 import OverlayImageInput from "../inputs/OverlayImageInput.vue";
 import SubstitutionsInput from "../inputs/SubstitutionsInput.vue";

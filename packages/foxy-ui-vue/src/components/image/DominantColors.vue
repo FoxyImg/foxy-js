@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ImageMeta} from "@foxy/url-builder";
+import {ImageMeta} from "@foxyimg/url-builder";
 
 defineProps<{
 	imageMeta: ImageMeta|null,

@@ -9,7 +9,7 @@ import {
 	HGravityOptions,
 	InterestingOptions,
 	VGravityOptions
-} from "@foxy/url-builder";
+} from "@foxyimg/url-builder";
 import TagsInput from "../inputs/TagsInput.vue";
 import SelectInput from "../inputs/SelectInput.vue";
 import SliderInput from "../inputs/SliderInput.vue";
