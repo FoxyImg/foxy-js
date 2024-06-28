@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {computed, watch} from "vue";
 import EditorPanel from "../inputs/EditorPanel.vue";
+import EditorSubPanel from "../inputs/EditorSubPanel.vue";
 import {
 	type ImageMeta,
 	type SizingParams,
@@ -112,28 +113,28 @@ watch(() => [currentValue.value.width, currentValue.value.height], (newVal, oldV
 			<SelectInput title="Horizontal Gravity" v-model="currentValue.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
 			<SelectInput title="Vertical Gravity" v-model="currentValue.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
 		</div>
-	</EditorPanel>
-	<EditorPanel v-if="currentValue.crop.includes('focus') && imageKey" collapse-key="focal-point-editor" title="Focal Point"  :disabled="!currentValue.enabled">
-		<FocalPointInput v-model="currentValue.focalPoint" :image-key="imageKey" :image-meta="imageMeta" />
-		<SliderInput title="Focal Point Zoom" v-model="currentValue.focalPointZoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
-	</EditorPanel>
-	<EditorPanel v-if="currentValue.crop.includes('face') && faceCount > 0" title="Face Crop Options" collapse-key="face-crop-options"  :disabled="!currentValue.enabled">
-		<ObjectSelectInput title="Face Index" v-model="currentValue.face.index" :default="-1" :allow-null="false" :options="faceOptions" />
-		<SliderInput title="Face Padding" v-model="currentValue.face.padding" :min="0" :max="256" :step="1" :default="8" suffix="px" />
-		<SliderInput title="Face Zoom" v-model="currentValue.face.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
-		<div class="grid grid-cols-2 gap-3">
-			<SelectInput title="Face Horizontal Gravity" v-model="currentValue.face.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
-			<SelectInput title="Face Vertical Gravity" v-model="currentValue.face.vGravity" default="top" :allow-null="false" :options="VGravityOptions" />
-		</div>
-		<ToggleInput title="Focus Face" v-model="currentValue.face.focus" />
-	</EditorPanel>
-	<EditorPanel v-if="currentValue.crop.includes('person') && peopleCount > 0" title="Person Crop Options" collapse-key="person-crop-options"  :disabled="!currentValue.enabled">
-		<ObjectSelectInput title="Person Index" v-model="currentValue.person.index" :default="-1" :allow-null="false" :options="personOptions" />
-		<SliderInput title="Person Padding" v-model="currentValue.person.padding" :min="0" :max="256" :step="1" :default="0" suffix="px" />
-		<SliderInput title="Person Zoom" v-model="currentValue.person.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
-		<div class="grid grid-cols-2 gap-3">
-			<SelectInput title="Person Horiz. Gravity" v-model="currentValue.person.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
-			<SelectInput title="Person Vertical Gravity" v-model="currentValue.person.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
-		</div>
+		<EditorSubPanel v-if="currentValue.crop.includes('focus') && imageKey" collapse-key="focal-point-editor" title="Focal Point"  :disabled="!currentValue.enabled">
+			<FocalPointInput v-model="currentValue.focalPoint" :image-key="imageKey" :image-meta="imageMeta" />
+			<SliderInput title="Focal Point Zoom" v-model="currentValue.focalPoint.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+		</EditorSubPanel>
+		<EditorSubPanel v-if="currentValue.crop.includes('face') && faceCount > 0" title="Face Crop Options" collapse-key="face-crop-options"  :disabled="!currentValue.enabled">
+			<ObjectSelectInput title="Face Index" v-model="currentValue.face.index" :default="-1" :allow-null="false" :options="faceOptions" />
+			<SliderInput title="Face Padding" v-model="currentValue.face.padding" :min="0" :max="256" :step="1" :default="8" suffix="px" />
+			<SliderInput title="Face Zoom" v-model="currentValue.face.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+			<div class="grid grid-cols-2 gap-3">
+				<SelectInput title="Face Horizontal Gravity" v-model="currentValue.face.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
+				<SelectInput title="Face Vertical Gravity" v-model="currentValue.face.vGravity" default="top" :allow-null="false" :options="VGravityOptions" />
+			</div>
+			<ToggleInput title="Focus Face" v-model="currentValue.face.focus" />
+		</EditorSubPanel>
+		<EditorSubPanel v-if="currentValue.crop.includes('person') && peopleCount > 0" title="Person Crop Options" collapse-key="person-crop-options"  :disabled="!currentValue.enabled">
+			<ObjectSelectInput title="Person Index" v-model="currentValue.person.index" :default="-1" :allow-null="false" :options="personOptions" />
+			<SliderInput title="Person Padding" v-model="currentValue.person.padding" :min="0" :max="256" :step="1" :default="0" suffix="px" />
+			<SliderInput title="Person Zoom" v-model="currentValue.person.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
+			<div class="grid grid-cols-2 gap-3">
+				<SelectInput title="Person Horiz. Gravity" v-model="currentValue.person.hGravity" default="center" :allow-null="false" :options="HGravityOptions" />
+				<SelectInput title="Person Vertical Gravity" v-model="currentValue.person.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
+			</div>
+		</EditorSubPanel>
 	</EditorPanel>
 </template>

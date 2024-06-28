@@ -184,8 +184,10 @@ export const useOverlayParam:ComposableParam<OverlayParams, FoxyOverlayParams> =
 			}
 
 			if (params.substitutions.length > 0) {
+				let subIdx = 0;
 				for(const substitution of params.substitutions) {
-					urlParams[`${prefix}:sub`] = `${base64(substitution.key, true)}:${base64(substitution.value, true)}`;
+					urlParams[`${prefix}:sub:${subIdx}`] = `${base64(substitution.key, true)}:${base64(substitution.value, true)}`;
+					subIdx++;
 				}
 			}
 		}

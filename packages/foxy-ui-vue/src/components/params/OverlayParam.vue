@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {computed} from "vue";
 import EditorPanel from "../inputs/EditorPanel.vue";
+import EditorSubPanel from "../inputs/EditorSubPanel.vue";
 import {
 	FitOptions,
 	OverlayBackgroundColorTypeOptions,
@@ -77,7 +78,7 @@ const imageHeight = computed(() => {
 		<ObjectSelectInput v-if="currentValue.type === 'image' || currentValue.type === 'text'" title="Rotation" v-model="currentValue.rotate" :default="0" :allow-null="false" :options="RotationOptions" />
 		<SliderInput title="Horizontal Padding" v-model="currentValue.hPadding" :min="0" :max="imageWidth" :step="1" :default="0" default-label="None" suffix="px" />
 		<SliderInput title="Vertical Padding" v-model="currentValue.vPadding" :min="0" :max="imageHeight" :step="1" :default="0"  default-label="None" suffix="px" />
-		<EditorPanel title="Position" :collapse-key="`overlay-${currentValue.id}-position`" :initially-expanded="false">
+		<EditorSubPanel title="Position" :collapse-key="`overlay-${currentValue.id}-position`" :initially-expanded="false">
 			<ToggleInput title="Relative Coordinates" v-model="currentValue.relativeCoords" />
 			<SliderInput title="X" v-model="currentValue.x" :min="0" :max="currentValue.relativeCoords ? 100 : imageWidth" :step="1" :default="0" :suffix="currentValue.relativeCoords ? '%' : 'px'" />
 			<SliderInput title="Y" v-model="currentValue.y" :min="0" :max="currentValue.relativeCoords ? 100 : imageHeight" :step="1" :default="0" :suffix="currentValue.relativeCoords ? '%' : 'px'" />
@@ -85,17 +86,17 @@ const imageHeight = computed(() => {
 				<SelectInput title="Horizontal Anchor" v-model="currentValue.hAnchor" default="right" :allow-null="false" :options="HGravityOptions" />
 				<SelectInput title="Vertical Anchor" v-model="currentValue.vAnchor" default="bottom" :allow-null="false" :options="VGravityOptions" />
 			</div>
-		</EditorPanel>
-		<EditorPanel title="Size" :collapse-key="`overlay-${currentValue.id}-size`" :initially-expanded="false">
+		</EditorSubPanel>
+		<EditorSubPanel title="Size" :collapse-key="`overlay-${currentValue.id}-size`" :initially-expanded="false">
 			<ToggleInput title="Relative Size" v-model="currentValue.relativeSize" />
-			<SliderInput title="Width" v-model="currentValue.width" :min="0" :max="currentValue.relativeCoords ? 100 : imageWidth" :step="1" :default="0" default-label="Auto" :suffix="currentValue.relativeCoords ? '%' : 'px'" />
-			<SliderInput title="Height" v-model="currentValue.height" :min="0" :max="currentValue.relativeCoords ? 100 : imageHeight" :step="1" :default="0" default-label="Auto" :suffix="currentValue.relativeCoords ? '%' : 'px'" />
-			<SliderInput title="Minimum Width" v-model="currentValue.minWidth" :min="0" :max="!currentValue.relativeCoords ? 100 : imageWidth" :step="1" :default="0" default-label="None" :suffix="!currentValue.relativeCoords ? '%' : 'px'" />
-			<SliderInput title="Minimum Height" v-model="currentValue.minHeight" :min="0" :max="!currentValue.relativeCoords ? 100 : imageHeight" :step="1" :default="0" default-label="None" :suffix="!currentValue.relativeCoords ? '%' : 'px'" />
-			<SliderInput title="Maximum Width" v-model="currentValue.maxWidth" :min="0" :max="!currentValue.relativeCoords ? 100 : imageWidth" :step="1" :default="0" default-label="None" :suffix="!currentValue.relativeCoords ? '%' : 'px'" />
-			<SliderInput title="Maximum Height" v-model="currentValue.maxHeight" :min="0" :max="!currentValue.relativeCoords ? 100 : imageHeight" :step="1" :default="0" default-label="None" :suffix="!currentValue.relativeCoords ? '%' : 'px'" />
-		</EditorPanel>
-		<EditorPanel title="Background" :collapse-key="`overlay-${currentValue.id}-background`" :initially-expanded="false" v-model="currentValue.background.enabled" :show-toggle="true" :disabled="!currentValue.background.enabled">
+			<SliderInput title="Width" v-model="currentValue.width" :min="0" :max="currentValue.relativeSize ? 100 : imageWidth" :step="1" :default="0" default-label="Auto" :suffix="currentValue.relativeSize ? '%' : 'px'" />
+			<SliderInput title="Height" v-model="currentValue.height" :min="0" :max="currentValue.relativeSize ? 100 : imageHeight" :step="1" :default="0" default-label="Auto" :suffix="currentValue.relativeSize ? '%' : 'px'" />
+			<SliderInput title="Minimum Width" v-model="currentValue.minWidth" :min="0" :max="!currentValue.relativeSize ? 100 : imageWidth" :step="1" :default="0" default-label="None" :suffix="!currentValue.relativeSize ? '%' : 'px'" />
+			<SliderInput title="Minimum Height" v-model="currentValue.minHeight" :min="0" :max="!currentValue.relativeSize ? 100 : imageHeight" :step="1" :default="0" default-label="None" :suffix="!currentValue.relativeSize ? '%' : 'px'" />
+			<SliderInput title="Maximum Width" v-model="currentValue.maxWidth" :min="0" :max="!currentValue.relativeSize ? 100 : imageWidth" :step="1" :default="0" default-label="None" :suffix="!currentValue.relativeSize ? '%' : 'px'" />
+			<SliderInput title="Maximum Height" v-model="currentValue.maxHeight" :min="0" :max="!currentValue.relativeSize ? 100 : imageHeight" :step="1" :default="0" default-label="None" :suffix="!currentValue.relativeSize ? '%' : 'px'" />
+		</EditorSubPanel>
+		<EditorSubPanel title="Background" :collapse-key="`overlay-${currentValue.id}-background`" :initially-expanded="false" v-model="currentValue.background.enabled" :show-toggle="true" :disabled="!currentValue.background.enabled">
 			<ObjectSelectInput title="Background Color Type" v-model="currentValue.background.backgroundColorType" default="color" :allow-null="false" :options="OverlayBackgroundColorTypeOptions" />
 			<SliderInput v-if="currentValue.background.backgroundColorType !== 'color'" title="Dominant Color Opacity" v-model="currentValue.background.dominantColorOpacity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
 			<ColorInput title="Background Color" v-model="currentValue.background.backgroundColor" default="#000000" />
@@ -110,7 +111,7 @@ const imageHeight = computed(() => {
 				<SelectInput title="Horizontal Align" v-model="currentValue.background.hAlign" default="right" :allow-null="false" :options="HGravityOptions" />
 				<SelectInput title="Vertical Align" v-model="currentValue.background.vAlign" default="bottom" :allow-null="false" :options="VGravityOptions" />
 			</div>
-			<EditorPanel title="Size" :collapse-key="`overlay-${currentValue.id}-bg-size`" :initially-expanded="false">
+			<EditorSubPanel title="Background Size" :collapse-key="`overlay-${currentValue.id}-bg-size`" :initially-expanded="false">
 				<ToggleInput title="Relative Size" v-model="currentValue.background.relativeSize" />
 				<SliderInput title="Width" v-model="currentValue.background.width" :min="0" :max="currentValue.background.relativeSize ? 100 : imageWidth" :step="1" :default="0" default-label="Auto" :suffix="currentValue.background.relativeSize ? '%' : 'px'" />
 				<SliderInput title="Height" v-model="currentValue.background.height" :min="0" :max="currentValue.background.relativeSize ? 100 : imageHeight" :step="1" :default="0" default-label="Auto" :suffix="currentValue.background.relativeSize ? '%' : 'px'" />
@@ -118,9 +119,9 @@ const imageHeight = computed(() => {
 				<SliderInput title="Minimum Height" v-model="currentValue.background.minHeight" :min="0" :max="!currentValue.background.relativeSize ? 100 : imageHeight" :step="1" :default="0" default-label="None" :suffix="!currentValue.background.relativeSize ? '%' : 'px'" />
 				<SliderInput title="Maximum Width" v-model="currentValue.background.maxWidth" :min="0" :max="!currentValue.background.relativeSize ? 100 : imageWidth" :step="1" :default="0" default-label="None" :suffix="!currentValue.background.relativeSize ? '%' : 'px'" />
 				<SliderInput title="Maximum Height" v-model="currentValue.background.maxHeight" :min="0" :max="!currentValue.background.relativeSize ? 100 : imageHeight" :step="1" :default="0" default-label="None" :suffix="!currentValue.background.relativeSize ? '%' : 'px'" />
-			</EditorPanel>
-		</EditorPanel>
-		<EditorPanel title="Drop Shadow" :collapse-key="`overlay-${currentValue.id}-shadow`" :initially-expanded="false" v-model="currentValue.dropShadow.enabled" :show-toggle="true" :disabled="!currentValue.dropShadow.enabled">
+			</EditorSubPanel>
+		</EditorSubPanel>
+		<EditorSubPanel title="Drop Shadow" :collapse-key="`overlay-${currentValue.id}-shadow`" :initially-expanded="false" v-model="currentValue.dropShadow.enabled" :show-toggle="true" :disabled="!currentValue.dropShadow.enabled">
 			<SliderInput title="Opacity" v-model="currentValue.dropShadow.opacity" :min="0" :max="100" :step="1" :default="100" suffix="%" />
 			<SliderInput title="Blur" v-model="currentValue.dropShadow.blur" :min="0" :max="100" :step="1" :default="3" suffix="px" />
 			<ColorInput title="Color" v-model="currentValue.dropShadow.color" default="#000000" />
@@ -128,6 +129,6 @@ const imageHeight = computed(() => {
 				<SliderInput title="Offset X" v-model="currentValue.dropShadow.offsetX" :min="0" :max="100" :step="1" :default="1" suffix="px" />
 				<SliderInput title="Offset Y" v-model="currentValue.dropShadow.offsetX" :min="0" :max="100" :step="1" :default="1" suffix="px" />
 			</div>
-		</EditorPanel>
+		</EditorSubPanel>
 	</EditorPanel>
 </template>

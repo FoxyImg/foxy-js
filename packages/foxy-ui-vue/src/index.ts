@@ -29,6 +29,7 @@ export {default as SaveIcon} from "./components/icons/SaveIcon.vue";
 
 export {default as ColorInput} from "./components/inputs/ColorInput.vue";
 export {default as EditorPanel} from "./components/inputs/EditorPanel.vue";
+export {default as EditorSubPanel} from "./components/inputs/EditorSubPanel.vue";
 export {default as FocalPointInput} from "./components/inputs/FocalPointInput.vue";
 export {default as FontInput} from "./components/inputs/FontInput.vue";
 export {default as GradientMapInput} from "./components/inputs/GradientMapInput.vue";

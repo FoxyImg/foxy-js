@@ -7,14 +7,14 @@ import type {URLBuilder} from "../../types/url-builder";
 const buildUrl:URLBuilder = inject("buildUrl") as URLBuilder;
 
 const props = defineProps<{
-	modelValue: {x: number, y:number},
+	modelValue: {x: number, y:number, zoom: number},
 	imageKey: string|null,
 	imageMeta: ImageMeta|null,
 }>();
 
 const emit = defineEmits(['update:modelValue']);
 
-const currentValue = computed<{x: number, y:number}>({
+const currentValue = computed<{x: number, y:number, zoom: number}>({
 	get() {
 		return props.modelValue;
 	},
@@ -50,11 +50,13 @@ function mouseDown(e:MouseEvent) {
 		console.log({
 			x: e.offsetX / boundingRect.width,
 			y: e.offsetY / boundingRect.height,
+			zoom: currentValue.value.zoom,
 		});
 
 		emit("update:modelValue", {
 			x: e.offsetX / boundingRect.width,
 			y: e.offsetY / boundingRect.height,
+			zoom: currentValue.value.zoom,
 		});
 	}
 }
@@ -68,11 +70,13 @@ function mouseMove(e:MouseEvent) {
 		console.log({
 			x: e.offsetX / boundingRect.width,
 			y: e.offsetY / boundingRect.height,
+			zoom: currentValue.value.zoom,
 		});
 
 		emit("update:modelValue", {
 			x: e.offsetX / boundingRect.width,
 			y: e.offsetY / boundingRect.height,
+			zoom: currentValue.value.zoom,
 		});
 	}
 }
