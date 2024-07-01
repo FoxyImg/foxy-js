@@ -11,10 +11,10 @@ importers:
   apps/demo:
     dependencies:
       '@foxyimg/url-builder':
-        specifier: workspace:*
+        specifier: 0.1.0
         version: link:../../packages/url-builder
       '@foxyimg/vue-ui':
-        specifier: workspace:*
+        specifier: 0.1.0
         version: link:../../packages/vue-ui
       '@pinia-plugin-persistedstate/nuxt':
         specifier: ^1.2.1
