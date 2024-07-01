@@ -139,6 +139,7 @@ const previewImage = ref<HTMLImageElement|null>(null);
 <template>
 	<div class="fixed inset-0 flex flex-col">
 		<div class="px-5 py-3 flex items-center gap-5">
+			<img src="/logo.png" class="w-auto max-h-12" />
 			<FoxyAppSelector :apps="apps" v-model="currentAppId" @add-app="newFoxyApp" @edit-app="editFoxyApp" @delete-app="deleteFoxyApp" />
 			<FoxySourceSelector v-if="currentApp" :sources="currentSources" v-model="currentSourceId" @new-source="newFoxySource" @edit-source="editFoxySource" @save-source="saveFoxySource" @delete-source="deleteFoxySource" />
 			<HeaderImageKeyInput v-if="currentApp && currentSource" class="flex-1" label="Image Key" v-model="imageKey" :host="currentApp?.url" :access-key="currentSource?.key" :secret="currentApp?.signingKey" :imgix-mode="currentSource!.imgixMode" :sample-images="sampleImages" @remove-sample-image="removeSampleImage" @import-sample-images="sampleImages = $event" />
