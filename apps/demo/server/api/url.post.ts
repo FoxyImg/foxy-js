@@ -3,7 +3,6 @@ import {z} from "zod";
 import {ImageParamsSchema, PartialImageParams} from "@foxyimg/url-builder";
 import SampleImages from "@/data/sample-images.json";
 import OverlayImages from "@/data/overlay-images.json";
-import Foxy from "@/data/foxy.json";
 import {foxy} from "@foxyimg/url-builder";
 
 export default defineEventHandler(async (event) => {
@@ -50,7 +49,8 @@ export default defineEventHandler(async (event) => {
 		}
 	}
 
-	const url = foxy(Foxy.host, Foxy.source, Foxy.secret, Foxy.imgixMode).buildUrl(options.imageKey, options.params);
+	const config = useRuntimeConfig();
+	const url = foxy(config.foxyHost, config.foxySource, config.foxySecret, config.foxyImgixMode).buildUrl(options.imageKey, options.params);
 	console.log(decodeURIComponent(url));
 	return {
 		url

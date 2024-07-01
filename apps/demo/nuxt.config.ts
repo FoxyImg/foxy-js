@@ -25,4 +25,10 @@ export default defineNuxtConfig({
     server: true,
     client: process.env.NODE_ENV !== "production",
   },
+  runtimeConfig: {
+    foxyHost: "",
+    foxySource: "",
+    foxySecret: "",
+    foxyImgixMode: true,
+  }
 })
