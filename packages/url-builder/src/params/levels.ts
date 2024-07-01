@@ -1,5 +1,6 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 import {DeepPartial} from "../deep-partial";
+import {z} from "zod";
 
 export type ChannelLevelsParams = BaseParam & {
 	shadows: number,
@@ -7,6 +8,13 @@ export type ChannelLevelsParams = BaseParam & {
 	highlights: number,
 }
 export type FoxyChannelLevelsParams = Partial<ChannelLevelsParams>;
+
+export const ChannelLevelsSchema = z.object({
+	enabled: z.boolean().optional(),
+	shadows: z.number().optional(),
+	mid: z.number().optional(),
+	highlights: z.number().optional(),
+});
 
 export const DefaultChannelLevelsParams: ChannelLevelsParams = {
 	enabled: true,
@@ -24,6 +32,14 @@ type BaseLevelsParams = {
 
 export type LevelsParams = BaseParam & BaseLevelsParams;
 export type FoxyLevelsParams = DeepPartial<BaseLevelsParams>;
+
+export const LevelsSchema = z.object({
+	enabled: z.boolean().optional(),
+	all: ChannelLevelsSchema.optional(),
+	red: ChannelLevelsSchema.optional(),
+	green: ChannelLevelsSchema.optional(),
+	blue: ChannelLevelsSchema.optional(),
+});
 
 export const DefaultLevelsParams: LevelsParams = {
 	enabled: true,

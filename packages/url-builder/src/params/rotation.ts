@@ -1,4 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import {z} from "zod";
 
 type BaseRotationParams = {
 	rotation: number,
@@ -7,6 +8,12 @@ type BaseRotationParams = {
 
 export type RotationParams = BaseParam & BaseRotationParams;
 export type FoxyRotationParams = Partial<BaseRotationParams>;
+
+export const RotationSchema = z.object({
+	enabled: z.boolean().optional(),
+	rotation: z.number().optional(),
+	mode: z.union([z.literal('none'), z.literal('fit'), z.literal('fill')]).optional(),
+});
 
 export const DefaultRotationParams: RotationParams = {
 	enabled: true,

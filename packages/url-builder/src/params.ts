@@ -1,32 +1,51 @@
+import {z} from "zod";
 import type {DeepPartial} from "./deep-partial";
-import {type SourceCropParams, DefaultSourceCropParams, FoxySourceCropParams, useSourceCropParam} from "./params/source-crop";
-import {type SizingParams, DefaultSizingParams, FoxySizingParams, useSizingParam} from "./params/sizing";
 import {
-	type BackgroundRemovalParams,
+	type SourceCropParams,
+	DefaultSourceCropParams,
+	FoxySourceCropParams,
+	useSourceCropParam,
+	SourceCropSchema
+} from "./params/source-crop";
+import {type SizingParams, DefaultSizingParams, FoxySizingParams, useSizingParam, SizingSchema} from "./params/sizing";
+import {
+	type BackgroundRemovalParams, BackgroundRemovalSchema,
 	DefaultBackgroundRemovalParams,
 	FoxyBackgroundRemovalParams, useBackgroundRemovalParam
 } from "./params/background-removal";
-import {type RotationParams, DefaultRotationParams, FoxyRotationParams, useRotationParam} from "./params/rotation";
-import {type AdjustmentsParams, DefaultAdjustmentsParams, FoxyAdjustmentsParams, useAdjustmentsParam} from "./params/adjustments";
-import {type StylizeParams, DefaultStylizeParams, FoxyStylizeParams, useStylizeParam} from "./params/stylize";
+import {
+	type RotationParams,
+	DefaultRotationParams,
+	FoxyRotationParams,
+	useRotationParam,
+	RotationSchema
+} from "./params/rotation";
+import {
+	type AdjustmentsParams,
+	AdjustmentsSchema,
+	DefaultAdjustmentsParams,
+	FoxyAdjustmentsParams,
+	useAdjustmentsParam
+} from "./params/adjustments";
+import {type StylizeParams, DefaultStylizeParams, FoxyStylizeParams, useStylizeParam, StylizeSchema} from "./params/stylize";
 import {
 	type GradientMapParams,
 	DefaultGradientMapParams,
 	FoxyGradientMapParams,
-	useGradientMapParam
+	useGradientMapParam, GradientMapSchema
 } from "./params/gradient-map";
-import {type BorderParams, DefaultBorderParams, FoxyBorderParams} from "./params/abstract-border";
-import {type MaskParams, DefaultMaskParams, FoxyMaskParams, useMaskParam} from "./params/mask";
-import {type RedactParams, DefaultRedactParams, FoxyRedactParams, useRedactParam} from "./params/redact";
-import {type ExportParams, DefaultExportParams, FoxyExportParams, useExportParam} from "./params/export";
-import {type OverlaysParams, DefaultOverlaysParam, FoxyOverlaysParams, useOverlaysParam} from "./params/overlays";
+import {type BorderParams, BorderSchema, DefaultBorderParams, FoxyBorderParams} from "./params/abstract-border";
+import {type MaskParams, DefaultMaskParams, FoxyMaskParams, useMaskParam, MaskSchema} from "./params/mask";
+import {type RedactParams, DefaultRedactParams, FoxyRedactParams, useRedactParam, RedactSchema} from "./params/redact";
+import {type ExportParams, DefaultExportParams, FoxyExportParams, useExportParam, ExportSchema} from "./params/export";
+import {type OverlaysParams, DefaultOverlaysParam, FoxyOverlaysParams, useOverlaysParam, OverlaysSchema} from "./params/overlays";
 import {
 	type ChannelLevelsParams,
 	type LevelsParams,
 	DefaultChannelLevelsParams,
-	DefaultLevelsParams, FoxyLevelsParams, useLevelsParam
+	DefaultLevelsParams, FoxyLevelsParams, useLevelsParam, LevelsSchema
 } from "./params/levels";
-import {DebugParams, DefaultDebugParams, FoxyDebugParams, useDebugParam} from "./params/debug";
+import {DebugParams, DebugSchema, DefaultDebugParams, FoxyDebugParams, useDebugParam} from "./params/debug";
 import {usePaddingParam} from "./params/padding";
 import {useBorderParam} from "./params/border";
 
@@ -61,6 +80,28 @@ export type ImageParams = {
 
 	backgroundColor: string|null,
 }
+
+export const ImageParamsSchema = z.object({
+	metaOnly: z.boolean().optional(),
+	showPreset: z.boolean().optional(),
+
+	backgroundRemoval: BackgroundRemovalSchema.optional(),
+	sourceCrop: SourceCropSchema.optional(),
+	sizing: SizingSchema.optional(),
+	rotation: RotationSchema.optional(),
+	adjustments: AdjustmentsSchema.optional(),
+	stylize: StylizeSchema.optional(),
+	gradientMap: GradientMapSchema.optional(),
+	padding: BorderSchema.optional(),
+	border: BorderSchema.optional(),
+	mask: MaskSchema.optional(),
+	redact: RedactSchema.optional(),
+	export: ExportSchema.optional(),
+	overlays: OverlaysSchema.optional(),
+	levels: LevelsSchema.optional(),
+	debug: DebugSchema.optional(),
+	backgroundColor: z.string().nullable().optional(),
+});
 
 export type FoxyImageParams = {
 	backgroundRemoval?: FoxyBackgroundRemovalParams,
@@ -146,8 +187,6 @@ export function getImageParams(partialParams:PartialImageParams):ImageParams {
 }
 
 export function importFoxyImageParams(foxyParams:FoxyImageParams):ImageParams {
-	console.log('importFoxyImageParams', foxyParams);
-
 	const sourceCropParam = useSourceCropParam();
 	const sizingParam = useSizingParam();
 	const backgroundRemovalParam = useBackgroundRemovalParam();
@@ -164,7 +203,7 @@ export function importFoxyImageParams(foxyParams:FoxyImageParams):ImageParams {
 	const levelsParam = useLevelsParam();
 	const debugParam = useDebugParam();
 
-	const result = {
+	return {
 		metaOnly: false,
 		showPreset: false,
 
@@ -186,7 +225,4 @@ export function importFoxyImageParams(foxyParams:FoxyImageParams):ImageParams {
 		overlays: foxyParams.overlays ? overlaysParam.importParams(foxyParams.overlays) : {...DefaultOverlaysParam},
 		debug: foxyParams.debug ? debugParam.importParams(foxyParams.debug) : {...DefaultDebugParams},
 	}
-
-	console.log('importFoxyImageParams', result);
-	return result;
 }

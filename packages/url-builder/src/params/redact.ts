@@ -1,4 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import {z} from "zod";
 
 export type Rect = {
 	left: number,
@@ -11,6 +12,15 @@ export type RedactRect = Rect & {
 	cornerRadius: number,
 	rotation: number,
 }
+
+export const RedactRegionSchema = z.object({
+	left: z.number().optional(),
+	top: z.number().optional(),
+	width: z.number().optional(),
+	height: z.number().optional(),
+	cornerRadius: z.number().optional(),
+	rotation: z.number().optional(),
+});
 
 export type RedactParams = BaseParam & {
 	faces: string[],
@@ -25,6 +35,21 @@ export type RedactParams = BaseParam & {
 	pixelate: number,
 	cornerRadius: number,
 }
+
+export const RedactSchema = z.object({
+	enabled: z.boolean().optional(),
+	faces: z.array(z.string()).optional(),
+	people: z.array(z.string()).optional(),
+	regions: z.array(RedactRegionSchema).optional(),
+	blur: z.number().optional(),
+	expandMask: z.number().optional(),
+	blurMask: z.number().optional(),
+	pixelateMask: z.number().optional(),
+	useColor: z.boolean().optional(),
+	color: z.string().nullable().optional(),
+	pixelate: z.number().optional(),
+	cornerRadius: z.number().optional(),
+});
 
 export type FoxyRedactParams = {
 	faces?: number[],

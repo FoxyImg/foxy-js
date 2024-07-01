@@ -1,4 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import {z} from "zod";
 
 type BaseAdjustmentsParams = {
 	brightness: number,
@@ -15,6 +16,20 @@ type BaseAdjustmentsParams = {
 
 export type AdjustmentsParams = BaseParam & BaseAdjustmentsParams;
 export type FoxyAdjustmentsParams = Partial<BaseAdjustmentsParams>;
+
+export const AdjustmentsSchema = z.object({
+	enabled: z.boolean().optional(),
+	brightness: z.number().optional(),
+	saturation: z.number().optional(),
+	contrast: z.number().optional(),
+	exposure: z.number().optional(),
+	gamma: z.number().optional(),
+	hue: z.number().optional(),
+	vibrance: z.number().optional(),
+	invert: z.boolean().optional(),
+	texture: z.number().optional(),
+	textureDensity: z.number().optional(),
+});
 
 export const DefaultAdjustmentsParams: AdjustmentsParams = {
 	enabled: true,

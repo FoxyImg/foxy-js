@@ -1,5 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
-import {DeepPartial} from "../deep-partial";
+import {z} from "zod";
 
 export const enum BlendModes {
 	BlendModeClear = 0,
@@ -62,6 +62,12 @@ export type GradientStops = BaseParam & {
 	color: string,
 }
 
+export const GradientStopsSchema = z.object({
+	enabled: z.boolean().optional(),
+	stop: z.number().optional(),
+	color: z.string().optional(),
+});
+
 export const DefaultGradientStops: GradientStops = {
 	enabled: true,
 	stop: 0,
@@ -78,6 +84,15 @@ type BaseGradientMapParams = {
 
 export type GradientMapParams = BaseParam & BaseGradientMapParams;
 export type FoxyGradientMapParams = Partial<BaseGradientMapParams>;
+
+export const GradientMapSchema = z.object({
+	enabled: z.boolean().optional(),
+	stops: z.array(GradientStopsSchema).optional(),
+	monochrome: z.boolean().optional(),
+	blur: z.number().optional(),
+	blendMode: z.number().optional(),
+	opacity: z.number().optional(),
+});
 
 export const DefaultGradientMapParams: GradientMapParams = {
 	enabled: true,

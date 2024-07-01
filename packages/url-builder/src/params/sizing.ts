@@ -1,5 +1,6 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 import calcAspectRatio from "../utils/aspect-ratio";
+import {z} from "zod";
 
 export type BoxCropParams = {
 	index: number,
@@ -9,6 +10,15 @@ export type BoxCropParams = {
 	zoom: number,
 	focus: boolean,
 }
+
+export const BoxCropSchema = z.object({
+	index: z.number().optional(),
+	hGravity: z.union([z.literal('left'), z.literal('center'), z.literal('right')]).optional(),
+	vGravity: z.union([z.literal('top'), z.literal('center'), z.literal('bottom')]).optional(),
+	padding: z.number().optional(),
+	zoom: z.number().optional(),
+	focus: z.boolean().optional(),
+});
 
 export const DefaultFaceBoxCropParams: BoxCropParams = {
 	index: -1,
@@ -34,6 +44,12 @@ export type FocalPointParams = {
 	zoom: number,
 }
 
+export const FocalPointSchema = z.object({
+	x: z.number().optional(),
+	y: z.number().optional(),
+	zoom: z.number().optional(),
+});
+
 type BaseSizingParams = {
 	crop: string[],
 	width: number,
@@ -58,6 +74,23 @@ export type FoxySizingParams = Partial<BaseSizingParams> & {
 	face?: Partial<BoxCropParams>,
 	person?: Partial<BoxCropParams>,
 }
+
+export const SizingSchema = z.object({
+	enabled: z.boolean().optional(),
+	crop: z.array(z.string()).optional(),
+	width: z.number().optional(),
+	height: z.number().optional(),
+	aspectRatioWidth: z.number().optional(),
+	aspectRatioHeight: z.number().optional(),
+	zoom: z.number().optional(),
+	smartMode: z.string().nullable().optional(),
+	hGravity: z.union([z.literal('left'), z.literal('center'), z.literal('right')]).optional(),
+	vGravity: z.union([z.literal('top'), z.literal('center'), z.literal('bottom')]).optional(),
+	focalPoint: FocalPointSchema.optional(),
+
+	face: BoxCropSchema.optional(),
+	person: BoxCropSchema.optional(),
+});
 
 export const DefaultSizingParams: SizingParams = {
 	enabled: true,
@@ -155,7 +188,6 @@ export const useSizingParam:ComposableParam<SizingParams, FoxySizingParams> = ()
 		}
 
 		if (params.crop.includes('face')) {
-			console.log('face', params.face);
 			processBoxParams(urlParams, 'face', params.face);
 		}
 

@@ -1,4 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import {z} from "zod";
 
 export const StylizeOrderOptions = [
 	{ label: 'Blur', value: 'blur' },
@@ -13,6 +14,13 @@ type BaseStylizeParams = {
 
 export type StylizeParams = BaseParam & BaseStylizeParams;
 export type FoxyStylizeParams = Partial<BaseStylizeParams>;
+
+export const StylizeSchema = z.object({
+	enabled: z.boolean().optional(),
+	order: z.array(z.string()).optional(),
+	blur: z.number().optional(),
+	pixelate: z.number().optional(),
+});
 
 export const DefaultStylizeParams: StylizeParams = {
 	enabled: true,

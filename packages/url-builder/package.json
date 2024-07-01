@@ -45,12 +45,14 @@
     "eslint": "^9.5.0",
     "eslint-config-unjs": "^0.3.2",
     "jiti": "^1.21.6",
+    "ts-to-zod": "^3.8.7",
     "typescript": "^5.5.2",
     "unbuild": "^2.0.0",
     "vitest": "^1.6.0"
   },
   "packageManager": "pnpm@9.4.0",
   "dependencies": {
-    "js-sha256": "^0.11.0"
+    "js-sha256": "^0.11.0",
+    "zod": "^3.23.8"
   }
 }

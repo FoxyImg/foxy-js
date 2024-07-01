@@ -1,10 +1,16 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
-import {FoxyOverlayParams, type OverlayParams, useOverlayParam} from "./overlay";
+import {FoxyOverlayParams, OverlaySchema, type OverlayParams, useOverlayParam} from "./overlay";
+import {z} from "zod";
 
 export type OverlaysParams = BaseParam & {
 	encode: boolean,
 	overlays: OverlayParams[],
 }
+
+export const OverlaysSchema = z.object({
+	enabled: z.boolean().optional(),
+	overlays: z.array(OverlaySchema).optional(),
+});
 
 export type FoxyOverlaysParams = BaseParam & {
 	overlays: FoxyOverlayParams[],

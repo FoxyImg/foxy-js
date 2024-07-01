@@ -1,4 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import {z} from "zod";
 
 type BaseSourceCropParams = {
 	x: number,
@@ -9,6 +10,14 @@ type BaseSourceCropParams = {
 
 export type SourceCropParams = BaseParam & BaseSourceCropParams;
 export type FoxySourceCropParams = Partial<BaseSourceCropParams>;
+
+export const SourceCropSchema = z.object({
+	enabled: z.boolean().optional(),
+	x: z.number().optional(),
+	y: z.number().optional(),
+	width: z.number().optional(),
+	height: z.number().optional(),
+});
 
 export const DefaultSourceCropParams: SourceCropParams = {
 	enabled: true,

@@ -1,4 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import {z} from "zod";
 
 type BaseBorderParams = {
 	color: string|null,
@@ -10,6 +11,15 @@ type BaseBorderParams = {
 
 export type BorderParams = BaseParam & BaseBorderParams;
 export type FoxyBorderParams = Partial<BaseBorderParams>;
+
+export const BorderSchema = z.object({
+	enabled: z.boolean().optional(),
+	color: z.string().nullable().optional(),
+	left: z.number().optional(),
+	top: z.number().optional(),
+	right: z.number().optional(),
+	bottom: z.number().optional(),
+});
 
 export const DefaultBorderParams:BorderParams = {
 	enabled: true,

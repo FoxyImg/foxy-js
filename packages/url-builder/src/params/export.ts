@@ -1,4 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import {z} from "zod";
 
 export const ExportFormatOptions = [
 	{ label: 'WebP', value: 'webp' },
@@ -17,6 +18,14 @@ type BaseExportParams = {
 
 export type ExportParams = BaseParam & BaseExportParams;
 export type FoxyExportParams = Partial<BaseExportParams>;
+
+export const ExportSchema = z.object({
+	format: z.union([z.literal('webp'), z.literal('png'), z.literal('jpg'), z.literal('avif')]).optional(),
+	quality: z.number().optional(),
+	reductionEffort: z.number().optional(),
+	lossless: z.boolean().optional(),
+	nearLossless: z.boolean().optional(),
+});
 
 export const DefaultExportParams: ExportParams = {
 	enabled: true,

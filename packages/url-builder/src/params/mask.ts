@@ -1,5 +1,6 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 import base64 from "../utils/base-64";
+import {z} from "zod";
 
 export const MaskTypeOptions = [
 	{ label: 'Image', value: 'image' },
@@ -21,8 +22,17 @@ type BaseMaskParams = {
 	cornerRadius: number,
 	fit: 'fit' | 'fill' | 'stretch',
 }
+
 export type MaskParams = BaseParam & BaseMaskParams;
 export type FoxyMaskParams = Partial<BaseMaskParams>;
+
+export const MaskSchema = z.object({
+	enabled: z.boolean().optional(),
+	type: z.union([z.literal('image'), z.literal('rect'), z.literal('square'), z.literal('ellipse'), z.literal('circle')]).optional(),
+	imageKey: z.string().nullable().optional(),
+	cornerRadius: z.number().optional(),
+	fit: z.union([z.literal('fit'), z.literal('fill'), z.literal('stretch')]).optional(),
+});
 
 export const DefaultMaskParams: MaskParams = {
 	enabled: false,

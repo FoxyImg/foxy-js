@@ -1,4 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
+import {z} from "zod";
 
 type BaseDebugParams = {
 	faces: boolean,
@@ -14,6 +15,18 @@ type BaseDebugParams = {
 
 export type DebugParams = BaseParam & BaseDebugParams;
 export type FoxyDebugParams = Partial<BaseDebugParams>;
+
+export const DebugSchema = z.object({
+	faces: z.boolean().optional(),
+	allFaces: z.boolean().optional(),
+	people: z.boolean().optional(),
+	allPeople: z.boolean().optional(),
+	otherLabels: z.boolean().optional(),
+
+	disableSourceCache: z.boolean().optional(),
+	disableMetaCache: z.boolean().optional(),
+	disableRenderCache: z.boolean().optional(),
+});
 
 export const DefaultDebugParams: DebugParams = {
 	enabled: true,

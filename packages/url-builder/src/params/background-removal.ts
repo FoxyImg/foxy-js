@@ -1,5 +1,6 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 import base64 from "../utils/base-64";
+import {z} from "zod";
 
 export type BackgroundRemovalParams = BaseParam & {
 	enabled: boolean,
@@ -9,6 +10,13 @@ export type BackgroundRemovalParams = BaseParam & {
 }
 
 export type FoxyBackgroundRemovalParams = Partial<BackgroundRemovalParams>;
+
+export const BackgroundRemovalSchema = z.object({
+	enabled: z.boolean().optional(),
+	mode: z.union([z.literal('photoroom'), z.literal('clipdrop'), z.literal('fg'), z.literal('person')]).default('fg').optional(),
+	imageKey: z.string().nullable().default(null).optional(),
+	backgroundColor: z.string().nullable().default(null).optional(),
+});
 
 export const DefaultBackgroundRemovalParams: BackgroundRemovalParams = {
 	enabled: false,
@@ -26,7 +34,6 @@ export const BackgroundRemovalModeOptions = [
 
 export const useBackgroundRemovalParam:ComposableParam<BackgroundRemovalParams, FoxyBackgroundRemovalParams> = () => {
 	function buildParams(urlParams: BuiltParams, params:BackgroundRemovalParams) {
-		console.log('builtParams, background removal', params)
 		if (!params.enabled) {
 			return urlParams;
 		}

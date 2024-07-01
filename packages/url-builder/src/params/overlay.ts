@@ -1,5 +1,6 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
 import base64 from "../utils/base-64";
+import {z} from "zod";
 
 export const OverlayTypeOptions = [
 	{ label: 'Image', value: 'image' },
@@ -26,6 +27,15 @@ export type DropShadowParams = BaseParam & {
 	offsetX: number,
 	offsetY: number,
 }
+
+export const DropShadowSchema = z.object({
+	enabled: z.boolean().optional(),
+	opacity: z.number().optional(),
+	blur: z.number().optional(),
+	color: z.string().optional(),
+	offsetX: z.number().optional(),
+	offsetY: z.number().optional(),
+});
 
 export const DefaultDropShadowParams = {
 	enabled: false,
@@ -62,6 +72,30 @@ export type OverlayBackgroundParams = BaseParam & OverlaySizeParams & {
 	vAlign: 'top'|'center'|'bottom',
 }
 
+export const OverlayBackgroundSchema = z.object({
+	enabled: z.boolean().optional(),
+	relativeSize: z.boolean().optional(),
+	width: z.number().optional(),
+	height: z.number().optional(),
+	minWidth: z.number().optional(),
+	minHeight: z.number().optional(),
+	maxWidth: z.number().optional(),
+	maxHeight: z.number().optional(),
+	backgroundColor: z.string().optional(),
+	backgroundColorType: z.union([z.literal('color'), z.literal('dominant'), z.literal('lightest'), z.literal('darkest')]).optional(),
+	dominantColorOpacity: z.number().optional(),
+	blur: z.number().optional(),
+	saturation: z.number().optional(),
+	contrast: z.number().optional(),
+	brightness: z.number().optional(),
+	cornerRadius: z.number().optional(),
+	relativePadding: z.boolean().optional(),
+	hPadding: z.number().optional(),
+	vPadding: z.number().optional(),
+	hAlign: z.union([z.literal('left'), z.literal('center'), z.literal('right')]).optional(),
+	vAlign: z.union([z.literal('top'), z.literal('center'), z.literal('bottom')]).optional(),
+});
+
 export const DefaultOverlayBackgroundParams: OverlayBackgroundParams = {
 	enabled: false,
 	backgroundColor: "#00000000",
@@ -90,6 +124,11 @@ export type OverlaySubstitutionParam = {
 	key: string,
 	value: string,
 }
+
+export const OverlaySubstitutionSchema = z.object({
+	key: z.string().optional(),
+	value: z.string().optional(),
+});
 
 type BaseOverlayParams = OverlaySizeParams & {
 	type: 'image'|'text'
@@ -121,6 +160,39 @@ export type OverlayParams =  BaseOverlayParams & {
 
 	substitutions: OverlaySubstitutionParam[],
 }
+
+export const OverlaySchema = z.object({
+	enabled: z.boolean().optional(),
+	type: z.union([z.literal('image'), z.literal('text')]).optional(),
+	text: z.string().nullable().optional(),
+	font: z.string().nullable().optional(),
+	url: z.string().nullable().optional(),
+	opacity: z.number().optional(),
+	rotate: z.number().optional(),
+	relativeCoords: z.boolean().optional(),
+	hPadding: z.number().optional(),
+	vPadding: z.number().optional(),
+	x: z.number().optional(),
+	y: z.number().optional(),
+	relativeSize: z.boolean().optional(),
+	width: z.number().optional(),
+	height: z.number().optional(),
+	minWidth: z.number().optional(),
+	minHeight: z.number().optional(),
+	maxWidth: z.number().optional(),
+	maxHeight: z.number().optional(),
+	fit: z.union([z.literal('fit'), z.literal('fill'), z.literal('crop')]).optional(),
+	hAnchor: z.union([z.literal('left'), z.literal('center'), z.literal('right')]).optional(),
+	vAnchor: z.union([z.literal('top'), z.literal('center'), z.literal('bottom')]).optional(),
+	textColor: z.string().nullable().optional(),
+	fillColor: z.string().nullable().optional(),
+	strokeColor: z.string().nullable().optional(),
+	strokeWidth: z.number().optional(),
+	dropShadow: DropShadowSchema.optional(),
+	background: OverlayBackgroundSchema.optional(),
+	trim: z.boolean().optional(),
+	substitutions: z.array(OverlaySubstitutionSchema).optional(),
+});
 
 export type FoxyOverlayParams = Partial<BaseOverlayParams> & {
 	dropShadow?: Partial<DropShadowParams>,
