@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import {ColorPicker} from "vue3-colorpicker";
 import CloseIcon from "../icons/CloseIcon.vue";
+import {ClientOnly} from "../ssr/ClientOnly";
 
 const props = defineProps<{
 	title: string,
@@ -30,7 +31,9 @@ const currentValue = computed({
 			<label class="text-xxs uppercase text-neutral-600" :class="{'font-bold text-neutral-700': modelValue !== props.default}">{{title}}</label>
 			<div class="flex items-center gap-1">
 				<a v-if="modelValue !== props.default" href="#" @click.prevent.stop="emit('update:modelValue', props.default)" class="aspect-square rounded-full p-1"><CloseIcon class="fill-black w-2 h-auto" /></a>
-				<ColorPicker format="hex8" :z-index="100001" :disable-alpha="false" shape="circle" :pure-color="currentValue" @update:pure-color="currentValue = $event.replace('#', '')" />
+				<ClientOnly>
+					<ColorPicker format="hex8" :z-index="100001" :disable-alpha="false" shape="circle" :pure-color="currentValue" @update:pure-color="currentValue = $event.replace('#', '')" />
+				</ClientOnly>
 			</div>
 		</div>
 	</div>

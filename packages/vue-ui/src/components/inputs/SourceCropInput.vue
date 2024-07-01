@@ -3,6 +3,7 @@ import {computed, inject, ref, watch} from 'vue';
 import SourceCropModal from "../modals/SourceCropModal.vue";
 import {type SourceCropParams, DefaultSizingParams, type ImageMeta} from "@foxyimg/url-builder";
 import type {URLBuilder} from "../../types/url-builder";
+import {ClientOnly} from "../ssr/ClientOnly";
 
 const buildUrl:URLBuilder = inject("buildUrl") as URLBuilder;
 
@@ -152,7 +153,9 @@ function mouseUp(e:MouseEvent) {
 			<button type="button" class="button small"  @click="showCropModal = true">Edit Crop</button>
 		</div>
 	</div>
-	<teleport to="#modals">
-		<SourceCropModal v-if="showCropModal" v-model="currentValue" @close="showCropModal = false" :image-key="imageKey" />
-	</teleport>
+	<ClientOnly>
+		<teleport to="#modals">
+			<SourceCropModal v-if="showCropModal" v-model="currentValue" @close="showCropModal = false" :image-key="imageKey" />
+		</teleport>
+	</ClientOnly>
 </template>
