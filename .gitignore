@@ -25,6 +25,3 @@ coverage
 *.sw?
 
 *.tsbuildinfo
-apps/preset-builder/src/data/sample-local-images.json
-apps/preset-builder/src/data/sample-s3-images.json
-apps/preset-builder/src/data/sample-web-images.json
