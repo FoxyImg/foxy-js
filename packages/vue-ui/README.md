@@ -9,7 +9,7 @@
 
 <!-- /automd -->
 
-The Vue components and utils used by the various Foxy Vue based apps.
+The Vue components and utils used by the various [Foxy](https://github.com/FoxyImg/Foxy) Vue based apps.
 
 ## Usage
 

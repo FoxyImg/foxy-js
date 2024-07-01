@@ -9,7 +9,7 @@
 
 <!-- /automd -->
 
-A typescript/javascript package for building Foxy Image image URLs.
+A typescript/javascript SDK for building [Foxy Image](https://github.com/FoxyImg/Foxy) image URLs.
 
 ## Usage
 
