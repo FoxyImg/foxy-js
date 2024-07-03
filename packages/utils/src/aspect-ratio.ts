@@ -1,4 +1,4 @@
-export default function calcAspectRatio(val:number, lim:number) {
+export function calcAspectRatio(val:number, lim:number) {
 	let lower = [0, 1];
 	let upper = [1, 0];
 

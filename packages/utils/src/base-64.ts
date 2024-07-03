@@ -2,7 +2,7 @@
  * Based on code from hexagon@56k.guru https://github.com/Hexagon/base64/blob/main/src/base64.js
  */
 
-export default function base64(str: string, urlMode:boolean = false) {
+export function base64(str: string, urlMode:boolean = false) {
 
 	// Regular base64 characters
 	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
