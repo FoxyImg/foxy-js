@@ -1,6 +1,6 @@
 {
   "name": "@foxyimg/vue-ui",
-  "version": "0.1.0",
+  "version": "0.1.6",
   "description": "",
   "repository": "foxyimg/foxy-js",
   "license": "MIT",
@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.8.2",
-    "@formkit/drag-and-drop": "^0.1.4",
+    "@formkit/drag-and-drop": "^0.1.6",
     "@foxyimg/url-builder": "workspace:*",
     "@vueform/multiselect": "^2.6.8",
     "@vueuse/core": "^10.11.0",
@@ -45,7 +45,7 @@
     "short-uuid": "^5.2.0",
     "vue-advanced-cropper": "^2.8.9",
     "vue-json-pretty": "^2.4.0",
-    "vue3-colorpicker": "^2.3.0"
+    "@foxyimg/utils": "workspace:*"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
@@ -53,7 +53,7 @@
     "@vitest/coverage-v8": "^1.6.0",
     "automd": "^0.3.7",
     "changelogen": "^0.5.5",
-    "eslint": "^9.5.0",
+    "eslint": "^9.6.0",
     "eslint-config-unjs": "^0.3.2",
     "jiti": "^1.21.6",
     "typescript": "^5.5.2",

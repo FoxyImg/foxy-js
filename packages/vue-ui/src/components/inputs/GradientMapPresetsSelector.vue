@@ -8,7 +8,7 @@ import {useFileDialog, useStorage} from "@vueuse/core";
 import {StreamReader} from "../../lib/grd-parser/stream-reader";
 //@ts-ignore
 import PSDGradient from "../../lib/grd-parser/psd-gradient";
-import colorToHex from "../../utils/hex-color";
+import {colorToHex} from "@foxyimg/utils";
 
 const props = defineProps<{
 	modelValue: GradientStops[],

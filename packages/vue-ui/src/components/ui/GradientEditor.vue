@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {computed, onMounted, onUnmounted, ref} from "vue";
-import {ColorPicker} from "vue3-colorpicker";
 import shortUUID from "short-uuid";
 import type {GradientStops} from "@foxyimg/url-builder";
 import {ClientOnly} from "../ssr/ClientOnly";
+import ColorPicker from "../forms/ColorPicker.vue";
 
 const props = defineProps<{
 	modelValue: GradientStops[],
@@ -101,7 +101,7 @@ const gradId = ref('gradient-'+shortUUID.generate());
 					<div class="flex-1" @mousedown.prevent.stop="draggingStop=stop" >&nbsp;</div>
 					<div v-if="stop.enabled" class="cursor-pointer leading-none">
 						<ClientOnly>
-							<ColorPicker format="hex8" :z-index="100001" :disable-alpha="false" shape="circle" class="" :pure-color="stop.color" @update:pure-color="stop.color = $event" />
+							<ColorPicker v-model="stop.color" :size="16" />
 						</ClientOnly>
 					</div>
 				</div>

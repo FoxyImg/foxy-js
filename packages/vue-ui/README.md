@@ -1,11 +1,11 @@
-![Foxy Image Logo](.logo.png)
+![Foxy Image Logo](https://aspekt-media.b-cdn.net/logo.png)
 
 # @foxyimg/vue-ui
 
 <!-- automd:badges color=yellow -->
 
-[![npm version](https://img.shields.io/npm/v/packageName?color=yellow)](https://npmjs.com/package/packageName)
-[![npm downloads](https://img.shields.io/npm/dm/packageName?color=yellow)](https://npmjs.com/package/packageName)
+[![npm version](https://img.shields.io/npm/v/packageName?color=yellow)](https://npmjs.com/package/@foxyimg/vue-ui)
+[![npm downloads](https://img.shields.io/npm/dm/packageName?color=yellow)](https://npmjs.com/package/@foxyimg/vue-ui)
 
 <!-- /automd -->
 
@@ -52,21 +52,4 @@ createApp(App)
 
 ## License
 
-<!-- automd:contributors license=MIT -->
-
 Published under the [MIT](https://github.com/unjs/packageName/blob/main/LICENSE) license.
-Made by [community](https://github.com/unjs/packageName/graphs/contributors) 💛
-<br><br>
-<a href="https://github.com/unjs/packageName/graphs/contributors">
-<img src="https://contrib.rocks/image?repo=unjs/packageName" />
-</a>
-
-<!-- /automd -->
-
-<!-- automd:with-automd -->
-
----
-
-_🤖 auto updated with [automd](https://automd.unjs.io)_
-
-<!-- /automd -->

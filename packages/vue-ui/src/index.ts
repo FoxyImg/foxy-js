@@ -85,7 +85,6 @@ export {default as ImageActions} from "./components/image/ImageActions.vue";
 //region Manual Exports
 
 export { default as useImageLoader } from "./composables/image-loader";
-export { default as hexColor } from "./utils/hex-color";
 export * from "./types/url-builder";
 export {default as PSDGradient} from "./lib/grd-parser/psd-gradient";
 export {StreamReader} from "./lib/grd-parser/stream-reader";
