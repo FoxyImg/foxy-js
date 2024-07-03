@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import {ref, watch, computed} from "vue";
 import shortUUID from "short-uuid";
-import {clamp, hsvToRgb, rgbToHsv} from "@foxyimg/utils";
+import {clamp, hsvToRgb, rgbToHsv, hexToRgb} from "@foxyimg/utils";
+import Tabs from "../ui/Tabs.vue";
+import Tab from "../ui/Tab.vue";
 
 const props = withDefaults(defineProps<{
 	modelValue: string|null,
-	size: number,
+	size?: number,
 }>(), {
 	size: 24
 });
@@ -19,18 +21,32 @@ const currentValue = computed({
 	set: (value) => emit('update:modelValue', value),
 });
 
+const currentRGB = computed({
+	get: () => hexToRgb(currentValue.value),
+	set: (value) => {
+		currentValue.value = '#'+value.r.toString(16).padStart(2, '0')+value.g.toString(16).padStart(2, '0')+value.b.toString(16).padStart(2, '0')+value.a.toString(16).padStart(2, '0');
+	},
+});
+
+const currentRed = computed({get:() => currentRGB.value.r, set: (value) => currentRGB.value = { ...currentRGB.value, r: value }});
+const currentGreen = computed({get:() => currentRGB.value.g, set: (value) => currentRGB.value = { ...currentRGB.value, g: value }});
+const currentBlue = computed({get:() => currentRGB.value.b, set: (value) => currentRGB.value = { ...currentRGB.value, b: value }});
+
+
 const currentHue = ref(0);
 const currentSaturation = ref(1);
 const currentBrightness = ref(1);
 const currentAlpha = ref(1);
 
-if (props.modelValue) {
-	const hsv = rgbToHsv(props.modelValue);
-	currentHue.value = hsv.hue;
-	currentSaturation.value = hsv.saturation / 100.0;
-	currentBrightness.value = hsv.brightness / 100.0;
-	currentAlpha.value = hsv.alpha;
-}
+watch(currentValue, () => {
+	if (currentValue.value) {
+		const hsv = rgbToHsv(currentValue.value);
+		currentHue.value = hsv.hue;
+		currentSaturation.value = hsv.saturation / 100.0;
+		currentBrightness.value = hsv.brightness / 100.0;
+		currentAlpha.value = hsv.alpha;
+	}
+}, {immediate: true});
 
 
 const currentColor = computed(() => {
@@ -48,7 +64,7 @@ const cpAlphaId = ref('cp-alpha-'+shortUUID.generate());
 
 const isBrightSatDown = ref(false);
 const brightSatRef = ref<HTMLElement|null>(null);
-const brightSatRect = ref<DOMRect|null>(null);
+const brightSatRect = ref<DOMRect|null|undefined>(null);
 
 function brightSatDown(e:MouseEvent) {
 	isBrightSatDown.value = true;
@@ -75,7 +91,7 @@ function brightSatMove(e:MouseEvent) {
 
 const isHueDown = ref(false);
 const hueRef = ref<HTMLElement|null>(null);
-const hueRect = ref<DOMRect|null>(null);
+const hueRect = ref<DOMRect|null|undefined>(null);
 
 function hueDown(e:MouseEvent) {
 	isHueDown.value = true;
@@ -101,7 +117,7 @@ function hueMove(e:MouseEvent) {
 
 const isAlphaDown = ref(false);
 const alphaRef = ref<HTMLElement|null>(null);
-const alphaRect = ref<DOMRect|null>(null);
+const alphaRect = ref<DOMRect|null|undefined>(null);
 
 function alphaDown(e:MouseEvent) {
 	isAlphaDown.value = true;
@@ -130,6 +146,31 @@ function mouseUp(e:MouseEvent) {
 	isHueDown.value = false;
 	isAlphaDown.value = false;
 }
+
+const currentTab = ref<"hex"|"rgb"|"hsl">("hex");
+const editingColor = ref(false);
+const inputRef = ref<HTMLInputElement|null>(null);
+watch(inputRef, (el) => {
+	if (el) {
+		el.focus();
+		el.select();
+	}
+});
+function editChange() {
+	if (!inputRef.value) {
+		return;
+	}
+
+	if (/#?[0-9a-fA-F]{6,8}/gm.exec(inputRef.value.value)) {
+		const newVal = '#'+inputRef.value.value.replaceAll('#', '');
+		currentValue.value = newVal;
+		const hsv = rgbToHsv(newVal);
+		currentHue.value = hsv.hue;
+		currentSaturation.value = hsv.saturation / 100.0;
+		currentBrightness.value = hsv.brightness / 100.0;
+		currentAlpha.value = hsv.alpha;
+	}
+}
 </script>
 <template>
 	<div>
@@ -138,56 +179,83 @@ function mouseUp(e:MouseEvent) {
 				<div class="absolute w-full h-full rounded-full border border-neutral-200 " :style="`background-color: ${currentValue}`"></div>
 			</div>
 			<template #popper>
-				<div class="flex flex-col w-[240px] p-3 gap-3">
-					<div class="relative w-full">
-						<svg ref="brightSatRef" @mousedown="brightSatDown" class="cursor-pointer w-full aspect-square" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-							<defs>
-								<linearGradient :id="cpHueId" x1="0%" y1="0%" x2="100%" y2="0%">
-									<stop offset="0%" :stop-color="`hsl(${currentHue},100%,100%)`" />
-									<stop offset="100%" :stop-color="`hsl(${currentHue},100%,50%)`" />
-								</linearGradient>
-								<linearGradient :id="cpBrightId" x1="0%" y1="0%" x2="0%" y2="100%">
-									<stop offset="0%" :stop-color="`rgba(0,0,0,0)`" />
-									<stop offset="100%" stop-color="black" />
-								</linearGradient>
-							</defs>
-							<rect width="100%" height="100%" :fill="`url(#${cpHueId})`" />
-							<rect width="100%" height="100%" :fill="`url(#${cpBrightId})`" />
-						</svg>
-						<div
-							class="cursor-pointer bg-white border aspect-square w-[14px] rounded-full drop-shadow-lg absolute -translate-y-1/2 -translate-x-1/2"
-							:style="`left: ${currentSaturation * 100}%; top: ${(1.0 - currentBrightness) * 100}%;`"></div>
-					</div>
-					<div class="relative w-full">
-						<svg ref="hueRef" @mousedown="hueDown" class="cursor-pointer w-full h-[12px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 12">
-							<defs>
-								<linearGradient :id="cpHueLineId" x1="0%" y1="0%" x2="100%" y2="0%">
-									<stop offset="0%" stop-color="hsl(0,100%,50%)" />
-									<stop offset="16.66666667%" stop-color="hsl(60,100%,50%)" />
-									<stop offset="33.33333333%" stop-color="hsl(120,100%,50%)" />
-									<stop offset="50%" stop-color="hsl(180,100%,50%)" />
-									<stop offset="66.66666667%" stop-color="hsl(240,100%,50%)" />
-									<stop offset="83.33333333%" stop-color="hsl(300,100%,50%)" />
-									<stop offset="100%" stop-color="hsl(360,100%,50%)" />
-								</linearGradient>
-							</defs>
-							<rect width="100%" height="100%" :fill="`url(#${cpHueLineId})`" rx="6" ry="6"/>
-						</svg>
-						<div class="cursor-pointer bg-white border aspect-square w-[14px] rounded-full drop-shadow-lg absolute top-1/2 -translate-y-1/2 -translate-x-1/2" :style="`left: ${(currentHue / 360.0) * 100}%`"></div>
-					</div>
-					<div class="relative w-full">
-						<div ref="alphaRef" @mousedown="alphaDown" class="cursor-pointer relative w-full bg-checkered-white overflow-hidden rounded-full h-[12px]"  style="background-size: 10px 10px; background-position: center center;">
-							<svg class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 12">
+				<div class="flex flex-col w-[240px]">
+					<Tabs>
+						<Tab v-model="currentTab" active-color="bg-white" value="hex">Hex</Tab>
+						<Tab v-model="currentTab" active-color="bg-white" value="rgb">RGB</Tab>
+					</Tabs>
+					<div class="flex flex-col w-[240px] p-3 gap-3">
+						<div class="relative w-full">
+							<svg ref="brightSatRef" @mousedown="brightSatDown" class="cursor-pointer w-full aspect-square" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
 								<defs>
-									<linearGradient :id="cpAlphaId" x1="0%" y1="0%" x2="100%" y2="0%">
-										<stop offset="0%" stop-color="rgba(0,0,0,0)" />
-										<stop offset="100%" stop-color="rgba(0,0,0,255)" />
+									<linearGradient :id="cpHueId" x1="0%" y1="0%" x2="100%" y2="0%">
+										<stop offset="0%" :stop-color="`hsl(${currentHue},100%,100%)`" />
+										<stop offset="100%" :stop-color="`hsl(${currentHue},100%,50%)`" />
+									</linearGradient>
+									<linearGradient :id="cpBrightId" x1="0%" y1="0%" x2="0%" y2="100%">
+										<stop offset="0%" :stop-color="`rgba(0,0,0,0)`" />
+										<stop offset="100%" stop-color="black" />
 									</linearGradient>
 								</defs>
-								<rect width="100%" height="100%" :fill="`url(#${cpAlphaId})`"/>
+								<rect width="100%" height="100%" :fill="`url(#${cpHueId})`" />
+								<rect width="100%" height="100%" :fill="`url(#${cpBrightId})`" />
 							</svg>
+							<div
+								class="cursor-pointer bg-white border aspect-square w-[14px] rounded-full drop-shadow-lg absolute -translate-y-1/2 -translate-x-1/2"
+								:style="`left: ${currentSaturation * 100}%; top: ${(1.0 - currentBrightness) * 100}%;`"></div>
 						</div>
-						<div class="cursor-pointer bg-white border aspect-square w-[14px] rounded-full drop-shadow-lg absolute top-1/2 -translate-y-1/2 -translate-x-1/2" :style="`left: ${currentAlpha * 100}%`"></div>
+						<div class="relative w-full">
+							<svg ref="hueRef" @mousedown="hueDown" class="cursor-pointer w-full h-[12px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 12">
+								<defs>
+									<linearGradient :id="cpHueLineId" x1="0%" y1="0%" x2="100%" y2="0%">
+										<stop offset="0%" stop-color="hsl(0,100%,50%)" />
+										<stop offset="16.66666667%" stop-color="hsl(60,100%,50%)" />
+										<stop offset="33.33333333%" stop-color="hsl(120,100%,50%)" />
+										<stop offset="50%" stop-color="hsl(180,100%,50%)" />
+										<stop offset="66.66666667%" stop-color="hsl(240,100%,50%)" />
+										<stop offset="83.33333333%" stop-color="hsl(300,100%,50%)" />
+										<stop offset="100%" stop-color="hsl(360,100%,50%)" />
+									</linearGradient>
+								</defs>
+								<rect width="100%" height="100%" :fill="`url(#${cpHueLineId})`" rx="6" ry="6"/>
+							</svg>
+							<div class="cursor-pointer bg-white border aspect-square w-[14px] rounded-full drop-shadow-lg absolute top-1/2 -translate-y-1/2 -translate-x-1/2" :style="`left: ${(currentHue / 360.0) * 100}%`"></div>
+						</div>
+						<div class="relative w-full">
+							<div ref="alphaRef" @mousedown="alphaDown" class="cursor-pointer relative w-full bg-checkered-white overflow-hidden rounded-full h-[12px]"  style="background-size: 10px 10px; background-position: center center;">
+								<svg class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 12">
+									<defs>
+										<linearGradient :id="cpAlphaId" x1="0%" y1="0%" x2="100%" y2="0%">
+											<stop offset="0%" stop-color="rgba(0,0,0,0)" />
+											<stop offset="100%" stop-color="rgba(0,0,0,255)" />
+										</linearGradient>
+									</defs>
+									<rect width="100%" height="100%" :fill="`url(#${cpAlphaId})`"/>
+								</svg>
+							</div>
+							<div class="cursor-pointer bg-white border aspect-square w-[14px] rounded-full drop-shadow-lg absolute top-1/2 -translate-y-1/2 -translate-x-1/2" :style="`left: ${currentAlpha * 100}%`"></div>
+						</div>
+						<div class="w-full flex items-center gap-3">
+							<div class="h-6 min-w-6" :style="`background-color: ${currentValue}`"></div>
+							<div v-if="currentTab === 'hex'" class="relative">
+								<input v-if="editingColor" ref="inputRef" type="text" class="text-xs" @blur="editingColor=false" @keyup.enter="editingColor=false" :value="currentValue" @change="editChange" @keyup="editChange" />
+								<div v-else class="cursor-pointer text-neutral-600 text-xs underline decoration-dotted" @click="editingColor = true">{{ currentValue }}</div>
+							</div>
+							<div v-else-if="currentTab === 'rgb'" class="grid grid-cols-3 gap-1 text-xxs">
+								<div class="flex-1 flex items-center gap-1">
+									<div>R</div>
+									<input type="number" class="w-full text-xxs border rounded px-1 py-0.5" v-model="currentRed" min="0" max="255" step="1" @change="editChange" />
+								</div>
+								<div class="flex-1 flex items-center gap-1">
+									<div>G</div>
+									<input type="number" class="w-full text-xxs border rounded px-1 py-0.5"  v-model="currentGreen" min="0" max="255" step="1" @change="editChange" />
+								</div>
+								<div class="flex-1 flex items-center gap-1">
+									<div>B</div>
+									<input type="number" class="w-full text-xxs border rounded px-1 py-0.5"  v-model="currentBlue" min="0" max="255" step="1" @change="editChange" />
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</template>
