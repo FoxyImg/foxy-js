@@ -1,4 +1,4 @@
-![Foxy Image Logo](.logo.png)
+![Foxy Image Logo](https://aspekt-media.b-cdn.net/logo.png)
 # JavaScript/TypeScript Packages and Apps
 This monorepo contains packages and apps for working with [Foxy Image](https://github.com/foxyimg/foxy) image proxy.
 
