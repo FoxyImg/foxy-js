@@ -10,6 +10,7 @@ export default {
     "./error.vue",
     "./node_modules/@foxyimg/vue-ui/src/**/*.{vue,js,ts,jsx,tsx}",
     "./node_modules/@foxyimg/vue-ui/components/**/*.{vue,js,ts,jsx,tsx}",
+    "./node_modules/@foxyimg/vue-ui/dist/components/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
