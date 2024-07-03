@@ -13,9 +13,8 @@ import {useExportParam} from "./params/export";
 import {useOverlaysParam} from "./params/overlays";
 import {useLevelsParam} from "./params/levels";
 import {type BuiltParams, getImageParams, type PartialImageParams} from "./params";
-import {leadingSlash, trimStartingSlash} from "./utils/slash-it";
 import signHMAC256 from "./utils/sign";
-import base64 from "./utils/base-64";
+import {base64, leadingSlash, trimStartingSlash} from "@foxyimg/utils";
 import {useDebugParam} from "./params/debug";
 
 const sourceCropParam = useSourceCropParam();

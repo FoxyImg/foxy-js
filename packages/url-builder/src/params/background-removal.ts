@@ -1,5 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
-import base64 from "../utils/base-64";
+import {base64} from "@foxyimg/utils";
 import {z} from "zod";
 
 export type BackgroundRemovalParams = BaseParam & {

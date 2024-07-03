@@ -1,6 +1,6 @@
 {
   "name": "@foxyimg/url-builder",
-  "version": "0.1.0",
+  "version": "0.1.6",
   "description": "",
   "repository": "foxyimg/foxy-js",
   "license": "MIT",
@@ -32,7 +32,7 @@
     "lint:fix": "automd && eslint . --fix && biome check --apply .",
     "prepack": "pnpm build",
     "play": "jiti playground",
-    "release": "pnpm test && changelogen --release && npm publish && git push --follow-tags",
+    "release": "pnpm test && changelogen --release && npm publish --access public  && git push --follow-tags",
     "test": "pnpm lint && pnpm test:types && vitest run --coverage",
     "test:types": "tsc --noEmit --skipLibCheck"
   },
@@ -52,7 +52,8 @@
   },
   "packageManager": "pnpm@9.4.0",
   "dependencies": {
-    "js-sha256": "^0.11.0",
-    "zod": "^3.23.8"
+    "@noble/hashes": "^1.4.0",
+    "zod": "^3.23.8",
+    "@foxyimg/utils": "workspace:*"
   }
 }

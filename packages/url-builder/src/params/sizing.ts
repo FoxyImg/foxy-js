@@ -1,5 +1,5 @@
 import type {BaseParam, BuiltParams, ComposableParam} from "../params";
-import calcAspectRatio from "../utils/aspect-ratio";
+import {calcAspectRatio} from "@foxyimg/utils";
 import {z} from "zod";
 
 export type BoxCropParams = {
