@@ -33,13 +33,32 @@ export function hsvToRgb(currentHue:number, currentSaturation:number, currentBri
 	return `#${out[0].toString(16).padStart(2, '0')}${out[1].toString(16).padStart(2, '0')}${out[2].toString(16).padStart(2, '0')}${out[3].toString(16).padStart(2, '0')}`;
 }
 
+export function hexToRgb(hex:string): { r: number, g: number, b: number, a: number } {
+	const colorString = hex.replaceAll('#', '');
+
+	if (colorString.length !== 6 && colorString.length !== 8) {
+		return { r: 0, g: 0, b: 0, a: 255 };
+	}
+
+	const r = Number.parseInt(colorString.slice(0, 2), 16);
+	const g = Number.parseInt(colorString.slice(2, 4), 16);
+	const b = Number.parseInt(colorString.slice(4, 6), 16);
+	const a = colorString.length === 8 ? Number.parseInt(colorString.slice(6, 8), 16) : 255;
+
+	console.log(r, g, b, a);
+
+	return {
+		r, g, b, a
+	}
+}
+
 export function rgbToHsv(rgba:string):{hue: number, saturation: number, brightness: number, alpha: number} {
 	const colorString = rgba.replaceAll('#', '');
 
-	const r = parseInt(colorString.substring(0, 2), 16);
-	const g = parseInt(colorString.substring(2, 4), 16);
-	const b = parseInt(colorString.substring(4, 6), 16);
-	const a = colorString.length === 8 ? parseInt(colorString.substring(6, 8), 16) : 255;
+	const r = Number.parseInt(colorString.slice(0, 2), 16);
+	const g = Number.parseInt(colorString.slice(2, 4), 16);
+	const b = Number.parseInt(colorString.slice(4, 6), 16);
+	const a = colorString.length === 8 ? Number.parseInt(colorString.slice(6, 8), 16) : 255;
 
 	const min = Math.min(r, g, b),
 		max = Math.max(r, g, b),
@@ -75,6 +94,6 @@ export function rgbToHsv(rgba:string):{hue: number, saturation: number, brightne
 		hue: h,
 		saturation: s,
 		brightness: v,
-		alpha: a / 255.0,
+		alpha: a / 255,
 	};
 }
