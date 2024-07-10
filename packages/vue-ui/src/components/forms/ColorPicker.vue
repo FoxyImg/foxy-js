@@ -236,7 +236,7 @@ function editChange() {
 							<div class="cursor-pointer bg-white border aspect-square w-[14px] rounded-full drop-shadow-lg absolute top-1/2 -translate-y-1/2 -translate-x-1/2" :style="`left: ${currentAlpha * 100}%`"></div>
 						</div>
 						<div class="w-full flex items-center gap-3">
-							<div class="h-6 min-w-6" :style="`background-color: ${currentValue}`"></div>
+							<div class="h-6 min-w-6 border" :style="`background-color: ${currentValue}`"></div>
 							<div v-if="currentTab === 'hex'" class="relative">
 								<input v-if="editingColor" ref="inputRef" type="text" class="text-xs" @blur="editingColor=false" @keyup.enter="editingColor=false" :value="currentValue" @change="editChange" @keyup="editChange" />
 								<div v-else class="cursor-pointer text-neutral-600 text-xs underline decoration-dotted" @click="editingColor = true">{{ currentValue }}</div>

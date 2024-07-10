@@ -8,7 +8,7 @@ import {
 	CropOptions,
 	HGravityOptions,
 	InterestingOptions,
-	VGravityOptions
+	VGravityOptions, type ImageParams
 } from "@foxyimg/url-builder";
 import TagsInput from "../inputs/TagsInput.vue";
 import SelectInput from "../inputs/SelectInput.vue";
@@ -26,6 +26,7 @@ const props = defineProps<{
 	imageMeta: ImageMeta|null,
 	faceCount: number,
 	peopleCount: number,
+	imageParams: ImageParams,
 }>();
 
 const emit = defineEmits<{
@@ -114,7 +115,7 @@ watch(() => [currentValue.value.width, currentValue.value.height], (newVal, oldV
 			<SelectInput title="Vertical Gravity" v-model="currentValue.vGravity" default="center" :allow-null="false" :options="VGravityOptions" />
 		</div>
 		<EditorSubPanel v-if="currentValue.crop.includes('focus') && imageKey" collapse-key="focal-point-editor" title="Focal Point"  :disabled="!currentValue.enabled">
-			<FocalPointInput v-model="currentValue.focalPoint" :image-key="imageKey" :image-meta="imageMeta" />
+			<FocalPointInput v-model="currentValue.focalPoint" :image-key="imageKey" :image-meta="imageMeta" :image-params="imageParams" />
 			<SliderInput title="Focal Point Zoom" v-model="currentValue.focalPoint.zoom" :min="0" :max="200" :step="1" :default="0" suffix="%" />
 		</EditorSubPanel>
 		<EditorSubPanel v-if="currentValue.crop.includes('face') && faceCount > 0" title="Face Crop Options" collapse-key="face-crop-options"  :disabled="!currentValue.enabled">

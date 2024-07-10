@@ -15,8 +15,10 @@ import ExportParam from "../params/ExportParam.vue";
 import LevelsParam from "../params/LevelsParam.vue";
 
 import {type ImageMeta, type ImageParams} from "@foxyimg/url-builder";
+import {computed} from "vue";
+import VideoParam from "../params/VideoParam.vue";
 
-defineProps<{
+const props = defineProps<{
 	imageParams: ImageParams,
 	imageKey: string|null,
 	imageMeta: ImageMeta|null,
@@ -34,12 +36,15 @@ const emit = defineEmits<{
 	(e: 'addOverlayImage', value: string): void;
 }>();
 
+const isVideo = computed(() => props.imageKey && (props.imageKey.endsWith('.mp4') || props.imageKey.endsWith('.mov') || props.imageKey.endsWith('.m2v') || props.imageKey.endsWith('.mkv')));
+
 </script>
 
 <template>
 	<div class="p-3 flex flex-col gap-3">
-		<SourceCropParam v-model="imageParams.sourceCrop" :image-meta="imageMeta" :image-key="imageKey" />
-		<SizingParam v-model="imageParams.sizing" :image-key="imageKey" :image-meta="imageMeta" :face-count="faceCount" :people-count="peopleCount" />
+		<VideoParam v-if="isVideo" v-model="imageParams.video" :image-key="imageKey" :image-meta="imageMeta" />
+		<SourceCropParam v-model="imageParams.sourceCrop" :image-meta="imageMeta" :image-key="imageKey" :image-params="imageParams" />
+		<SizingParam v-model="imageParams.sizing" :image-key="imageKey" :image-meta="imageMeta" :face-count="faceCount" :people-count="peopleCount" :image-params="imageParams" />
 		<EditorPanel title="Image Attributes" collapse-key="image-attributes">
 			<ColorInput title="Background Color" v-model="imageParams.backgroundColor" :default="null" />
 		</EditorPanel>

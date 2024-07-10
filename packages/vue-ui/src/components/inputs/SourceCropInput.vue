@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed, inject, ref, watch} from 'vue';
 import SourceCropModal from "../modals/SourceCropModal.vue";
-import {type SourceCropParams, DefaultSizingParams, type ImageMeta} from "@foxyimg/url-builder";
+import {type SourceCropParams, DefaultSizingParams, type ImageMeta, type ImageParams} from "@foxyimg/url-builder";
 import type {URLBuilder} from "../../types/url-builder";
 import {ClientOnly} from "../ssr/ClientOnly";
 
@@ -13,6 +13,7 @@ const props = withDefaults(defineProps<{
 	default: SourceCropParams,
 	imageMeta: ImageMeta|null,
 	imageKey: string|null,
+	imageParams: ImageParams,
 }>(), {
 });
 
@@ -25,12 +26,21 @@ const currentValue = computed({
 	set: (value) => emit('update:modelValue', value),
 });
 
+const isVideo = computed(() => props.imageKey && (props.imageKey.endsWith('.mp4') || props.imageKey.endsWith('.mov') || props.imageKey.endsWith('.m2v') || props.imageKey.endsWith('.mkv')));
+
 const imageUrl = ref<string|null>(null);
-watch(() => props.imageKey, async (newVal) => {
+
+async function buildPreviewUrl() {
 	if (props.imageKey) {
-		imageUrl.value = await buildUrl(props.imageKey, { sizing: { ...DefaultSizingParams, width: 300 } });
+		if (isVideo.value) {
+			imageUrl.value = await buildUrl(props.imageKey, { sizing: { ...DefaultSizingParams, width: 300 }, video:props.imageParams.video });
+		} else {
+			imageUrl.value = await buildUrl(props.imageKey, { sizing: { ...DefaultSizingParams, width: 300 } });
+		}
 	}
-}, {immediate: true});
+}
+
+watch([() => props.imageKey, () => props.imageParams.video], buildPreviewUrl, {immediate: true, deep: true});
 
 const showCropModal = ref(false);
 

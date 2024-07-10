@@ -67,6 +67,7 @@ export {default as RotationParam} from "./components/params/RotationParam.vue";
 export {default as SizingParam} from "./components/params/SizingParam.vue";
 export {default as SourceCropParam} from "./components/params/SourceCropParam.vue";
 export {default as StylizeParam} from "./components/params/StylizeParam.vue";
+export {default as VideoParam} from "./components/params/VideoParam.vue";
 
 export {default as GradientEditor} from "./components/ui/GradientEditor.vue";
 export {default as JSONViewer} from "./components/ui/JSONViewer.vue";

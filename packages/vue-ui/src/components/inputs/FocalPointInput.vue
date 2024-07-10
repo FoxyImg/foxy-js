@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, inject, ref, watch} from 'vue';
-import {DefaultSizingParams, type Face, type ImageMeta} from "@foxyimg/url-builder";
+import {DefaultSizingParams, type Face, type ImageMeta, type ImageParams} from "@foxyimg/url-builder";
 import FocalPointerIcon from "../icons/FocalPointerIcon.vue";
 import type {URLBuilder} from "../../types/url-builder";
 
@@ -10,6 +10,7 @@ const props = defineProps<{
 	modelValue: {x: number, y:number, zoom: number},
 	imageKey: string|null,
 	imageMeta: ImageMeta|null,
+	imageParams: ImageParams,
 }>();
 
 const emit = defineEmits(['update:modelValue']);
@@ -30,12 +31,20 @@ const focalPointStyle = computed(() => {
 	};
 });
 
+const isVideo = computed(() => props.imageKey && (props.imageKey.endsWith('.mp4') || props.imageKey.endsWith('.mov') || props.imageKey.endsWith('.m2v') || props.imageKey.endsWith('.mkv')));
+
 const imageUrl = ref<string|null>(null);
-watch(() => props.imageKey, async (newVal) => {
+async function buildPreviewUrl() {
 	if (props.imageKey) {
-		imageUrl.value = await buildUrl(props.imageKey, { sizing: { ...DefaultSizingParams, width: 300 } });
+		if (isVideo.value) {
+			imageUrl.value = await buildUrl(props.imageKey, { sizing: { ...DefaultSizingParams, width: 300 }, video:props.imageParams.video });
+		} else {
+			imageUrl.value = await buildUrl(props.imageKey, { sizing: { ...DefaultSizingParams, width: 300 } });
+		}
 	}
-}, {immediate: true});
+}
+
+watch([() => props.imageKey, () => props.imageParams.video], buildPreviewUrl, {immediate: true, deep: true});
 
 
 let boundingRect:DOMRect|null = null;
