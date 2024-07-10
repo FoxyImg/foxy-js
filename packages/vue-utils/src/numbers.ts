@@ -4,19 +4,21 @@ import {
 	wrap,
 } from "@foxyimg/utils";
 
-import {computed, WritableComputedRef, Ref, ComputedRef} from "vue";
+import {computed, WritableComputedRef, Ref, ComputedRef, ref} from "vue";
 
 export function useWritableClampedRef(initialValue: number|null, min: number|Ref<number>, max: number|Ref<number>):WritableComputedRef<number|null> {
 	const minIsNumber = typeof min === 'number';
 	const maxIsNumber = typeof max === 'number';
 
+	const currentValue = ref(initialValue === null ? null : clamp(initialValue, minIsNumber ? min : min.value, maxIsNumber ? max : max.value));
+
 	return computed({
-		get: () => initialValue ? clamp(initialValue, minIsNumber ? min : min.value, maxIsNumber ? max : max.value) : null,
+		get: () => currentValue.value,
 		set: (value:number|null) => {
 			if (value === null) {
-				initialValue = null;
+				currentValue.value = null;
 			} else {
-				initialValue = clamp(value, minIsNumber ? min : min.value, maxIsNumber ? max : max.value);
+				currentValue.value = clamp(value, minIsNumber ? min : min.value, maxIsNumber ? max : max.value);
 			}
 		}
 	});
@@ -34,13 +36,15 @@ export function useWritableRolloverRef(initialValue: number|null, min: number|Re
 	const minIsNumber = typeof min === 'number';
 	const maxIsNumber = typeof max === 'number';
 
+	const currentValue = ref(initialValue === null ? null : rollover(initialValue, minIsNumber ? min : min.value, maxIsNumber ? max : max.value));
+
 	return computed({
-		get: () => initialValue ? rollover(initialValue, minIsNumber ? min : min.value, maxIsNumber ? max : max.value) : null,
+		get: () => currentValue.value,
 		set: (value:number|null) => {
 			if (value === null) {
-				initialValue = null;
+				currentValue.value = null;
 			} else {
-				initialValue = rollover(value, minIsNumber ? min : min.value, maxIsNumber ? max : max.value);
+				currentValue.value = rollover(value, minIsNumber ? min : min.value, maxIsNumber ? max : max.value);
 			}
 		}
 	});
@@ -56,14 +60,15 @@ export function useRolloverRef(initialValue: Ref<number|null>, min: number|Ref<n
 
 export function useWritableWrappedRef(initialValue: number|null, max: number|Ref<number>):WritableComputedRef<number|null> {
 	const maxIsNumber = typeof max === 'number';
+	const currentValue = ref(initialValue === null ? null : wrap(initialValue, maxIsNumber ? max : max.value));
 
 	return computed({
-		get: () => initialValue ? wrap(initialValue, maxIsNumber ? max : max.value) : null,
+		get: () => currentValue.value,
 		set: (value:number|null) => {
 			if (value === null) {
-				initialValue = null;
+				currentValue.value = null;
 			} else {
-				initialValue = wrap(value, maxIsNumber ? max : max.value);
+				currentValue.value = wrap(value, maxIsNumber ? max : max.value);
 			}
 		}
 	});
