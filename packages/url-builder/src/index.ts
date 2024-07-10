@@ -15,6 +15,7 @@ export * from "./params/rotation";
 export * from "./params/sizing";
 export * from "./params/source-crop";
 export * from "./params/stylize";
+export * from "./params/video";
 
 export * from './deep-partial';
 export * from './image-meta';

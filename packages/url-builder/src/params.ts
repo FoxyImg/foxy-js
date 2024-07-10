@@ -48,6 +48,7 @@ import {
 import {DebugParams, DebugSchema, DefaultDebugParams, FoxyDebugParams, useDebugParam} from "./params/debug";
 import {usePaddingParam} from "./params/padding";
 import {useBorderParam} from "./params/border";
+import {DefaultVideoParams, FoxyVideoParams, useVideoParam, VideoParams, VideoSchema} from "./params/video";
 
 export type BuiltParams = { [key:string] : string|null}
 export type ParamBuilder<T> = (urlParams:BuiltParams, params:T) => BuiltParams;
@@ -62,6 +63,7 @@ export type ImageParams = {
 	metaOnly: boolean,
 	showPreset: boolean,
 
+	video: VideoParams,
 	backgroundRemoval: BackgroundRemovalParams,
 	sourceCrop: SourceCropParams,
 	sizing: SizingParams,
@@ -85,6 +87,7 @@ export const ImageParamsSchema = z.object({
 	metaOnly: z.boolean().optional(),
 	showPreset: z.boolean().optional(),
 
+	video: VideoSchema.optional(),
 	backgroundRemoval: BackgroundRemovalSchema.optional(),
 	sourceCrop: SourceCropSchema.optional(),
 	sizing: SizingSchema.optional(),
@@ -104,6 +107,7 @@ export const ImageParamsSchema = z.object({
 });
 
 export type FoxyImageParams = {
+	video?: FoxyVideoParams,
 	backgroundRemoval?: FoxyBackgroundRemovalParams,
 	sourceCrop?: FoxySourceCropParams,
 	sizing?: FoxySizingParams,
@@ -138,6 +142,7 @@ export const DefaultImageParams: ImageParams = {
 
 	backgroundColor: null,
 
+	video: {...DefaultVideoParams},
 	backgroundRemoval: {...DefaultBackgroundRemovalParams},
 	sourceCrop: {...DefaultSourceCropParams},
 	sizing: {...DefaultSizingParams},
@@ -159,6 +164,8 @@ export function getImageParams(partialParams:PartialImageParams):ImageParams {
 	return {
 		metaOnly: !!partialParams.metaOnly,
 		showPreset: !!partialParams.showPreset,
+
+		video: {...DefaultVideoParams, ...(<VideoParams>partialParams.video ?? {})},
 
 		backgroundColor: partialParams.backgroundColor ?? null,
 
@@ -188,6 +195,7 @@ export function getImageParams(partialParams:PartialImageParams):ImageParams {
 
 export function importFoxyImageParams(foxyParams:FoxyImageParams):ImageParams {
 	const sourceCropParam = useSourceCropParam();
+	const videoParam = useVideoParam();
 	const sizingParam = useSizingParam();
 	const backgroundRemovalParam = useBackgroundRemovalParam();
 	const rotationParam = useRotationParam();
@@ -209,6 +217,7 @@ export function importFoxyImageParams(foxyParams:FoxyImageParams):ImageParams {
 
 		backgroundColor: foxyParams.background?.color ?? null,
 
+		video: foxyParams.video ? videoParam.importParams(foxyParams.video) : {...DefaultVideoParams},
 		backgroundRemoval: foxyParams.backgroundRemoval ? backgroundRemovalParam.importParams(foxyParams.backgroundRemoval) : {...DefaultBackgroundRemovalParams},
 		sourceCrop: foxyParams.sourceCrop ? sourceCropParam.importParams(foxyParams.sourceCrop) : {...DefaultSourceCropParams},
 		sizing: foxyParams.sizing ? sizingParam.importParams(foxyParams.sizing) : {...DefaultSizingParams},

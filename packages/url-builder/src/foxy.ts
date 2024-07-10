@@ -16,6 +16,7 @@ import {type BuiltParams, getImageParams, type PartialImageParams} from "./param
 import signHMAC256 from "./utils/sign";
 import {base64, leadingSlash, trimStartingSlash} from "@foxyimg/utils";
 import {useDebugParam} from "./params/debug";
+import {useVideoParam} from "./params/video";
 
 const sourceCropParam = useSourceCropParam();
 const sizingParam = useSizingParam();
@@ -32,6 +33,7 @@ const exportParam = useExportParam()
 const overlaysParam = useOverlaysParam();
 const levelsParam = useLevelsParam();
 const debugParam = useDebugParam();
+const videoParam = useVideoParam();
 
 export function foxy(host:string, accessKey:string, secret:string|undefined = undefined, imgixMode:boolean = false, cacheBuster:boolean = false) {
 	const buildUrl = (imageKey:string, params:PartialImageParams) => {
@@ -39,6 +41,7 @@ export function foxy(host:string, accessKey:string, secret:string|undefined = un
 
 		const imageParams = getImageParams(params);
 
+		videoParam.buildParams(builtParams, imageParams.video);
 		backgroundRemovalParam.buildParams(builtParams, imageParams.backgroundRemoval);
 		sourceCropParam.buildParams(builtParams, imageParams.sourceCrop);
 		redactParam.buildParams(builtParams, imageParams.redact);

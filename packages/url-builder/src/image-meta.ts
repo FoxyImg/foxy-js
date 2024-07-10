@@ -36,6 +36,15 @@ export type DominantColors = {
 	colors: UsedColor[],
 }
 
+export type VideoMeta = {
+	width: number,
+	height: number,
+	duration: number,
+	fps: number,
+	frameCount: number,
+	keyframeCount: number,
+}
+
 export type ImageMeta = {
 	width: number,
 	height: number,
@@ -44,4 +53,5 @@ export type ImageMeta = {
 	people: Label[],
 	moderationLabels: Label[],
 	dominantColors: DominantColors,
+	video?: VideoMeta,
 }
