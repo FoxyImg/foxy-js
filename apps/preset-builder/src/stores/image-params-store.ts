@@ -8,8 +8,8 @@ import {
 	type ImageMeta,
 	type GradientMapParams,
 	DefaultImageParams,
-	base64
 } from "@foxyimg/url-builder";
+import {base64} from "@foxyimg/utils";
 
 import {buildUrl} from "@/composables/build-url";
 import {importFoxyImageParams} from "@foxyimg/url-builder";

@@ -2,7 +2,7 @@
 import {computed} from "vue";
 import {SmallLabel} from "@foxyimg/vue-ui";
 import type {FoxyPreset} from "@foxyimg/url-builder";
-import {properCase} from "@foxyimg/url-builder";
+import {properCase} from "@foxyimg/utils";
 import {DeleteSourceIcon, EditSourceIcon, NewSourceIcon, ReloadIcon, SaveIcon} from "@foxyimg/vue-ui";
 
 const props = defineProps<{
