@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import type {File} from "~/types/file";
-//@ts-ignore
-import FolderIcon from "~/assets/icons/folder.svg";
-//@ts-ignore
-import FileIcon from "~/assets/icons/file.svg";
-//@ts-ignore
-import NextIcon from "~/assets/icons/next.svg";
-//@ts-ignore
-import VideoIcon from "~/assets/icons/video.svg";
-
 import {leadingSlash, trailingSlash} from "@foxyimg/utils";
-import copy from "copy-to-clipboard";
 import {useStorage} from "@vueuse/core";
+import Icon from "~/components/Icon.vue";
+import Folder from "~/components/Folder.vue";
+import FilePreview from "~/components/FilePreview.vue";
+import {useShoppingListStore} from "~/stores/shopping-list-store";
+import ShoppingList from "~/components/ShoppingList.vue";
+
+const {selectedFiles} = storeToRefs(useShoppingListStore());
 
 const route = useRoute();
 const path = computed(() => {
@@ -68,13 +65,21 @@ const reversedColumns = computed({
 	get: () => 13 - columns.value,
 	set: (value) => columns.value = 13 - value,
 });
+
+const showPreviewModal = ref(false);
+const previewFileIndex = ref(0);
+
+function showPreview(fileIndex:number) {
+	previewFileIndex.value = fileIndex;
+	showPreviewModal.value = true;
+}
 </script>
 <template>
-	<div class="fixed inset-0 flex">
-		<div class="flex-1 relative h-full flex flex-col">
+	<div class="fixed inset-0 flex" v-auto-animate>
+		<div class="flex-1 relative h-full flex flex-col" key="browser">
 			<div class="p-3 flex items-center gap-3 border-b border-neutral-200 bg-neutral-100">
 				<NuxtLink v-if="path !== '/'" :to="parentFolder" class="flex items-center gap-1 text-xs">
-					<NextIcon class="w-auto h-3 fill-black rotate-180" />
+					<Icon name="next" class="w-auto h-3 fill-black rotate-180" />
 					<div>Back</div>
 				</NuxtLink>
 				<div class="flex-1 flex items-center border rounded-md border-neutral-200 px-2 py-1.5 text-xs bg-white">
@@ -83,38 +88,9 @@ const reversedColumns = computed({
 			</div>
 			<div class="flex-1 w-full relative">
 				<div class="absolute inset-0 overflow-x-hidden overflow-y-auto p-1.5">
-					<div class="grid w-[100vw] max-w-[100vw]" :style="`grid-template-columns: repeat(${columns}, minmax(0, 1fr))`">
-						<NuxtLink v-for="folder in folders" :key="folder.path" :to="`${leadingSlash(folder.path)}`" class="cursor-pointer flex flex-col items-center justify-center gap-3 text-xs p-3">
-							<div class="w-full relative aspect-square">
-								<div v-if="folder.folderPreviews" class="grid gap-1 drop-shadow-lg" :style="`grid-template-columns: repeat(2, minmax(0, 1fr))`">
-									<div v-for="preview in folder.folderPreviews" :key="preview.large" class="relative w-full">
-										<img v-if="columns <= 3" :key="preview.xl" :src="preview.xl" class="w-full aspect-square object-cover bg-neutral-500" />
-										<img v-else :src="preview.large" class="w-full aspect-square object-cover bg-neutral-500" />
-										<VideoIcon v-if="preview.mimeType && preview.mimeType.startsWith('video')" class="absolute right-1 bottom-1 w-3 h-auto fill-white" />
-									</div>
-								</div>
-								<FolderIcon v-else class="w-full h-auto" />
-							</div>
-							<div class="overflow-hidden w-full text-center">
-								<div class="max-w-full truncate">{{ folder.name }}</div>
-							</div>
-						</NuxtLink>
-						<div v-for="file in files" :key="file.path" class="cursor-pointer flex flex-col items-center justify-center gap-3 text-xs p-3" @click="copy(file.path)">
-							<div class="w-full bg-checkered">
-								<div v-if="file.preview" class="relative w-full aspect-square">
-									<img v-if="columns <= 2" loading="lazy" :src="file.preview.xl" class="w-full aspect-square object-cover" />
-									<img v-else-if="columns <= 4" loading="lazy" :src="file.preview.large" class="w-full aspect-square object-cover" />
-									<img v-else :src="file.preview.small" loading="lazy" class="w-full aspect-square object-cover" />
-									<VideoIcon v-if="file.mimeType && file.mimeType.startsWith('video')" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-auto fill-white drop-shadow-sm" />
-								</div>
-								<div v-else class="w-full h-auto">
-									<FileIcon class="w-full h-auto" />
-								</div>
-							</div>
-							<div class="overflow-hidden w-full text-center">
-								<div class="max-w-full truncate">{{ file.name }}</div>
-							</div>
-						</div>
+					<div class="grid w-full" :style="`grid-template-columns: repeat(${columns}, minmax(0, 1fr))`">
+						<Folder v-for="folder in folders" :key="folder.path" :folder="folder" :columns="columns" />
+						<FilePreview v-for="(file, idx) in files" :key="file.path" :file="file" :columns="columns"  @click="showPreview(idx)" />
 					</div>
 				</div>
 			</div>
@@ -127,5 +103,10 @@ const reversedColumns = computed({
 				</div>
 			</div>
 		</div>
+		<ShoppingList v-if="selectedFiles.length > 0" key="shopping-list" />
 	</div>
+
+	<FadeTransition>
+		<PreviewModal v-if="showPreviewModal && allFiles" :file-index="previewFileIndex" :files="allFiles" @close="showPreviewModal = false"></PreviewModal>
+	</FadeTransition>
 </template>

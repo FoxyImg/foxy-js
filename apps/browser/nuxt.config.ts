@@ -10,30 +10,41 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: false },
   css: ['~/assets/css/main.css'],
+  modules: [
+    "@pinia/nuxt",
+    "@pinia-plugin-persistedstate/nuxt",
+  ],
   vite: {
     plugins: [
-      svgLoader()
+      svgLoader({
+        defaultImport: 'raw',
+      })
     ]
   },
+
   postcss: {
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
     },
   },
+
   alias: process.env.FOXY_DEV_MODE === 'true' ? {
     "@foxyimg/vue-ui": require.resolve(join(currentDir, './node_modules/@foxyimg/vue-ui/src')),
     "@foxyimg/url-builder": require.resolve(join(currentDir, './node_modules/@foxyimg/url-builder/src')),
   } : {},
+
   sourcemap: {
     server: true,
     client: process.env.NODE_ENV !== "production",
   },
+
   runtimeConfig: {
     foxyHost: "",
     foxySource: "",
     foxySecret: "",
     foxyImgixMode: true,
+    foxyStaticHost: "",
     fileRoot: "",
-  }
+  },
 })

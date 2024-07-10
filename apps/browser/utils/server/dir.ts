@@ -216,6 +216,7 @@ export function dir(sourcePath:string):File[] {
 
 			files.push({
 				name: file,
+				dir: sourcePath,
 				path: trailingSlash(sourcePath) + file,
 				type: 'file',
 				size: stat.size,

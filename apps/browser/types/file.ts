@@ -8,6 +8,7 @@ export type PreviewUrls = {
 export type File = {
 	name: string,
 	path: string,
+	dir?:string,
 	type: 'dir' | 'file',
 	mimeType?: string,
 	size: number,
