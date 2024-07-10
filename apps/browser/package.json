@@ -1,0 +1,30 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@foxyimg/url-builder": "workspace:^",
+    "@foxyimg/utils": "workspace:^",
+    "@foxyimg/vue-ui": "workspace:^",
+    "@vueuse/core": "^10.11.0",
+    "copy-to-clipboard": "^3.3.3",
+    "floating-vue": "^5.2.2",
+    "mime": "^4.0.4",
+    "nuxt": "^3.12.3",
+    "p-debounce": "^4.0.0",
+    "vue": "latest"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.39",
+    "tailwindcss": "^3.4.4",
+    "vite-svg-loader": "^5.1.0"
+  }
+}
