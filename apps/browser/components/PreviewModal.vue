@@ -6,6 +6,7 @@ import {useWritableWrappedRef} from "@foxyimg/vue-utils";
 import copy from "copy-to-clipboard";
 import Icon from "~/components/Icon.vue";
 import {useShoppingListStore} from "~/stores/shopping-list-store";
+import "media-chrome";
 
 const props = withDefaults(defineProps<{
 	fileIndex: number,
@@ -65,12 +66,18 @@ onMounted(() => {
 
 		toggleFileSelection(currentFile.value);
 	});
+
+	hotkeys('escape', (e) => {
+		e.preventDefault();
+		emit('close');
+	});
 });
 
 onUnmounted(() => {
 	hotkeys.unbind('right');
 	hotkeys.unbind('left');
 	hotkeys.unbind('space');
+	hotkeys.unbind('escape');
 });
 
 const isSelected = computed(() => currentFile.value && isFileSelected(currentFile.value));
@@ -100,7 +107,18 @@ const isSelected = computed(() => currentFile.value && isFileSelected(currentFil
 			<template v-if="currentFile && currentFile.mimeType">
 				<FadeTransition>
 					<img v-if="currentFile.preview && currentFile.mimeType.startsWith('image')" key="image" :src="'/api/web/'+currentFile.path" class="absolute w-full h-full object-contain" />
-					<video v-else-if="currentFile.mimeType.startsWith('video')" :src="'/api/web/'+currentFile.path" key="video" class="absolute w-full h-full object-contain" controls />
+					<media-controller v-else-if="currentFile.mimeType.startsWith('video')" key="video" class="absolute w-full h-full">
+						<video slot="media" playsinline muted autoplay :src="'/api/web/'+currentFile.path" class="w-full h-full" />
+						<media-control-bar>
+							<media-play-button></media-play-button>
+							<media-mute-button></media-mute-button>
+							<media-volume-range></media-volume-range>
+							<media-time-range></media-time-range>
+							<media-airplay-button></media-airplay-button>
+							<media-pip-button></media-pip-button>
+							<media-fullscreen-button></media-fullscreen-button>
+						</media-control-bar>
+					</media-controller>
 				</FadeTransition>
 				<Icon v-if="currentIndex !== null" name="next" class="cursor-pointer z-10 absolute right-1 top-1/2 w-4 h-auto fill-white -translate-y-1/2" @click="currentIndex++" />
 				<Icon v-if="currentIndex !== null" name="next" class="rotate-180 cursor-pointer z-10 absolute left-1 top-1/2 w-4 h-auto fill-white -translate-y-1/2" @click="currentIndex--" />

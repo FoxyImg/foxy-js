@@ -1,6 +1,6 @@
 {
   "name": "@foxyimg/vue-utils",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "",
   "repository": "foxyimg/foxy-js",
   "license": "MIT",
@@ -51,7 +51,8 @@
   },
   "packageManager": "pnpm@9.4.0",
   "dependencies": {
-    "vue": "^3.4.31",
-    "@foxyimg/utils": "workspace:*"
+    "@foxyimg/utils": "workspace:*",
+    "@vueuse/core": "^10.11.0",
+    "vue": "^3.4.31"
   }
 }

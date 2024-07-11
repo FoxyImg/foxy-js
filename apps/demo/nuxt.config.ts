@@ -1,4 +1,4 @@
-import { fileURLToPath, URL } from 'node:url'
+import { fileURLToPath } from 'node:url'
 import {dirname, join} from "path";
 
 const currentDir = dirname(fileURLToPath(import.meta.url));

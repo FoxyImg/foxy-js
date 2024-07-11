@@ -20,7 +20,7 @@ function reset() {
 }
 
 function exportList() {
-	const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(selectedFiles.value.map(file => file.path)));
+	const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(selectedFiles.value.map(file => file.preview!.xl)));
 	const downloadAnchorNode = document.createElement('a');
 	downloadAnchorNode.setAttribute("href",     dataStr);
 	downloadAnchorNode.setAttribute("download", "shopping-list.json");
@@ -48,9 +48,9 @@ function exportList() {
 			</div>
 		</div>
 
-		<div class="p-3 flex items-center justify-center gap-6 w-full border-t text-xs bg-neutral-100">
-			<button type="button" @click="exportList">Export ...</button>
-			<button type="button" @click="reset">Reset</button>
+		<div class="px-3 py-2 flex items-center justify-center gap-1.5 w-full border-t text-xs bg-neutral-100">
+			<button type="button" class="button alt small" @click="exportList">Export List ...</button>
+			<button type="button" class="button alt small" @click="reset">Reset List</button>
 		</div>
 	</div>
 

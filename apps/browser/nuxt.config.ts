@@ -14,6 +14,11 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@pinia-plugin-persistedstate/nuxt",
   ],
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag) => tag.startsWith('media-')
+    }
+  },
   vite: {
     plugins: [
       svgLoader({

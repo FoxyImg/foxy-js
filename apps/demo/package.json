@@ -20,7 +20,7 @@
     "copy-to-clipboard": "^3.3.3",
     "floating-vue": "^5.2.2",
     "h3-zod": "^0.5.3",
-    "nuxt": "^3.12.2",
+    "nuxt": "^3.12.3",
     "p-debounce": "^4.0.0",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.38",
+    "postcss": "^8.4.39",
     "tailwindcss": "^3.4.4"
   }
 }

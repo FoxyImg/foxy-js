@@ -5,6 +5,7 @@ import {
 } from "@foxyimg/utils";
 
 import {computed, WritableComputedRef, Ref, ComputedRef, ref} from "vue";
+import {useStorage} from "@vueuse/core";
 
 export function useWritableClampedRef(initialValue: number|null, min: number|Ref<number>, max: number|Ref<number>):WritableComputedRef<number|null> {
 	const minIsNumber = typeof min === 'number';
@@ -29,6 +30,24 @@ export function useClampedRef(initialValue: Ref<number|null>, min: number|Ref<nu
 	const maxIsNumber = typeof max === 'number';
 
 	return computed(() => initialValue.value ? clamp(initialValue.value, minIsNumber ? min : min.value, maxIsNumber ? max : max.value) : null);
+}
+
+export function useStorageClampedRef(key: string, initialValue: number|null, min: number|Ref<number>, max: number|Ref<number>):WritableComputedRef<number|null> {
+	const minIsNumber = typeof min === 'number';
+	const maxIsNumber = typeof max === 'number';
+
+	const currentValue = useStorage(key, initialValue === null ? null : clamp(initialValue, minIsNumber ? min : min.value, maxIsNumber ? max : max.value));
+
+	return computed({
+		get: () => currentValue.value,
+		set: (value:number|null) => {
+			if (value === null) {
+				currentValue.value = null;
+			} else {
+				currentValue.value = clamp(value, minIsNumber ? min : min.value, maxIsNumber ? max : max.value);
+			}
+		}
+	});
 }
 
 
@@ -57,6 +76,24 @@ export function useRolloverRef(initialValue: Ref<number|null>, min: number|Ref<n
 	return computed(() => initialValue.value ? rollover(initialValue.value, minIsNumber ? min : min.value, maxIsNumber ? max : max.value) : null);
 }
 
+export function useStorageRolloverRef(key: string, initialValue: number|null, min: number|Ref<number>, max: number|Ref<number>):WritableComputedRef<number|null> {
+	const minIsNumber = typeof min === 'number';
+	const maxIsNumber = typeof max === 'number';
+
+	const currentValue = useStorage(key, initialValue === null ? null : rollover(initialValue, minIsNumber ? min : min.value, maxIsNumber ? max : max.value));
+
+	return computed({
+		get: () => currentValue.value,
+		set: (value:number|null) => {
+			if (value === null) {
+				currentValue.value = null;
+			} else {
+				currentValue.value = rollover(value, minIsNumber ? min : min.value, maxIsNumber ? max : max.value);
+			}
+		}
+	});
+}
+
 
 export function useWritableWrappedRef(initialValue: number|null, max: number|Ref<number>):WritableComputedRef<number|null> {
 	const maxIsNumber = typeof max === 'number';
@@ -78,5 +115,21 @@ export function useWrappedRef(initialValue: Ref<number|null>, max: number|Ref<nu
 	const maxIsNumber = typeof max === 'number';
 
 	return computed(() => initialValue.value ? wrap(initialValue.value, maxIsNumber ? max : max.value) : null);
+}
+
+export function useStorageWrappedRef(key: string, initialValue: number|null, max: number|Ref<number>):WritableComputedRef<number|null> {
+	const maxIsNumber = typeof max === 'number';
+	const currentValue = useStorage(key, initialValue === null ? null : wrap(initialValue, maxIsNumber ? max : max.value));
+
+	return computed({
+		get: () => currentValue.value,
+		set: (value:number|null) => {
+			if (value === null) {
+				currentValue.value = null;
+			} else {
+				currentValue.value = wrap(value, maxIsNumber ? max : max.value);
+			}
+		}
+	});
 }
 

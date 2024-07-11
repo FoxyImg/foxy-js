@@ -1,6 +1,6 @@
 import {useValidatedBody} from "h3-zod";
 import {z} from "zod";
-import {ImageParamsSchema, PartialImageParams} from "@foxyimg/url-builder";
+import {ImageParamsSchema} from "@foxyimg/url-builder";
 import SampleImages from "@/data/sample-images.json";
 import OverlayImages from "@/data/overlay-images.json";
 import {foxy} from "@foxyimg/url-builder";

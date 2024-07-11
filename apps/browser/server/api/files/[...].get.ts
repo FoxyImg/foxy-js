@@ -1,6 +1,6 @@
 import {dir} from "~/utils/server/dir";
 
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (event) => {
 	const path = event.context.params!._;
 	return dir(path);
-});
+}, { maxAge: 5 * 60 });

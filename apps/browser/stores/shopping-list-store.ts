@@ -20,6 +20,22 @@ export const useShoppingListStore = defineStore("foxy-browser-shopping-list", ()
 		}
 	}
 
+	function selectFile(file:File) {
+		if (isFileSelected(file)) {
+			return;
+		}
+
+		selectedFiles.value.push(file);
+	}
+
+	function deselectFile(file:File) {
+		if (!isFileSelected(file)) {
+			return;
+		}
+
+		selectedFiles.value = selectedFiles.value.filter(f => f.path !== file.path);
+	}
+
 	function resetShoppingList() {
 		selectedFiles.value = [];
 	}
@@ -30,6 +46,8 @@ export const useShoppingListStore = defineStore("foxy-browser-shopping-list", ()
 		isFileSelected,
 		toggleFileSelection,
 		resetShoppingList,
+		selectFile,
+		deselectFile,
 	}
 }, {
 	persist: {

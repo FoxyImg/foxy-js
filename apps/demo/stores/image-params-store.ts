@@ -1,4 +1,4 @@
-import {defineStore, storeToRefs} from "pinia";
+import {defineStore} from "pinia";
 import {computed, ref, watch} from "vue";
 import pDebounce from "p-debounce";
 import SecureLS from "secure-ls";
@@ -7,14 +7,12 @@ import {
 	type ImageMeta,
 	type GradientMapParams,
 	DefaultImageParams,
-	base64,
-	type FoxyImageParams, ImageParamsSchema
+	type FoxyImageParams
 } from "@foxyimg/url-builder";
 
 import {importFoxyImageParams} from "@foxyimg/url-builder";
 
 import {buildUrl} from "@/utils/build-url";
-import {useStorage} from "@vueuse/core";
 import SampleImages from "~/data/sample-images.json";
 
 type PresetList = {
