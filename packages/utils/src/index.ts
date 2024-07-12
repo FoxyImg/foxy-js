@@ -7,3 +7,5 @@ export * from './hex-color';
 export * from './numbers';
 export * from './slash-it';
 export * from './strings';
+export * from './date-utils';
+export * from './date-formatter';
