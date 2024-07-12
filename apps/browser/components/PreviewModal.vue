@@ -87,18 +87,18 @@ const isSelected = computed(() => currentFile.value && isFileSelected(currentFil
 	<ModalContainer v-bind="modalProps" @close="emit('close')" :full-screen="true">
 		<template #extras>
 			<div v-if="currentFile" class="flex gap-2 mr-3">
-				<div class="flex items-center justify-center w-6 rounded-full aspect-square border border-neutral-200 backdrop-blur-sm cursor-pointer hover:bg-black/25 group"  @click.stop.prevent="copy(currentFile.path)"><Icon name="copy" class="w-3.5 h-auto fill-black group-hover:fill-white" /></div>
+				<div class="flex items-center justify-center w-6 rounded-full aspect-square border border-neutral-400 hover:border-blue-600 backdrop-blur-sm cursor-pointer hover:bg-blue-200/50 group"  @click.stop.prevent="copy(currentFile.path)"><Icon name="copy" class="w-3.5 h-auto fill-neutral-500 group-hover:fill-blue-600" /></div>
 				<div
 					v-if="showSelection"
 					@click.stop.prevent="toggleFileSelection(currentFile)"
 					class="cursor-pointer flex items-center justify-center w-6 aspect-square rounded-full backdrop-blur-sm border group"
 					:class="{
-						'border-green-600 bg-green-200/50 hover:border-white hover:bg-white/10': isSelected,
-						'border-neutral-200 hover:border-green-600 hover:bg-green-200/50': !isSelected
+						'border-blue-600 bg-blue-200/50 hover:border-white hover:bg-white/10': isSelected,
+						'border-neutral-400 bg-white/10 hover:border-blue-600 hover:bg-blue-200/50': !isSelected
 					}">
 					<Icon name="check"
 					      class="w-auto h-3"
-					      :class="{ 'fill-green-600 group-hover:fill-white': isSelected, 'fill-neutral-700 group-hover:fill-green-600': !isSelected }"
+					      :class="{ 'fill-blue-600 group-hover:fill-white': isSelected, 'fill-neutral-400 group-hover:fill-blue-600': !isSelected }"
 					/>
 				</div>
 			</div>

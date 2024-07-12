@@ -138,9 +138,9 @@ useHead({
 	<div class="fixed inset-0 flex" v-auto-animate>
 		<div class="flex-1 relative h-full flex flex-col" key="browser">
 			<div class="p-3 flex items-center gap-3 border-b border-neutral-200 bg-neutral-100">
-				<NuxtLink v-if="path !== '/'" :to="parentFolder" class="flex items-center gap-1 text-xs">
-					<Icon name="next" class="w-auto h-3 fill-black rotate-180" />
-					<div>Back</div>
+				<NuxtLink v-if="path !== '/'" :to="parentFolder" class="flex items-center gap-1 text-xs group">
+					<Icon name="next" class="w-auto h-3 fill-black group-hover:fill-blue-600 rotate-180" />
+					<div class="group-hover:text-blue-600">Back</div>
 				</NuxtLink>
 				<div class="flex-1 flex items-center border rounded-md border-neutral-200 px-2 py-1.5 text-xs bg-neutral-50 gap-1.5">
 					<Icon name="folder" class="w-auto h-3.5" />

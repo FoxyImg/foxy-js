@@ -47,7 +47,7 @@ const imageClasses = computed(() => {
 </script>
 <template>
 	<NuxtLink :to="`${leadingSlash(folder.path)}`" class="cursor-pointer flex flex-col items-center justify-center gap-3 text-xs p-3">
-		<div class="w-full relative aspect-square">
+		<div class="w-full relative aspect-square flex items-center justify-center">
 			<template v-if="previewImages.length > 0" >
 				<div class="grid gap-1 shadow shadow-black/25 rounded-lg overflow-hidden" :style="gridStyle">
 					<div v-for="preview in previewImages" :key="`folder-${folder.path}`" class="relative w-full">
