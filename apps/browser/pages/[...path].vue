@@ -18,13 +18,10 @@ const path = computed(() => {
 	let p = Array.isArray(route.params.path) ? route.params.path.join('/') : route.params.path;
 	p = p === "" ? "/" : p;
 
-	console.log('path', p);
-
 	return leadingSlash(trailingSlash(p));
 });
 
 const { data: allFiles, refresh } = await useAsyncData<File[]>('files', () => {
-	console.log('fetching', path.value);
 	return $fetch(`/api/files${path.value}`)
 }, {
 	watch: [path]
@@ -32,6 +29,7 @@ const { data: allFiles, refresh } = await useAsyncData<File[]>('files', () => {
 
 const filter = useStorage<null|"images"|"videos">('foxy-browser-filter', null);
 const search = useStorage<string>('foxy-browser-search', "");
+const sort = useStorage<string>('foxy-browser-sort', "name-asc");
 
 const folders = computed(() => {
 	if (!allFiles.value || !Array.isArray(allFiles.value)) {
@@ -56,12 +54,19 @@ const folders = computed(() => {
 		return dir.path.toLowerCase().includes(search.value.toLowerCase());
 	}).filter(dir => {
 		return dir.subdirs! > 0 || dir.images! > 0 || dir.videos! > 0;
+	}).sort((a, b) => {
+		if (sort.value === 'name-asc') {
+			return a.name.localeCompare(b.name);
+		} else if (sort.value === 'date-asc') {
+			return a.created.localeCompare(b.created);
+		} else {
+			return b.created.localeCompare(a.created);
+		}
 	});
 });
 
 const files = computed(() => {
 	if (!allFiles.value || !Array.isArray(allFiles.value)) {
-		console.log('no files', allFiles.value);
 		return [];
 	}
 
@@ -81,6 +86,14 @@ const files = computed(() => {
 		}
 
 		return file.path.toLowerCase().includes(search.value.toLowerCase());
+	}).sort((a, b) => {
+		if (sort.value === 'name-asc') {
+			return a.name.localeCompare(b.name);
+		} else if (sort.value === 'date-asc') {
+			return a.created.localeCompare(b.created);
+		} else {
+			return b.created.localeCompare(a.created);
+		}
 	});
 });
 
@@ -90,13 +103,11 @@ const parentFolder = computed(() => {
 	}
 
 	const parts = path.value.split('/').filter(val => val.trim().length > 0);
-	console.log('parts', parts);
 	if (parts.length === 1) {
 		return '/';
 	}
 
 	const url = parts.slice(0, -1).join('/')+'/';
-	console.log('parent', path.value, url);
 	return leadingSlash(url);
 });
 
@@ -151,6 +162,11 @@ useHead({
 					<option :value="null">All</option>
 					<option value="images">Images</option>
 					<option value="videos">Videos</option>
+				</select>
+				<select v-model="sort" class="border border-neutral-200 rounded-md px-2 py-1.5 text-xs bg-white">
+					<option value="name-asc">Name</option>
+					<option value="date-asc">Oldest</option>
+					<option value="date-desc">Newest</option>
 				</select>
 			</div>
 			<div class="flex-1 w-full relative">

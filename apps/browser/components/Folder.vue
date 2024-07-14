@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {leadingSlash} from "@foxyimg/utils";
 import type {File, PreviewUrls} from "~/types/file";
+import FolderPreviewImage from "~/components/FolderPreviewImage.vue";
 
 const props = defineProps<{
 	folder: File,
@@ -49,13 +50,8 @@ const imageClasses = computed(() => {
 	<NuxtLink :to="`${leadingSlash(folder.path)}`" class="cursor-pointer flex flex-col items-center justify-center gap-3 text-xs p-3">
 		<div class="w-full relative aspect-square flex items-center justify-center">
 			<template v-if="previewImages.length > 0" >
-				<div class="grid gap-1 shadow shadow-black/25 rounded-lg overflow-hidden" :style="gridStyle">
-					<div v-for="preview in previewImages" :key="`folder-${folder.path}`" class="relative w-full">
-						<img v-if="previewSize <= 64" :key="preview.small" :src="preview.small" class="w-full  object-cover bg-neutral-500" :class="imageClasses" />
-						<img v-else-if="previewSize <= 128" :key="preview.large" :src="preview.large" class="w-full object-cover bg-neutral-500" :class="imageClasses" />
-						<img v-else :src="preview.xl" :key="preview.xl" class="w-full object-cover bg-neutral-500" :class="imageClasses" />
-						<Icon v-if="preview.mimeType && preview.mimeType.startsWith('video')" name="video" class="absolute right-1 bottom-1 w-3 h-auto fill-white" />
-					</div>
+				<div class="grid gap-1 shadow shadow-black/25 rounded-lg overflow-hidden w-full" :style="gridStyle">
+					<FolderPreviewImage v-for="preview in previewImages" :key="`folder-${folder.path}`" :preview-size="previewSize" :preview :image-classes="imageClasses" />
 				</div>
 				<div class="absolute left-1 bottom-1 p-2 backdrop-blur-sm bg-white/25 rounded-lg">
 					<Icon name="folder" class="w-5 h-auto" />

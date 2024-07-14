@@ -16,7 +16,8 @@ export type File = {
 	type: 'dir' | 'file',
 	mimeType?: string,
 	size: number,
-	lastModified: Date,
+	lastModified: string,
+	created: string,
 	preview?: PreviewUrls,
 	folderPreviews?: PreviewUrls[],
 }

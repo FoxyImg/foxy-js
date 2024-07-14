@@ -3,10 +3,13 @@ import copy from "copy-to-clipboard";
 import type {File} from "~/types/file";
 import Icon from "~/components/Icon.vue";
 
+import FoxyImage from "~/components/FoxyImage.vue";
+
 import {useShoppingListStore} from "~/stores/shopping-list-store";
 import prettyBytes from "pretty-bytes";
 import {dateTimeFormat} from "@foxyimg/utils";
 import {useToastStore} from "@foxyimg/toaster";
+import {useElementVisibility} from "@vueuse/core";
 
 const {
 	isFileSelected,
@@ -27,15 +30,25 @@ function copyPath(path:string) {
 	toast('info', 'Copied path', 'Path copied to clipboard');
 }
 
+const imageRef = ref<HTMLImageElement | null>(null);
+const isVisible = useElementVisibility(imageRef);
+const wasVisible = ref(isVisible.value);
+watch(isVisible, currValue => {
+	wasVisible.value = wasVisible.value || currValue;
+});
+
 </script>
 <template>
 	<div class="cursor-pointer flex flex-col items-center justify-center gap-3 text-xs p-3 border">
 		<div class="w-full relative rounded-md" :class="{'bg-checkered-blue': isSelected, 'bg-checkered-white': !isSelected}">
 			<div v-if="file.preview" class="relative w-full aspect-square">
-				<img v-if="previewSize <= 384" loading="lazy" :src="file.preview.small" class="w-full aspect-square object-cover" />
-				<img v-else-if="previewSize <= 768" loading="lazy" :src="file.preview.large" class="w-full aspect-square object-cover" />
-				<img v-else :src="file.preview.xl" loading="lazy" class="w-full aspect-square object-cover" />
-				<Icon v-if="file.mimeType && file.mimeType.startsWith('video')" name="video" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-auto fill-white drop-shadow-sm" />
+				<div ref="imageRef" class="max-h-[0px] h-[0px]"></div>
+				<template v-if="wasVisible">
+					<FoxyImage v-if="previewSize <= 384" loading="lazy" :src="file.preview.small" class="w-full aspect-square object-cover" />
+					<FoxyImage v-else-if="previewSize <= 768" loading="lazy" :src="file.preview.large" class="w-full aspect-square object-cover" />
+					<FoxyImage v-else :src="file.preview.xl" loading="lazy" class="w-full aspect-square object-cover" />
+					<Icon v-if="file.mimeType && file.mimeType.startsWith('video')" name="video" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-auto fill-white drop-shadow-sm" />
+				</template>
 			</div>
 			<div v-else class="w-full h-auto">
 				<Icon name="file" class="w-full h-auto" />

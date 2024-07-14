@@ -92,30 +92,35 @@ function getFolderInfo(buildUrl:(imageKey:string, params:PartialImageParams) => 
 		} else {
 			imageCount++;
 
-			images.push({
-				mimeType,
-				small: buildUrl(trailingSlash(sourcePath) + file, {
-					sizing: {
-						width: 64,
-						height: 64,
-						crop: ['fill']
-					}
-				}),
-				large: buildUrl(trailingSlash(sourcePath) + file, {
-					sizing: {
-						width: 128,
-						height: 128,
-						crop: ['fill']
-					}
-				}),
-				xl: buildUrl(trailingSlash(sourcePath) + file, {
-					sizing: {
-						width: 256,
-						height: 256,
-						crop: ['fill']
-					}
-				}),
-			});
+			try {
+				images.push({
+					mimeType,
+					small: buildUrl(trailingSlash(sourcePath) + file, {
+						sizing: {
+							width: 64,
+							height: 64,
+							crop: ['fill']
+						}
+					}),
+					large: buildUrl(trailingSlash(sourcePath) + file, {
+						sizing: {
+							width: 128,
+							height: 128,
+							crop: ['fill']
+						}
+					}),
+					xl: buildUrl(trailingSlash(sourcePath) + file, {
+						sizing: {
+							width: 256,
+							height: 256,
+							crop: ['fill']
+						}
+					}),
+				});
+			} catch(ex:any) {
+				console.log('ex', ex.message, trailingSlash(sourcePath) + file);
+			}
+
 		}
 	}
 
@@ -160,7 +165,8 @@ export function dir(sourcePath:string):File[] {
 				videos: folderInfo.videoCount,
 				other: folderInfo.otherCount,
 				folderPreviews: folderInfo.images,
-				lastModified: stat.mtime,
+				lastModified: stat.mtime.toISOString(),
+				created: stat.birthtime.toISOString(),
 			});
 		} else {
 			const ext = path.extname(file).substring(1).toLowerCase();
@@ -246,7 +252,8 @@ export function dir(sourcePath:string):File[] {
 				size: stat.size,
 				mimeType,
 				preview,
-				lastModified: stat.mtime,
+				lastModified: stat.mtime.toISOString(),
+				created: stat.birthtime.toISOString(),
 			});
 		}
 	});
