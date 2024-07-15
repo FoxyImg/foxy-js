@@ -103,3 +103,16 @@ export function shortDateTimeFormat(dateStr: string | Date) {
 		day: "numeric",
 	}).format(date);
 }
+
+export function timecode(seconds: number) {
+	const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+	const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+	const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+
+	let timecode = `${m}:${s}`;
+	if (h !== '00') {
+		timecode = `${h}:${timecode}`;
+	}
+
+	return timecode;
+}
