@@ -50,5 +50,7 @@ export default defineNuxtConfig({
     foxyImgixMode: true,
     foxyStaticHost: "",
     fileRoot: "",
+    dbPath: "./data/foxy-browser.db",
+    migrationsPath: "./data/migrations",
   },
 })

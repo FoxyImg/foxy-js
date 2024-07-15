@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import copy from "copy-to-clipboard";
-import type {File} from "~/types/file";
+import type {File, FileMeta} from "~/types/file";
 import Icon from "~/components/Icon.vue";
 
 import FoxyImage from "~/components/FoxyImage.vue";
 
 import {useShoppingListStore} from "~/stores/shopping-list-store";
 import prettyBytes from "pretty-bytes";
-import {dateTimeFormat} from "@foxyimg/utils";
+import {dateTimeFormat, timecode, trailingSlash} from "@foxyimg/utils";
 import {useToastStore} from "@foxyimg/toaster";
 import {useElementVisibility} from "@vueuse/core";
 
@@ -17,11 +17,20 @@ const {
 } = useShoppingListStore();
 
 const props = defineProps<{
-	file: File,
+	modelValue: File,
 	previewSize: number,
-}>()
+}>();
 
-const isSelected = computed(() => isFileSelected(props.file));
+const emit = defineEmits<{
+	(e: 'update:modelValue', value: File): void;
+}>();
+
+const file = computed({
+	get: () => props.modelValue,
+	set: (value) => emit('update:modelValue', value),
+});
+
+const isSelected = computed(() => isFileSelected(props.modelValue));
 
 const { toast } = useToastStore();
 
@@ -35,6 +44,27 @@ const isVisible = useElementVisibility(imageRef);
 const wasVisible = ref(isVisible.value);
 watch(isVisible, currValue => {
 	wasVisible.value = wasVisible.value || currValue;
+});
+
+onMounted(async () => {
+	if (!props.modelValue.meta) {
+		console.log("fetching meta", props.modelValue.path);
+		try {
+			const meta = await $fetch<FileMeta>('/api/meta', {
+				method: "POST",
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					filePath: props.modelValue.path,
+				}),
+			});
+
+			props.modelValue.meta = meta;
+		} catch(ex:any) {
+			console.error(ex);
+		}
+	}
 });
 
 </script>
@@ -55,7 +85,7 @@ watch(isVisible, currValue => {
 			</div>
 			<div class="absolute right-1.5 top-1.5 flex flex-col gap-1.5">
 				<div
-					@click.stop.prevent="toggleFileSelection(props.file)"
+					@click.stop.prevent="toggleFileSelection(modelValue)"
 					class="p-1 aspect-square rounded-full backdrop-blur-sm flex items-center justify-center border group shadow shadow-black/25"
 					:class="{
 						'border-blue-600 bg-blue-200/50 hover:border-white hover:bg-white/10': isSelected,
@@ -68,7 +98,6 @@ watch(isVisible, currValue => {
 				</div>
 				<div class="p-1.5 rounded-full border border-neutral-400 hover:border-blue-600 backdrop-blur-sm cursor-pointer hover:bg-blue-200/50 group shadow shadow-black/25"  @click.stop.prevent="copyPath(file.path)"><Icon name="copy" class="w-3 h-auto fill-neutral-500 group-hover:fill-blue-600" /></div>
 			</div>
-
 			<div class="border-[2px] rounded-md absolute w-full h-full left-0 top-0 pointer-events-none" :class="{'border-transparent': !isSelected, 'border-blue-500': isSelected}"></div>
 		</div>
 		<div class="overflow-hidden w-full">
@@ -79,6 +108,16 @@ watch(isVisible, currValue => {
 			<div class="flex items-center w-full overflow-hidden">
 				<div class="text-xxs flex flex-wrap gap-y-0 items-center gap-x-1 text-neutral-400 text-xxs">
 					<span>{{file.mimeType}}</span>
+					<template v-if="file.meta">
+						<template v-if="file.meta.width > 0 && file.meta.height > 0">
+							<span>&centerdot;</span>
+							<span>{{ file.meta.width }} x {{ file.meta.height }}</span>
+						</template>
+						<template v-if="file.meta.duration">
+							<span>&centerdot;</span>
+							<span>{{ timecode(file.meta.duration) }}</span>
+						</template>
+					</template>
 					<span>&centerdot;</span>
 					<span>{{dateTimeFormat(file.lastModified)}}</span>
 				</div>

@@ -5,6 +5,19 @@ export type PreviewUrls = {
 	xl: string,
 }
 
+export type FileMeta = {
+	width: number,
+	height: number,
+	description: string|null,
+	copyright: string|null,
+	videoCodec?: string,
+	audioCodec?: string,
+	fps?: number,
+	frameCount?: number,
+	duration?: number,
+	tags: string[],
+}
+
 export type File = {
 	name: string,
 	path: string,
@@ -20,4 +33,5 @@ export type File = {
 	created: string,
 	preview?: PreviewUrls,
 	folderPreviews?: PreviewUrls[],
+	meta?: FileMeta,
 }

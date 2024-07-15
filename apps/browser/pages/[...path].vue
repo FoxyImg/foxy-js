@@ -173,7 +173,9 @@ useHead({
 				<div class="absolute inset-0 overflow-x-hidden overflow-y-auto p-1.5">
 					<div class="grid w-full" :style="`grid-template-columns: repeat(auto-fill, minmax(${previewSize}px, 1fr))`">
 						<Folder v-for="folder in folders" :key="folder.path" :folder="folder" :preview-size="previewSize!" />
-						<FilePreview v-for="(file, idx) in files" :key="file.path" :file="file" :preview-size="previewSize!"  @click="showPreview(idx)" />
+						<template v-for="(file, idx) in files" :key="files[idx].path" >
+							<FilePreview v-model="files[idx]" :preview-size="previewSize!"  @click="showPreview(idx)" />
+						</template>
 					</div>
 				</div>
 			</div>

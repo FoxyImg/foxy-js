@@ -1,9 +1,11 @@
 import {foxy, type PartialImageParams} from "@foxyimg/url-builder";
 import * as fs from "node:fs";
 import {trailingSlash} from "@foxyimg/utils";
-import * as path from "node:path";
+import path from "node:path";
 import type {File, PreviewUrls} from "~/types/file";
 import mime from "mime";
+import type {Database} from "sqlite";
+import type {H3Event} from "h3";
 
 const validVideoExtensions = ['mp4', 'mov', 'm2v', 'mkv'];
 const validImageExtensions = ['svg', 'png', 'jpg', 'jpeg', 'webp'];
@@ -17,7 +19,7 @@ type FolderInfo = {
 	images?: PreviewUrls[],
 }
 
-function getFolderInfo(buildUrl:(imageKey:string, params:PartialImageParams) => string, sourcePath:string):FolderInfo {
+async function getFolderInfo(buildUrl:(imageKey:string, params:PartialImageParams) => string, sourcePath:string):Promise<FolderInfo> {
 	const config = useRuntimeConfig();
 	const finalPath = trailingSlash(config.fileRoot) + sourcePath;
 	const images:PreviewUrls[] = [];
@@ -133,27 +135,27 @@ function getFolderInfo(buildUrl:(imageKey:string, params:PartialImageParams) => 
 	};
 }
 
-export function dir(sourcePath:string):File[] {
-	console.log('dir', sourcePath);
+export async function dir(event: H3Event, db: Database,sourcePath:string):Promise<File[]> {
+	const scheme = getRequestProtocol(event);
+	const host = `${scheme}://`+getRequestHost(event);
 
 	const config = useRuntimeConfig();
 
 	const { buildUrl } = foxy(config.foxyHost, config.foxySource, config.foxySecret, config.foxyImgixMode);
 
 	sourcePath = decodeURIComponent(sourcePath);
-	const finalPath = trailingSlash(config.fileRoot) + sourcePath;
+	const finalPath = path.normalize(path.join(config.fileRoot, sourcePath));
 	const files:any = [];
-	fs.readdirSync(finalPath).forEach((file) => {
+	const foundFiles = fs.readdirSync(finalPath);
+	for(const file of foundFiles) {
 		if (file.startsWith('.')) {
-			return;
+			continue;
 		}
 
-		const filePath = finalPath + '/' + file;
+		const filePath = trailingSlash(finalPath) + file;
 		const stat = fs.statSync(filePath);
 		if (stat.isDirectory()) {
-			console.log('dir', trailingSlash(sourcePath) + file);
-
-			const folderInfo = getFolderInfo(buildUrl,trailingSlash(sourcePath) + file);
+			const folderInfo = await getFolderInfo(buildUrl, trailingSlash(sourcePath) + file);
 
 			files.push({
 				name: file,
@@ -171,12 +173,12 @@ export function dir(sourcePath:string):File[] {
 		} else {
 			const ext = path.extname(file).substring(1).toLowerCase();
 			if (!validFileExtensions.includes(ext)) {
-				return;
+				continue;
 			}
 
 			const mimeType = mime.getType(file) ?? undefined
 
-			let preview: PreviewUrls|undefined = undefined;
+			let preview: PreviewUrls | undefined = undefined;
 			if (validVideoExtensions.includes(ext)) {
 				preview = {
 					mimeType,
@@ -244,6 +246,8 @@ export function dir(sourcePath:string):File[] {
 				};
 			}
 
+			const meta = await db.get("select width, height, description, copyright, video_codec, audio_codec, duration, fps, frame_count, tags from meta where path = ?", filePath);
+
 			files.push({
 				name: file,
 				dir: sourcePath,
@@ -254,9 +258,20 @@ export function dir(sourcePath:string):File[] {
 				preview,
 				lastModified: stat.mtime.toISOString(),
 				created: stat.birthtime.toISOString(),
+				meta: meta ? {
+					width: meta.width ?? 0,
+					height: meta.height ?? 0,
+					description: meta.description,
+					copyright: meta.copyright,
+					videoCodec: meta.video_codec ?? undefined,
+					audioCodec: meta.audio_codec ?? undefined,
+					fps: meta.fps ?? undefined,
+					frameCount: meta.frame_count ?? undefined,
+					duration: meta.duration ?? undefined,
+					tags: meta.tags ? meta.tags.split(',') : [],
+				} : undefined,
 			});
 		}
-	});
-
+	}
 	return files;
 }
